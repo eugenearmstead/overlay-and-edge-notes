@@ -120,11 +120,11 @@
     <main id="main">
       <article>
         <h1>Broadcom in-kernel WireGuard SUnreclaim (flow-cache/runner A/B fail)</h1>
-        <p class="meta-line"><span>OEN-S14</span> · supporting · edition 1 · 2026-09-08</p>
+        <p class="meta-line"><span>OEN-S14</span> · supporting · edition 2 · 2026-09-08</p>
         <h2 id="context">Context</h2>
 <p>Scheduled reboot is an ops workaround, not a root-cause fix. Skip tables that list IPv4 ports while the tunnel underlay is IPv6 do not help. Scrubbed measurements only.</p>
 
-<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>LAN</dt><dd>Local Area Network</dd><dt>WAN</dt><dd>Wide Area Network</dd><dt>VPN</dt><dd>Virtual Private Network</dd><dt>MB</dt><dd>megabyte</dd><dt>TCP</dt><dd>Transmission Control Protocol</dd><dt>MTU</dt><dd>Maximum Transmission Unit</dd><dt>ICMP</dt><dd>Internet Control Message Protocol</dd><dt>HTTPS</dt><dd>Hypertext Transfer Protocol Secure</dd><dt>IPv4</dt><dd>Internet Protocol version 4</dd><dt>IPv6</dt><dd>Internet Protocol version 6</dd><dt>WG</dt><dd>WireGuard</dd><dt>WireGuard</dt><dd>UDP-based VPN protocol</dd><dt>DNS</dt><dd>Domain Name System</dd><dt>nft</dt><dd>nftables (Linux packet filter)</dd><dt>FC</dt><dd>flow-cache (Broadcom hardware forwarding cache)</dd></dl></section>
+<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>API</dt><dd>application programming interface</dd><dt>FC</dt><dd>flow-cache (Broadcom hardware forwarding cache)</dd><dt>IPv4</dt><dd>Internet Protocol version 4</dd><dt>IPv6</dt><dd>Internet Protocol version 6</dd><dt>MB</dt><dd>megabyte</dd><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>VPN</dt><dd>Virtual Private Network</dd><dt>WG</dt><dd>WireGuard</dd></dl></section>
 <h2 id="topology">Topology</h2>
 <pre><code class="language-text">Broadcom in-kernel WireGuard  --&gt;  SUnreclaim / skbuff slope ~6-8 MB/h
 drop_caches does not free it
@@ -132,7 +132,7 @@ flow-cache off / runner off A/B were negative
 Scheduled reboot is ops workaround, not root cause</code></pre>
 <h2 id="bind">Bind</h2>
 <p>Fill this table <strong>before</strong> any live change. Do <strong>not</strong> paste real values back into public notes.</p>
-<table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><code>&lt;wg-iface&gt;</code></td><td>Consumer-router WireGuard client iface</td><td>Iface</td></tr><tr><td><code>&lt;lan-bridge&gt;</code></td><td>LAN bridge</td><td>Iface; MTU 1500</td></tr><tr><td><code>&lt;wan-iface&gt;</code></td><td>WAN iface</td><td>Iface</td></tr><tr><td><code>&lt;lan-resolver&gt;</code></td><td>Intended LAN DNS</td><td>Address; never publish</td></tr></tbody></table>
+<table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><em>(none)</em></td><td>No packet-path Bind for this trap</td><td>Use the git host, origin, or API the operator already has</td></tr></tbody></table>
 <h2 id="formulas">Formulas</h2>
 <p>Skip tables that list IPv4 ports while underlay is IPv6 do not help. Scrubbed measurements only.</p>
 <h2 id="method">Method</h2>
@@ -140,9 +140,8 @@ Scheduled reboot is ops workaround, not root cause</code></pre>
 <h2 id="consequences">Consequences</h2>
 <p>Operators plan reboot windows honestly. They stop toggling FC/runner as if it were proven.</p>
 <h2 id="agent-stop-rule">Agent stop rule</h2>
-<blockquote><p>A coding agent MUST emit a <strong>bound runbook</strong> (placeholders replaced from Bind). MUST NOT apply live <code>ip rule</code>, nft, iptables, ip6tables, sysctl, <code>wg set</code>, daemon restart, or deploy until a <strong>human</strong> filled Bind. MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS. MUST NOT file an upstream bug from this page. MUST NOT publish real addresses, hostnames, or custom ports.</p></blockquote>
+<blockquote><p>MUST record scrubbed SUnreclaim slope only — no hostnames or iface names that identify a lab. MUST NOT claim flow-cache or runner A/B as the fix after a negative test. MUST NOT file a public firmware thread from this page.</p></blockquote>
 <h2 id="procedure">Procedure</h2>
-<p>Placeholders only until Bind is filled: <code>&lt;cloud-vps&gt;</code>, <code>&lt;lan-pi&gt;</code>, <code>&lt;overlay-peer&gt;</code>, <code>&lt;exit-node&gt;</code>, <code>&lt;wg-iface&gt;</code>, <code>&lt;gcp-nic&gt;</code>, plus the Bind extras on this page.</p>
 <h3>Copy-paste commands (after Bind)</h3>
 <pre><code class="language-bash"># On the router after Bind:
 grep -E &#x27;SUnreclaim|MemFree&#x27; /proc/meminfo</code></pre>
@@ -159,13 +158,13 @@ grep -E &#x27;SUnreclaim|MemFree&#x27; /proc/meminfo</code></pre>
 <h2 id="expected-samples">Expected samples</h2>
 <pre><code class="language-text">SUnreclaim:   climbing across hours</code></pre>
 <h2 id="verify">Verify</h2>
-<ul><li>Slope documented without hostnames.</li><li>FC/runner not claimed as fix.</li><li>ICMP / small ping success was <strong>not</strong> used as the pass criterion when this spec names TCP, SSH, or HTTPS.</li><li>Bind table was filled by a human before any live <code>ip</code> / nft / iptables change.</li></ul>
+<ul><li>Slope documented without hostnames.</li><li>FC/runner not claimed as fix.</li></ul>
 <h2 id="must-not" class="must-not">MUST NOT</h2>
-<ul><li>MUST NOT open a public firmware thread from this note.</li><li>MUST NOT publish serials or full syslog.</li><li>MUST NOT name the commercial VPN.</li><li>MUST NOT apply live network or firewall changes until Bind is filled by a human.</li><li>MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.</li><li>MUST NOT publish hostnames, addresses, ULAs, or custom ports.</li></ul>
+<ul><li>MUST NOT open a public firmware thread from this note.</li><li>MUST NOT publish serials or full syslog.</li><li>MUST NOT name the commercial VPN.</li><li>MUST NOT publish hostnames, addresses, ULAs, or custom ports.</li></ul>
+<h2 id="page-changelog">Page changelog</h2>
+<ul><li>Edition 2 (8 Sep 2026, Mountain Time): Trap-specific Bind and agent stop rule (review cleanup).</li></ul>
 <h2 id="related-specs">Related specs</h2>
 <ul><li><a href="../networking/12-consumer-wg-phantom-bridge.html">OEN-12</a></li></ul>
-<h2 id="prior-art-not-novel">Prior art (Not novel)</h2>
-<p>skbuff leaks are discussed in firmware circles. This note is the measured slope plus failed A/Bs without a public thread.</p>
       </article>
     </main>
     <footer class="site-footer">

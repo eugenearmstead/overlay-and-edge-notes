@@ -92,7 +92,7 @@
         <h1>Overlay and Edge Notes</h1>
         <p class="lede">Named traps with replicable procedures. Stable IDs that do not reset by year. Markdown is the source of truth; HTML is generated.</p>
         <p>This edition ships twenty-three original specs and thirty-four supporting methods. Year pages are indexes, not copies of specs.</p>
-        <section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>OEN</dt><dd>Overlay and Edge Notes (this series)</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>HTML</dt><dd>HyperText Markup Language</dd><dt>TCPMSS</dt><dd>iptables/nft target that sets TCP Maximum Segment Size</dd></dl></section>
+        <section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>OEN</dt><dd>Overlay and Edge Notes (this series)</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>HTML</dt><dd>HyperText Markup Language</dd><dt>TCPMSS</dt><dd>iptables/nft target that sets TCP Maximum Segment Size</dd><dt>KB</dt><dd>kilobyte</dd><dt>DNS</dt><dd>Domain Name System</dd><dt>MTU</dt><dd>Maximum Transmission Unit</dd><dt>HTTPS</dt><dd>Hypertext Transfer Protocol Secure</dd><dt>MSS</dt><dd>Maximum Segment Size</dd><dt>CAPI</dt><dd>CrowdSec Central API</dd><dt>HTTP</dt><dd>Hypertext Transfer Protocol</dd><dt>CSS</dt><dd>Cascading Style Sheets</dd><dt>Chromium</dt><dd>open-source browser engine</dd></dl></section>
         <h2 id="find">How to find these notes</h2>
         <p>Search the error you hit, not a private lab name.</p>
         <ul>
@@ -100,6 +100,18 @@
           <li>Agents start at <a href="llms.txt"><code>llms.txt</code></a> (and optionally <a href="llms-full.txt"><code>llms-full.txt</code></a>)</li>
           <li>Example searches: <code>curl 200 chrome ERR_CONNECTION_CLOSED</code>, <code>cscli capi 403</code>, overlay SSH hang / <code>ts-forward TCPMSS 0 packets</code></li>
         </ul>
+        <h2 id="triage">Symptom to first spec</h2>
+        <table>
+          <thead><tr><th>Symptom</th><th>Start here</th></tr></thead>
+          <tbody>
+            <tr><td>SSH login ok, output hangs ~1 KB</td><td><a href="networking/01-overlay-ssh-byte-cliff.html">OEN-01</a> + <a href="supporting/s01-pmtud-size-ladder.html">S01</a> + <a href="supporting/s03-transfer-matrix-controlpath.html">S03</a></td></tr>
+            <tr><td>curl 200, Chromium ERR_CONNECTION_*</td><td><a href="networking/02-chromium-tls-pmtu.html">OEN-02</a></td></tr>
+            <tr><td>Looks like MTU, actually DNS</td><td><a href="networking/03-router-vpn-dns-hijack.html">OEN-03</a></td></tr>
+            <tr><td>Exit HTTPS dies, ts-forward MSS counters 0</td><td><a href="networking/04-exit-tcpmss-after-ts-forward.html">OEN-04</a> + <a href="supporting/s02-clamp-mss-to-pmtu-noop.html">S02</a></td></tr>
+            <tr><td>CAPI HTTP 403</td><td><a href="networking/07-crowdsec-capi-403.html">OEN-07</a> then <a href="supporting/s34-crowdsec-capi-login-budget.html">S34</a></td></tr>
+            <tr><td>HTML 200, layout exploded</td><td><a href="supporting/s06-do-not-ship-html-only.html">S06</a> then <a href="supporting/s08-canonical-disk-tmpfs-origin.html">S08</a></td></tr>
+          </tbody>
+        </table>
         <h2 id="about">About</h2>
         <ul>
           <li><a href="DISCLOSURE.html">Disclosure and license</a></li>

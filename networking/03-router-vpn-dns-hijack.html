@@ -126,13 +126,13 @@
     <main id="main">
       <article>
         <h1>Router VPN DNS hijack looks like a path-MTU problem</h1>
-        <p class="meta-line"><span>OEN-03</span> · original · edition 1 · 2026-09-08</p>
+        <p class="meta-line"><span>OEN-03</span> · original · edition 2 · 2026-09-08</p>
         <h2 id="context">Context</h2>
 <p>Browser <code>ERR_TIMED_OUT</code>, IPv6 stall, or “the site is down” can appear <strong>with overlay off</strong>. Operators then clamp Maximum Segment Size (MSS) or shrink the Local Area Network (LAN) bridge — the <a href="02-chromium-tls-pmtu.html">OEN-02</a> playbook — and nothing changes.</p>
 <p>On ASUSWRT-Merlin-class firmware, filling WireGuard <strong>DNS Server</strong> fields can enable a destination network address translation (DNAT) helper (<code>DNSVPN2</code>) that steers LAN <code>:53</code> into the tunnel. When that resolver is unreachable, hung Domain Name System (DNS) looks like path Maximum Transmission Unit (MTU) or Happy-Eyeballs. A leak-test page that still shows “VPN DNS” is <strong>not</strong> proof the path is fine.</p>
 <p>Public wording: consumer Merlin-class firmware, LAN DNS hijack into a commercial WireGuard client. MUST NOT name the commercial provider.</p>
 
-<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>LAN</dt><dd>Local Area Network</dd><dt>WAN</dt><dd>Wide Area Network</dd><dt>VPN</dt><dd>Virtual Private Network</dd><dt>TCP</dt><dd>Transmission Control Protocol</dd><dt>UDP</dt><dd>User Datagram Protocol</dd><dt>MSS</dt><dd>Maximum Segment Size</dd><dt>MTU</dt><dd>Maximum Transmission Unit</dd><dt>ICMP</dt><dd>Internet Control Message Protocol</dd><dt>PMTU</dt><dd>path Maximum Transmission Unit</dd><dt>DF</dt><dd>don&#x27;t-fragment (IP flag)</dd><dt>TLS</dt><dd>Transport Layer Security</dd><dt>HTTPS</dt><dd>Hypertext Transfer Protocol Secure</dd><dt>IP</dt><dd>Internet Protocol</dd><dt>IPv4</dt><dd>Internet Protocol version 4</dd><dt>IPv6</dt><dd>Internet Protocol version 6</dd><dt>WireGuard</dt><dd>UDP-based VPN protocol</dd><dt>DNS</dt><dd>Domain Name System</dd><dt>DoH</dt><dd>DNS over HTTPS</dd><dt>NAT</dt><dd>network address translation</dd><dt>DNAT</dt><dd>destination network address translation</dd><dt>nft</dt><dd>nftables (Linux packet filter)</dd><dt>Happy-Eyeballs</dt><dd>dual-stack connection racing (RFC 8305)</dd><dt>REFUSED</dt><dd>DNS response code meaning the server will not answer</dd><dt>DHCP</dt><dd>Dynamic Host Configuration Protocol</dd><dt>RA</dt><dd>Router Advertisement (IPv6)</dd><dt>ASUSWRT-Merlin</dt><dd>consumer-router firmware class</dd><dt>Chromium</dt><dd>open-source browser engine</dd><dt>ASUSWRT</dt><dd>ASUS consumer-router firmware family</dd></dl></section>
+<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>ASUSWRT</dt><dd>ASUS consumer-router firmware family</dd><dt>Chromium</dt><dd>open-source browser engine</dd><dt>DHCP</dt><dd>Dynamic Host Configuration Protocol</dd><dt>DNAT</dt><dd>destination network address translation</dd><dt>DNS</dt><dd>Domain Name System</dd><dt>DoH</dt><dd>DNS over HTTPS</dd><dt>Happy-Eyeballs</dt><dd>dual-stack connection racing (RFC 8305)</dd><dt>HTTPS</dt><dd>Hypertext Transfer Protocol Secure</dd><dt>ICMP</dt><dd>Internet Control Message Protocol</dd><dt>IPv6</dt><dd>Internet Protocol version 6</dd><dt>LAN</dt><dd>Local Area Network</dd><dt>MSS</dt><dd>Maximum Segment Size</dd><dt>MTU</dt><dd>Maximum Transmission Unit</dd><dt>NAT</dt><dd>network address translation</dd><dt>nft</dt><dd>nftables (Linux packet filter)</dd><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>RA</dt><dd>Router Advertisement (IPv6)</dd><dt>REFUSED</dt><dd>DNS response code meaning the server will not answer</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>TCP</dt><dd>Transmission Control Protocol</dd><dt>TLS</dt><dd>Transport Layer Security</dd><dt>UDP</dt><dd>User Datagram Protocol</dd><dt>VPN</dt><dd>Virtual Private Network</dd><dt>WAN</dt><dd>Wide Area Network</dd></dl></section>
 <h2 id="topology">Topology</h2>
 <pre><code class="language-text">[LAN client] --UDP/TCP 53--&gt; [&lt;lan-resolver&gt; intended]
                  \
@@ -143,14 +143,11 @@ Overlay MAY be off. Browser ERR_TIMED_OUT still happens.</code></pre>
 <p>Fill this table <strong>before</strong> any live change. Do <strong>not</strong> paste real values back into public notes.</p>
 <table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><code>&lt;wg-iface&gt;</code></td><td>Consumer-router WireGuard client iface</td><td>Iface</td></tr><tr><td><code>&lt;lan-bridge&gt;</code></td><td>LAN bridge</td><td>Iface; MTU 1500</td></tr><tr><td><code>&lt;wan-iface&gt;</code></td><td>WAN iface</td><td>Iface</td></tr><tr><td><code>&lt;lan-resolver&gt;</code></td><td>Intended LAN DNS</td><td>Address; never publish</td></tr></tbody></table>
 <h2 id="formulas">Formulas</h2>
-<pre><code class="language-text"># Measure &lt;wg-mtu&gt; from: ip link show &lt;wg-iface&gt;
-mss4 = &lt;wg-mtu&gt; - 40    # IPv4 TCP (20-byte IP + 20-byte TCP)
-mss6 = &lt;wg-mtu&gt; - 60    # IPv6 TCP (40-byte IPv6 + 20-byte TCP)
-# IPv4 DF ping: IP size ≈ payload + 28
-# IPv6 DF ping: IP size ≈ payload + 48
-# Historical 1160 / 1146-byte SSH cliff = wrong-scope clamp, not this recipe.
+<pre><code class="language-text"># This trap is DNS, not MSS. Do not compute mss4 on this page.
+# After hijack is ruled out, LAN↔VPN clamp uses mss4_wg ([OEN-02](02-chromium-tls-pmtu.html)):
+#   mss4_wg = &lt;wg-mtu&gt; - 40
+#   mss6_wg = &lt;wg-mtu&gt; - 60
 # LAN bridge MTU MUST stay 1500.</code></pre>
-<p>See <a href="../networking/01-overlay-ssh-byte-cliff.html">OEN-01</a> and <a href="../supporting/s01-pmtud-size-ladder.html">OEN-S01</a>.</p>
 <h2 id="decision">Decision</h2>
 <p>Operators MUST check tunnel DNS hijack <strong>before</strong> MSS.</p>
 <ul><li>VPN <strong>DNS Server</strong> fields on the consumer router client SHOULD be empty when LAN devices already have a working resolver.</li><li>Operators MUST compare LAN <code>dig</code> with DNS over HTTPS (DoH). If LAN is sinkhole or timeout and DoH works, this is DNS, not MTU.</li><li>Overlay being down is a useful A/B: if the browser still fails with overlay off, stop blaming overlay.</li></ul>
@@ -192,10 +189,10 @@ example.com.  0  IN  A  0.0.0.0</code></pre>
 <ul><li>Overlay off: site loads in Chromium.</li><li>LAN dig and DoH agree on non-sinkhole answers.</li><li>VPN DNS Server fields are empty; no LAN <code>:53</code> DNAT into <code>&lt;wg-iface&gt;</code>.</li><li>LAN bridge MTU was not changed as part of this fix.</li><li>ICMP / small ping success was <strong>not</strong> used as the pass criterion when this spec names TCP, SSH, or HTTPS.</li><li>Bind table was filled by a human before any live <code>ip</code> / nft / iptables change.</li></ul>
 <h2 id="must-not" class="must-not">MUST NOT</h2>
 <ul><li>MUST NOT name the commercial VPN provider.</li><li>MUST NOT “fix” hung DNS by shrinking the LAN bridge or adding tunnel DNS servers.</li><li>MUST NOT treat a leak-test DNS name as proof of a working data path.</li><li>MUST NOT publish LAN resolver addresses.</li><li>MUST NOT apply live network or firewall changes until Bind is filled by a human.</li><li>MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.</li><li>MUST NOT publish hostnames, addresses, ULAs, or custom ports.</li></ul>
+<h2 id="page-changelog">Page changelog</h2>
+<ul><li>Edition 2 (8 Sep 2026, Mountain Time): Added overlay-impl Bind and trap-specific terms (review cleanup).</li></ul>
 <h2 id="related-specs">Related specs</h2>
 <ul><li><a href="02-chromium-tls-pmtu.html">OEN-02 Chromium TLS vs curl</a></li><li><a href="../supporting/s24-lan-dns-sinkhole-0-0-0-0.html">OEN-S24 LAN DNS returning 0.0.0.0</a></li><li><a href="16-commercial-wg-endpoint-rotation.html">OEN-16 Commercial WireGuard endpoint rotation</a></li></ul>
-<h2 id="prior-art-not-novel">Prior art (Not novel)</h2>
-<p>VPN DNS on routers is a known footgun. This spec’s claim is that Merlin-class DNSVPN2 hijack <strong>mimics</strong> browser PMTU, so MSS-first diagnosis is wrong.</p>
       </article>
     </main>
     <footer class="site-footer">

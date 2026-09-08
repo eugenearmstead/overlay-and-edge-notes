@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>OEN-S03: 1 KB vs 1 MB transfer matrix + ControlPath=none — Overlay and Edge Notes</title>
     <meta name="description" content="Prove overlay SSH size: 1 KB vs about 1 MB with ControlPath=none. Mux death is a symptom. Userspace overlay SSH is less forgiving than kernel SSH on the same host.">
-    <meta name="keywords" content="1 KB vs 1 MB SSH matrix, ControlPath=none overlay SSH, SSH mux death symptom, userspace vs kernel SSH, Tailscale SSH byte cliff test, large scp hang overlay, OpenSSH vs Tailscale SSH, transfer size matrix, overlay SSH 1146 bytes, do not trust mux hang, ControlMaster stale socket, path MTU SSH proof">
-    <meta name="citation_keywords" content="1 KB vs 1 MB SSH matrix, ControlPath=none overlay SSH, SSH mux death symptom, userspace vs kernel SSH, Tailscale SSH byte cliff test, large scp hang overlay, OpenSSH vs Tailscale SSH, transfer size matrix, overlay SSH 1146 bytes, do not trust mux hang, ControlMaster stale socket, path MTU SSH proof">
+    <meta name="keywords" content="1 KB vs 1 MB SSH matrix, ControlPath=none overlay SSH, SSH mux death symptom, userspace vs kernel SSH, Tailscale SSH byte cliff test, large scp hang overlay, OpenSSH vs Tailscale SSH, transfer size matrix, overlay SSH 3 KB hang, do not trust mux hang, ControlMaster stale socket, path MTU SSH proof">
+    <meta name="citation_keywords" content="1 KB vs 1 MB SSH matrix, ControlPath=none overlay SSH, SSH mux death symptom, userspace vs kernel SSH, Tailscale SSH byte cliff test, large scp hang overlay, OpenSSH vs Tailscale SSH, transfer size matrix, overlay SSH 3 KB hang, do not trust mux hang, ControlMaster stale socket, path MTU SSH proof">
     <link rel="canonical" href="https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s03-transfer-matrix-controlpath.html">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -55,7 +55,7 @@
         "large scp hang overlay",
         "OpenSSH vs Tailscale SSH",
         "transfer size matrix",
-        "overlay SSH 1146 bytes",
+        "overlay SSH 3 KB hang",
         "do not trust mux hang",
         "ControlMaster stale socket",
         "path MTU SSH proof"
@@ -120,11 +120,11 @@
     <main id="main">
       <article>
         <h1>1 KB vs 1 MB transfer matrix + ControlPath=none</h1>
-        <p class="meta-line"><span>OEN-S03</span> · supporting · edition 1 · 2026-09-08</p>
+        <p class="meta-line"><span>OEN-S03</span> · supporting · edition 2 · 2026-09-08</p>
         <h2 id="context">Context</h2>
 <p><a href="../networking/01-overlay-ssh-byte-cliff.html">OEN-01</a> needs a size matrix, not a vibe. Dead multiplexing sockets are a <strong>symptom</strong>. Userspace overlay Secure Shell (SSH) cliffs sooner than kernel OpenSSH on the same host.</p>
 
-<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>OpenSSH</dt><dd>OpenBSD Secure Shell</dd><dt>VPS</dt><dd>Virtual Private Server</dd><dt>LAN</dt><dd>Local Area Network</dd><dt>WAN</dt><dd>Wide Area Network</dd><dt>KB</dt><dd>kilobyte</dd><dt>MB</dt><dd>megabyte</dd><dt>TCP</dt><dd>Transmission Control Protocol</dd><dt>MSS</dt><dd>Maximum Segment Size</dd><dt>MTU</dt><dd>Maximum Transmission Unit</dd><dt>ICMP</dt><dd>Internet Control Message Protocol</dd><dt>DF</dt><dd>don&#x27;t-fragment (IP flag)</dd><dt>HTTPS</dt><dd>Hypertext Transfer Protocol Secure</dd><dt>IP</dt><dd>Internet Protocol</dd><dt>IPv4</dt><dd>Internet Protocol version 4</dd><dt>IPv6</dt><dd>Internet Protocol version 6</dd><dt>WireGuard</dt><dd>UDP-based VPN protocol</dd><dt>nft</dt><dd>nftables (Linux packet filter)</dd><dt>ControlPath</dt><dd>OpenSSH multiplexing socket path option</dd><dt>Pi</dt><dd>single-board computer (Raspberry Pi class)</dd></dl></section>
+<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>ControlPath</dt><dd>OpenSSH multiplexing socket path option</dd><dt>HTTPS</dt><dd>Hypertext Transfer Protocol Secure</dd><dt>ICMP</dt><dd>Internet Control Message Protocol</dd><dt>KB</dt><dd>kilobyte</dd><dt>LAN</dt><dd>Local Area Network</dd><dt>MB</dt><dd>megabyte</dd><dt>MSS</dt><dd>Maximum Segment Size</dd><dt>MTU</dt><dd>Maximum Transmission Unit</dd><dt>nft</dt><dd>nftables (Linux packet filter)</dd><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>OpenSSH</dt><dd>OpenBSD Secure Shell</dd><dt>Pi</dt><dd>single-board computer (Raspberry Pi class)</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>TCP</dt><dd>Transmission Control Protocol</dd><dt>VPS</dt><dd>Virtual Private Server</dd><dt>WAN</dt><dd>Wide Area Network</dd><dt>VPN</dt><dd>VPN</dd></dl></section>
 <h2 id="topology">Topology</h2>
 <pre><code class="language-text">[client] -o ControlPath=none --&gt; overlay SSH
     1 KB echo/dd    vs    ~1 MB dd
@@ -134,14 +134,11 @@ Mux death is a symptom.</code></pre>
 <p>Fill this table <strong>before</strong> any live change. Do <strong>not</strong> paste real values back into public notes.</p>
 <table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><code>&lt;cloud-vps&gt;</code></td><td>Overlay SSH target</td><td>Cloud VPS</td></tr><tr><td><code>&lt;lan-pi&gt;</code></td><td>Overlay SSH target</td><td>LAN Pi</td></tr><tr><td><code>&lt;user&gt;</code></td><td>SSH user</td><td>Guest account</td></tr><tr><td><code>&lt;wg-iface&gt;</code></td><td>Commercial WireGuard iface</td><td>Router or VPS client</td></tr><tr><td><code>&lt;wan-iface&gt;</code></td><td>WAN iface</td><td>Router</td></tr><tr><td><code>&lt;lan-bridge&gt;</code></td><td>LAN bridge</td><td>Router (MTU 1500)</td></tr><tr><td><code>&lt;overlay-tun&gt;</code></td><td>Overlay tun iface</td><td>Node under test</td></tr><tr><td><code>&lt;wg-mtu&gt;</code></td><td>MTU integer from <code>ip link</code></td><td>Measured</td></tr><tr><td><code>&lt;mss4&gt;</code> / <code>&lt;mss6&gt;</code></td><td>Computed MSS</td><td>Formulas</td></tr><tr><td><code>&lt;vps-public-v4&gt;</code> / <code>&lt;vps-public-v6&gt;</code></td><td>VPS public addresses</td><td>WAN; never publish</td></tr><tr><td><code>&lt;overlay-v4&gt;</code> / <code>&lt;overlay-v6&gt;</code></td><td>Overlay addresses</td><td>Overlay; never publish</td></tr></tbody></table>
 <h2 id="formulas">Formulas</h2>
-<pre><code class="language-text"># Measure &lt;wg-mtu&gt; from: ip link show &lt;wg-iface&gt;
-mss4 = &lt;wg-mtu&gt; - 40    # IPv4 TCP (20-byte IP + 20-byte TCP)
-mss6 = &lt;wg-mtu&gt; - 60    # IPv6 TCP (40-byte IPv6 + 20-byte TCP)
-# IPv4 DF ping: IP size ≈ payload + 28
-# IPv6 DF ping: IP size ≈ payload + 48
-# Historical 1160 / 1146-byte SSH cliff = wrong-scope clamp, not this recipe.
+<pre><code class="language-text"># Size matrix is not an MSS recipe. If you then clamp LAN↔VPN, use:
+mss4_wg = &lt;wg-mtu&gt; - 40
+mss6_wg = &lt;wg-mtu&gt; - 60
 # LAN bridge MTU MUST stay 1500.</code></pre>
-<p>See <a href="../networking/01-overlay-ssh-byte-cliff.html">OEN-01</a> and <a href="../supporting/s01-pmtud-size-ladder.html">OEN-S01</a>.</p>
+<p>See <a href="../networking/01-overlay-ssh-byte-cliff.html">OEN-01</a> and <a href="s01-pmtud-size-ladder.html">OEN-S01</a>.</p>
 <h2 id="method">Method</h2>
 <p>Audits MUST use <code>-o ControlPath=none</code>. Record tiny vs ~1 MB (or 3 KB+) on <code>&lt;cloud-vps&gt;</code> vs <code>&lt;lan-pi&gt;</code>, overlay SSH vs kernel SSH if both exist.</p>
 <h2 id="consequences">Consequences</h2>
@@ -171,10 +168,10 @@ ssh -o ControlPath=none &lt;user&gt;@&lt;lan-pi&gt; &#x27;dd if=/dev/zero bs=102
 <ul><li>ControlPath=none used.</li><li>Size matrix recorded for VPS vs Pi.</li><li>Mux not blamed as the MTU fix.</li><li>ICMP / small ping success was <strong>not</strong> used as the pass criterion when this spec names TCP, SSH, or HTTPS.</li><li>Bind table was filled by a human before any live <code>ip</code> / nft / iptables change.</li></ul>
 <h2 id="must-not" class="must-not">MUST NOT</h2>
 <ul><li>MUST NOT use a custom kernel SSH port as the daily fix.</li><li>MUST NOT publish that port number.</li><li>MUST NOT skip ControlPath=none.</li><li>MUST NOT apply live network or firewall changes until Bind is filled by a human.</li><li>MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.</li><li>MUST NOT publish hostnames, addresses, ULAs, or custom ports.</li></ul>
+<h2 id="page-changelog">Page changelog</h2>
+<ul><li>Edition 2 (8 Sep 2026, Mountain Time): Added overlay-impl Bind and trap-specific terms (review cleanup).</li></ul>
 <h2 id="related-specs">Related specs</h2>
 <ul><li><a href="../networking/01-overlay-ssh-byte-cliff.html">OEN-01</a></li><li><a href="s19-push-small-overlay-snapshots.html">OEN-S19</a></li></ul>
-<h2 id="prior-art-not-novel">Prior art (Not novel)</h2>
-<p>SSH mux docs are public. This method is the size matrix plus userspace-vs-kernel split.</p>
       </article>
     </main>
     <footer class="site-footer">

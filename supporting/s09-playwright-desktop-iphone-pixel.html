@@ -120,18 +120,16 @@
     <main id="main">
       <article>
         <h1>Playwright Desktop + iPhone + Pixel</h1>
-        <p class="meta-line"><span>OEN-S09</span> · supporting · edition 1 · 2026-09-08</p>
+        <p class="meta-line"><span>OEN-S09</span> · supporting · edition 2 · 2026-09-08</p>
         <h2 id="context">Context</h2>
 <p>A desktop-only pass misses iOS wrapping and Android overflow.</p>
 
-<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>TCP</dt><dd>Transmission Control Protocol</dd><dt>ICMP</dt><dd>Internet Control Message Protocol</dd><dt>HTTPS</dt><dd>Hypertext Transfer Protocol Secure</dd><dt>CSS</dt><dd>Cascading Style Sheets</dd><dt>nft</dt><dd>nftables (Linux packet filter)</dd><dt>URL</dt><dd>Uniform Resource Locator</dd><dt>UI</dt><dd>user interface</dd><dt>Playwright</dt><dd>browser automation and test runner</dd><dt>WebKit</dt><dd>Apple browser engine</dd><dt>Android</dt><dd>mobile operating system</dd><dt>Chromium</dt><dd>open-source browser engine</dd></dl></section>
+<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>Android</dt><dd>mobile operating system</dd><dt>Chromium</dt><dd>open-source browser engine</dd><dt>CSS</dt><dd>Cascading Style Sheets</dd><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>Playwright</dt><dd>browser automation and test runner</dd><dt>UI</dt><dd>user interface</dd><dt>URL</dt><dd>Uniform Resource Locator</dd></dl></section>
 <h2 id="topology">Topology</h2>
-<pre><code class="language-text">Playwright projects: Desktop Chrome + iPhone + Pixel
-Layout/nav/hero changes need all three
-WebKit binaries not required for this gate</code></pre>
+<p>N/A — deploy</p>
 <h2 id="bind">Bind</h2>
 <p>Fill this table <strong>before</strong> any live change. Do <strong>not</strong> paste real values back into public notes.</p>
-<table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><code>&lt;worker-root&gt;</code></td><td>Worker / UI source tree</td><td>Directory on the workstation</td></tr><tr><td><code>&lt;live-url&gt;</code></td><td>Public HTTPS origin</td><td>URL the browser loads</td></tr><tr><td><code>&lt;preview-url&gt;</code></td><td>Preview origin if used</td><td>URL</td></tr><tr><td><code>&lt;html-path&gt;</code></td><td>Path that becomes a Response body</td><td>File glob</td></tr></tbody></table>
+<table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><code>&lt;worker-root&gt;</code></td><td>Worker / UI source tree</td><td>Directory</td></tr></tbody></table>
 <h2 id="formulas">Formulas</h2>
 <p>Run against preview default for marketing; production for gated apps.</p>
 <h2 id="method">Method</h2>
@@ -139,9 +137,8 @@ WebKit binaries not required for this gate</code></pre>
 <h2 id="consequences">Consequences</h2>
 <p>Fewer “works on my monitor” ships.</p>
 <h2 id="agent-stop-rule">Agent stop rule</h2>
-<blockquote><p>A coding agent MUST emit a <strong>bound runbook</strong> (placeholders replaced from Bind). MUST NOT apply live <code>ip rule</code>, nft, iptables, ip6tables, sysctl, <code>wg set</code>, daemon restart, or deploy until a <strong>human</strong> filled Bind. MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS. MUST NOT file an upstream bug from this page. MUST NOT publish real addresses, hostnames, or custom ports.</p></blockquote>
+<blockquote><p>MUST emit the Playwright Desktop + iPhone + Pixel command with <code>&lt;live-url&gt;</code> or <code>&lt;preview-url&gt;</code> filled. MUST NOT skip the three-device gate after nav/hero/CSS changes. MUST NOT apply netfilter from this page.</p></blockquote>
 <h2 id="procedure">Procedure</h2>
-<p>Placeholders only until Bind is filled: <code>&lt;cloud-vps&gt;</code>, <code>&lt;lan-pi&gt;</code>, <code>&lt;overlay-peer&gt;</code>, <code>&lt;exit-node&gt;</code>, <code>&lt;wg-iface&gt;</code>, <code>&lt;gcp-nic&gt;</code>, plus the Bind extras on this page.</p>
 <h3>Copy-paste commands (after Bind)</h3>
 <pre><code class="language-bash">cd &lt;worker-root&gt; &amp;&amp; npx playwright test --project=desktop --project=iphone --project=pixel</code></pre>
 <ol><li><strong>P1 — Three projects.</strong><br>
@@ -157,13 +154,13 @@ WebKit binaries not required for this gate</code></pre>
 <h2 id="expected-samples">Expected samples</h2>
 <pre><code class="language-text">3 passed</code></pre>
 <h2 id="verify">Verify</h2>
-<ul><li>Three device projects green for the change.</li><li>ICMP / small ping success was <strong>not</strong> used as the pass criterion when this spec names TCP, SSH, or HTTPS.</li><li>Bind table was filled by a human before any live <code>ip</code> / nft / iptables change.</li></ul>
+<ul><li>Three device projects green for the change.</li></ul>
 <h2 id="must-not" class="must-not">MUST NOT</h2>
-<ul><li>MUST NOT ship hero/nav CSS with desktop-only proof.</li><li>MUST NOT require WebKit for this gate.</li><li>MUST NOT apply live network or firewall changes until Bind is filled by a human.</li><li>MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.</li><li>MUST NOT publish hostnames, addresses, ULAs, or custom ports.</li></ul>
+<ul><li>MUST NOT ship hero/nav CSS with desktop-only proof.</li><li>MUST NOT require WebKit for this gate.</li><li>MUST NOT publish hostnames, addresses, ULAs, or custom ports.</li></ul>
+<h2 id="page-changelog">Page changelog</h2>
+<ul><li>Edition 2 (8 Sep 2026, Mountain Time): Trap-specific Bind and agent stop rule (review cleanup).</li></ul>
 <h2 id="related-specs">Related specs</h2>
 <ul><li><a href="../web/10-one-blocking-stylesheet-variable-fonts.html">OEN-10</a></li><li><a href="../web/11-worker-chat-wrapper-turnstile.html">OEN-11</a></li></ul>
-<h2 id="prior-art-not-novel">Prior art (Not novel)</h2>
-<p>Responsive test matrices are standard. This note is the three Chromium device projects as the gate.</p>
       </article>
     </main>
     <footer class="site-footer">

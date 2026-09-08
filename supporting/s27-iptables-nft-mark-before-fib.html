@@ -120,18 +120,18 @@
     <main id="main">
       <article>
         <h1>iptables-nft PREROUTING MARK does not win before the forwarding information base</h1>
-        <p class="meta-line"><span>OEN-S27</span> · supporting · edition 1 · 2026-09-08</p>
+        <p class="meta-line"><span>OEN-S27</span> · supporting · edition 2 · 2026-09-08</p>
         <h2 id="context">Context</h2>
 <p>Method behind <a href="../networking/06-netfilter-off-v6-return.html">OEN-06</a>.</p>
 
-<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>LAN</dt><dd>Local Area Network</dd><dt>WAN</dt><dd>Wide Area Network</dd><dt>TCP</dt><dd>Transmission Control Protocol</dd><dt>MTU</dt><dd>Maximum Transmission Unit</dd><dt>ICMP</dt><dd>Internet Control Message Protocol</dd><dt>HTTPS</dt><dd>Hypertext Transfer Protocol Secure</dd><dt>NAT</dt><dd>network address translation</dd><dt>ULA</dt><dd>unique-local address (IPv6)</dd><dt>GCP</dt><dd>Google Cloud Platform</dd><dt>VM</dt><dd>virtual machine</dd><dt>NIC</dt><dd>network interface card</dd><dt>FIB</dt><dd>forwarding information base</dd><dt>nft</dt><dd>nftables (Linux packet filter)</dd><dt>MASQUERADE</dt><dd>iptables masquerade (source NAT)</dd><dt>PREROUTING</dt><dd>netfilter prerouting chain</dd><dt>MARK</dt><dd>netfilter packet mark</dd><dt>Pi</dt><dd>single-board computer (Raspberry Pi class)</dd></dl></section>
+<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>FIB</dt><dd>forwarding information base</dd><dt>HTTPS</dt><dd>Hypertext Transfer Protocol Secure</dd><dt>ICMP</dt><dd>Internet Control Message Protocol</dd><dt>IPv6</dt><dd>Internet Protocol version 6</dd><dt>MARK</dt><dd>netfilter packet mark</dd><dt>MASQUERADE</dt><dd>iptables masquerade (source NAT)</dd><dt>NAT</dt><dd>network address translation</dd><dt>nft</dt><dd>nftables (Linux packet filter)</dd><dt>NIC</dt><dd>network interface card</dd><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>PREROUTING</dt><dd>netfilter prerouting chain</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>TCP</dt><dd>Transmission Control Protocol</dd><dt>ULA</dt><dd>unique-local address (IPv6)</dd><dt>VPS</dt><dd>Virtual Private Server</dd><dt>WAN</dt><dd>Wide Area Network</dd></dl></section>
 <h2 id="topology">Topology</h2>
 <pre><code class="language-text">iptables-nft PREROUTING MARK  --&gt;  counters look marked
 ip -6 route get ULA iif tunnel  --&gt;  still WAN NIC
 Need /48 on table 52 AND main</code></pre>
 <h2 id="bind">Bind</h2>
 <p>Fill this table <strong>before</strong> any live change. Do <strong>not</strong> paste real values back into public notes.</p>
-<table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><code>&lt;exit-node&gt;</code></td><td>Overlay exit node</td><td>Cloud VM or LAN Pi used as exit</td></tr><tr><td><code>&lt;overlay-peer&gt;</code></td><td>Soak client (<strong>not</strong> the agent workstation)</td><td>LAN Pi</td></tr><tr><td><code>&lt;user&gt;</code></td><td>SSH user</td><td>Guest</td></tr><tr><td><code>&lt;overlay-tun&gt;</code></td><td>Overlay tun on the exit</td><td>Iface</td></tr><tr><td><code>&lt;gcp-nic&gt;</code></td><td>Public NIC on a Google Cloud guest</td><td>Iface; omit on non-GCP exits</td></tr><tr><td><code>&lt;wan-iface&gt;</code></td><td>WAN / public NIC</td><td>Iface</td></tr><tr><td><code>&lt;mss4&gt;</code> / <code>&lt;mss6&gt;</code></td><td>Computed from underlay or overlay tun MTU</td><td>Formulas</td></tr></tbody></table>
+<table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><code>&lt;overlay-ula&gt;</code></td><td>Overlay unique-local prefix class</td><td>ULA /48; never publish</td></tr><tr><td><code>&lt;wg-iface&gt;</code></td><td>Commercial WireGuard iface</td><td>Router or VPS client</td></tr><tr><td><code>&lt;tunnel&gt;</code></td><td>Commercial tunnel iface on the exit</td><td>Iface</td></tr></tbody></table>
 <h2 id="formulas">Formulas</h2>
 <p>One ip6tables NAT path. Backs <a href="../networking/06-netfilter-off-v6-return.html">OEN-06</a>.</p>
 <h2 id="method">Method</h2>
@@ -139,9 +139,8 @@ Need /48 on table 52 AND main</code></pre>
 <h2 id="consequences">Consequences</h2>
 <p>Return path exists. Counters stop lying.</p>
 <h2 id="agent-stop-rule">Agent stop rule</h2>
-<blockquote><p>A coding agent MUST emit a <strong>bound runbook</strong> (placeholders replaced from Bind). MUST NOT apply live <code>ip rule</code>, nft, iptables, ip6tables, sysctl, <code>wg set</code>, daemon restart, or deploy until a <strong>human</strong> filled Bind. MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS. MUST NOT file an upstream bug from this page. MUST NOT publish real addresses, hostnames, or custom ports.</p></blockquote>
+<blockquote><p>MUST emit bound iptables-nft MARK vs FIB checks after Bind is filled. MUST NOT apply <code>ip rule</code>, nft, or ip6tables until a human filled Bind. MUST NOT claim ICMP ping as the IPv6-return fix. MUST NOT split nft mark and ip6tables MASQUERADE.</p></blockquote>
 <h2 id="procedure">Procedure</h2>
-<p>Placeholders only until Bind is filled: <code>&lt;cloud-vps&gt;</code>, <code>&lt;lan-pi&gt;</code>, <code>&lt;overlay-peer&gt;</code>, <code>&lt;exit-node&gt;</code>, <code>&lt;wg-iface&gt;</code>, <code>&lt;gcp-nic&gt;</code>, plus the Bind extras on this page.</p>
 <h3>Copy-paste commands (after Bind)</h3>
 <pre><code class="language-bash">ip -6 route get &lt;overlay-ula&gt; iif &lt;wg-iface&gt;
 ip6tables -t mangle -L PREROUTING -n -v</code></pre>
@@ -161,10 +160,10 @@ ip6tables -t mangle -L PREROUTING -n -v</code></pre>
 <ul><li>route get iif tunnel uses overlay.</li><li>Single ip6tables NAT path.</li><li>ICMP / small ping success was <strong>not</strong> used as the pass criterion when this spec names TCP, SSH, or HTTPS.</li><li>Bind table was filled by a human before any live <code>ip</code> / nft / iptables change.</li></ul>
 <h2 id="must-not" class="must-not">MUST NOT</h2>
 <ul><li>MUST NOT trust mark counters without route get.</li><li>MUST NOT publish real ULA.</li><li>MUST NOT apply live network or firewall changes until Bind is filled by a human.</li><li>MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.</li><li>MUST NOT publish hostnames, addresses, ULAs, or custom ports.</li></ul>
+<h2 id="page-changelog">Page changelog</h2>
+<ul><li>Edition 2 (8 Sep 2026, Mountain Time): Trap-specific Bind and agent stop rule (review cleanup).</li></ul>
 <h2 id="related-specs">Related specs</h2>
 <ul><li><a href="../networking/06-netfilter-off-v6-return.html">OEN-06</a></li></ul>
-<h2 id="prior-art-not-novel">Prior art (Not novel)</h2>
-<p>Policy routing is documented. This note is iptables-nft mark missing the first FIB lookup.</p>
       </article>
     </main>
     <footer class="site-footer">

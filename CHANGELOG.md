@@ -47,11 +47,40 @@ terms:
     expansion: iptables/nft target that sets TCP Maximum Segment Size
   - abbr: README
     expansion: repository citation index in Markdown
+  - abbr: CAPI
+    expansion: CrowdSec Central API
+  - abbr: CSS
+    expansion: Cascading Style Sheets
+  - abbr: DNS
+    expansion: Domain Name System
+  - abbr: MTU
+    expansion: Maximum Transmission Unit
+  - abbr: MSS
+    expansion: Maximum Segment Size
+  - abbr: HTTP
+    expansion: Hypertext Transfer Protocol
+  - abbr: CLI
+    expansion: command-line interface
+  - abbr: Chromium
+    expansion: open-source browser engine
+  - abbr: CrowdSec
+    expansion: open-source IDS/IPS with a Central API
+  - abbr: FORWARD
+    expansion: netfilter/iptables forward chain
 ---
 
 # Changelog
 
 Dated in Mountain Time (MST) for this series. Spec URLs do not change when an edition bumps.
+
+## 2026-09-08 MST — One trap per page (review cleanup)
+
+Enhancement of the living notes, not a new ID series:
+
+- Home and README add a **symptom → first spec** table (SSH hang, Chromium `ERR_CONNECTION_*`, DNS-not-MTU, exit HTTPS / `ts-forward` TCPMSS 0, CAPI HTTP 403, HTML 200 / CSS 404).
+- Agents work one named trap per session. Overlay product CLI is allowed after Bind `<overlay-impl>` is `tailscale-compatible`. CSS, CrowdSec, and git-merge notes no longer carry stamped MSS Bind rows.
+- Two MSS families: `mss4_wg` / `mss6_wg` and `mss4_overlay_over_wg`. Historical 1160 / 1146 stays wrong-scope evidence on OEN-01 and OEN-S02 only.
+- OEN-04 inserts TCPMSS at the top of `ts-forward` (v4 and v6). A FORWARD copy, if used, is iface-scoped — never unscoped `FORWARD 1`.
 
 ## 2026-09-08 MST — Public vs contributor find copy
 

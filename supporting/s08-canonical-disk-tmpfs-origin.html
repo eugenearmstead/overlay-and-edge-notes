@@ -120,18 +120,16 @@
     <main id="main">
       <article>
         <h1>Canonical disk + tmpfs RAM origin on a Pi</h1>
-        <p class="meta-line"><span>OEN-S08</span> · supporting · edition 1 · 2026-09-08</p>
+        <p class="meta-line"><span>OEN-S08</span> · supporting · edition 2 · 2026-09-08</p>
         <h2 id="context">Context</h2>
 <p>Not new as “logs in RAM.” The claim is deploy-to-persistent then sync-to-RAM. HTML-only rsync to the wrong tree looks deployed (<a href="s06-do-not-ship-html-only.html">OEN-S06</a>). MUST NOT describe a private origin hostname.</p>
 
-<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>TCP</dt><dd>Transmission Control Protocol</dd><dt>ICMP</dt><dd>Internet Control Message Protocol</dd><dt>HTTPS</dt><dd>Hypertext Transfer Protocol Secure</dd><dt>HTML</dt><dd>HyperText Markup Language</dd><dt>CSS</dt><dd>Cascading Style Sheets</dd><dt>JS</dt><dd>JavaScript</dd><dt>nft</dt><dd>nftables (Linux packet filter)</dd><dt>ControlPath</dt><dd>OpenSSH multiplexing socket path option</dd><dt>URL</dt><dd>Uniform Resource Locator</dd><dt>UI</dt><dd>user interface</dd><dt>RAM</dt><dd>random-access memory</dd><dt>Pi</dt><dd>single-board computer (Raspberry Pi class)</dd><dt>SD</dt><dd>Secure Digital (flash storage)</dd><dt>tmpfs</dt><dd>temporary file system in RAM</dd><dt>Cloudflare</dt><dd>content delivery and Workers platform</dd></dl></section>
+<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>Cloudflare</dt><dd>content delivery and Workers platform</dd><dt>ControlPath</dt><dd>OpenSSH multiplexing socket path option</dd><dt>CSS</dt><dd>Cascading Style Sheets</dd><dt>HTML</dt><dd>HyperText Markup Language</dd><dt>JS</dt><dd>JavaScript</dd><dt>LAN</dt><dd>Local Area Network</dd><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>Pi</dt><dd>single-board computer (Raspberry Pi class)</dd><dt>RAM</dt><dd>random-access memory</dd><dt>SD</dt><dd>Secure Digital (flash storage)</dd><dt>SSH</dt><dd>Secure Shell</dd></dl></section>
 <h2 id="topology">Topology</h2>
-<pre><code class="language-text">[Pi] canonical disk tree  --&gt;  sync --&gt; tmpfs RAM origin
-Cloudflare origin SHOULD hit RAM, not the SD card
-HTML-only rsync to the wrong tree looks deployed</code></pre>
+<p>N/A — deploy</p>
 <h2 id="bind">Bind</h2>
 <p>Fill this table <strong>before</strong> any live change. Do <strong>not</strong> paste real values back into public notes.</p>
-<table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><code>&lt;worker-root&gt;</code></td><td>Worker / UI source tree</td><td>Directory on the workstation</td></tr><tr><td><code>&lt;live-url&gt;</code></td><td>Public HTTPS origin</td><td>URL the browser loads</td></tr><tr><td><code>&lt;preview-url&gt;</code></td><td>Preview origin if used</td><td>URL</td></tr><tr><td><code>&lt;html-path&gt;</code></td><td>Path that becomes a Response body</td><td>File glob</td></tr></tbody></table>
+<table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><code>&lt;user&gt;</code></td><td>SSH user</td><td>Guest account</td></tr><tr><td><code>&lt;lan-pi&gt;</code></td><td>Always-on LAN Pi</td><td>LAN Pi</td></tr><tr><td><code>&lt;ram-origin&gt;</code></td><td>tmpfs serve root</td><td>Directory on the Pi</td></tr><tr><td><code>&lt;site.css&gt;</code></td><td>Origin stylesheet filename</td><td>Asset</td></tr><tr><td><code>&lt;disk-origin&gt;</code></td><td>Persistent canonical web tree</td><td>Directory on the Pi</td></tr></tbody></table>
 <h2 id="formulas">Formulas</h2>
 <p>Deploy to persistent, then sync-to-RAM. Confirm both trees have CSS/JS.</p>
 <h2 id="method">Method</h2>
@@ -139,11 +137,10 @@ HTML-only rsync to the wrong tree looks deployed</code></pre>
 <h2 id="consequences">Consequences</h2>
 <p>SD wear drops. Missed sync looks like a CSS bug.</p>
 <h2 id="agent-stop-rule">Agent stop rule</h2>
-<blockquote><p>A coding agent MUST emit a <strong>bound runbook</strong> (placeholders replaced from Bind). MUST NOT apply live <code>ip rule</code>, nft, iptables, ip6tables, sysctl, <code>wg set</code>, daemon restart, or deploy until a <strong>human</strong> filled Bind. MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS. MUST NOT file an upstream bug from this page. MUST NOT publish real addresses, hostnames, or custom ports.</p></blockquote>
+<blockquote><p>MUST name <code>&lt;disk-origin&gt;</code> and <code>&lt;ram-origin&gt;</code> after Bind is filled. MUST NOT rsync HTML-only to the RAM tree. MUST NOT call a missing <code>&lt;site.css&gt;</code> on one tree a CSS bug (<a href="s06-do-not-ship-html-only.html">OEN-S06</a>). MUST NOT apply netfilter from this page.</p></blockquote>
 <h2 id="procedure">Procedure</h2>
-<p>Placeholders only until Bind is filled: <code>&lt;cloud-vps&gt;</code>, <code>&lt;lan-pi&gt;</code>, <code>&lt;overlay-peer&gt;</code>, <code>&lt;exit-node&gt;</code>, <code>&lt;wg-iface&gt;</code>, <code>&lt;gcp-nic&gt;</code>, plus the Bind extras on this page.</p>
 <h3>Copy-paste commands (after Bind)</h3>
-<pre><code class="language-bash">ssh -o ControlPath=none &lt;user&gt;@&lt;lan-pi&gt; &#x27;df -hT | grep -E &quot;tmpfs|ext&quot;; ls &lt;ram-origin&gt;/chrome.css &lt;disk-origin&gt;/chrome.css&#x27;</code></pre>
+<pre><code class="language-bash">ssh -o ControlPath=none &lt;user&gt;@&lt;lan-pi&gt; &#x27;df -hT | grep -E &quot;tmpfs|ext&quot;; ls &lt;ram-origin&gt;/&lt;site.css&gt; &lt;disk-origin&gt;/&lt;site.css&gt;&#x27;</code></pre>
 <ol><li><strong>P1 — Name the two trees.</strong><br>
 - <strong>Action:</strong> Persistent canonical vs tmpfs serve path (class, not inventory).<br>
 - <strong>Expected:</strong> Both exist. Serve reads RAM.<br>
@@ -157,13 +154,13 @@ HTML-only rsync to the wrong tree looks deployed</code></pre>
 <h2 id="expected-samples">Expected samples</h2>
 <pre><code class="language-text">tmpfs   ...  /srv/ram-origin</code></pre>
 <h2 id="verify">Verify</h2>
-<ul><li>Disk and RAM hashes match after deploy.</li><li>Reboot restores RAM from disk.</li><li>ICMP / small ping success was <strong>not</strong> used as the pass criterion when this spec names TCP, SSH, or HTTPS.</li><li>Bind table was filled by a human before any live <code>ip</code> / nft / iptables change.</li></ul>
+<ul><li>Disk and RAM hashes match after deploy.</li><li>Reboot restores RAM from disk.</li></ul>
 <h2 id="must-not" class="must-not">MUST NOT</h2>
-<ul><li>MUST NOT skip the disk copy.</li><li>MUST NOT publish the Pi hostname.</li><li>MUST NOT HTML-only to RAM.</li><li>MUST NOT apply live network or firewall changes until Bind is filled by a human.</li><li>MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.</li><li>MUST NOT publish hostnames, addresses, ULAs, or custom ports.</li></ul>
+<ul><li>MUST NOT skip the disk copy.</li><li>MUST NOT publish the Pi hostname.</li><li>MUST NOT HTML-only to RAM.</li><li>MUST NOT publish hostnames, addresses, ULAs, or custom ports.</li></ul>
+<h2 id="page-changelog">Page changelog</h2>
+<ul><li>Edition 2 (8 Sep 2026, Mountain Time): Trap-specific Bind and agent stop rule (review cleanup).</li></ul>
 <h2 id="related-specs">Related specs</h2>
 <ul><li><a href="s06-do-not-ship-html-only.html">OEN-S06</a></li><li><a href="../web/10-one-blocking-stylesheet-variable-fonts.html">OEN-10</a></li></ul>
-<h2 id="prior-art-not-novel">Prior art (Not novel)</h2>
-<p>tmpfs origins are known. This note is disk-then-RAM plus wrong-tree HTML-only.</p>
       </article>
     </main>
     <footer class="site-footer">

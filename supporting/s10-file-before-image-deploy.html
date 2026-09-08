@@ -120,17 +120,16 @@
     <main id="main">
       <article>
         <h1>file(1) before image deploy</h1>
-        <p class="meta-line"><span>OEN-S10</span> · supporting · edition 1 · 2026-09-08</p>
+        <p class="meta-line"><span>OEN-S10</span> · supporting · edition 2 · 2026-09-08</p>
         <h2 id="context">Context</h2>
 <p>A <code>.png</code> can be JPEG data. Hero cutouts need alpha. Swapping look-alike attachments without <code>file</code> ships the wrong bytes.</p>
 
-<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>TCP</dt><dd>Transmission Control Protocol</dd><dt>ICMP</dt><dd>Internet Control Message Protocol</dd><dt>HTTPS</dt><dd>Hypertext Transfer Protocol Secure</dd><dt>HTML</dt><dd>HyperText Markup Language</dd><dt>nft</dt><dd>nftables (Linux packet filter)</dd><dt>URL</dt><dd>Uniform Resource Locator</dd><dt>UI</dt><dd>user interface</dd><dt>JPEG</dt><dd>Joint Photographic Experts Group image format</dd><dt>PNG</dt><dd>Portable Network Graphics</dd></dl></section>
+<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>HTML</dt><dd>HyperText Markup Language</dd><dt>JPEG</dt><dd>Joint Photographic Experts Group image format</dd><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>PNG</dt><dd>Portable Network Graphics</dd></dl></section>
 <h2 id="topology">Topology</h2>
-<pre><code class="language-text">source_path --file(1)--&gt; actual type  --&gt;  dest_path same type
-Extension ≠ format. Do not swap look-alike attachments.</code></pre>
+<p>N/A — deploy</p>
 <h2 id="bind">Bind</h2>
 <p>Fill this table <strong>before</strong> any live change. Do <strong>not</strong> paste real values back into public notes.</p>
-<table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><code>&lt;worker-root&gt;</code></td><td>Worker / UI source tree</td><td>Directory on the workstation</td></tr><tr><td><code>&lt;live-url&gt;</code></td><td>Public HTTPS origin</td><td>URL the browser loads</td></tr><tr><td><code>&lt;preview-url&gt;</code></td><td>Preview origin if used</td><td>URL</td></tr><tr><td><code>&lt;html-path&gt;</code></td><td>Path that becomes a Response body</td><td>File glob</td></tr></tbody></table>
+<table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><code>&lt;src-a&gt;</code></td><td>First image source</td><td>Path</td></tr><tr><td><code>&lt;src-b&gt;</code></td><td>Second image source</td><td>Path</td></tr><tr><td><code>&lt;dest&gt;</code></td><td>Deploy destination path</td><td>Path</td></tr></tbody></table>
 <h2 id="formulas">Formulas</h2>
 <p>Map source → dest in writing before copy. Bytes verbatim unless the operator asks to re-process.</p>
 <h2 id="method">Method</h2>
@@ -138,9 +137,8 @@ Extension ≠ format. Do not swap look-alike attachments.</code></pre>
 <h2 id="consequences">Consequences</h2>
 <p>Hero transparency and photo JPEG stay in the right slots.</p>
 <h2 id="agent-stop-rule">Agent stop rule</h2>
-<blockquote><p>A coding agent MUST emit a <strong>bound runbook</strong> (placeholders replaced from Bind). MUST NOT apply live <code>ip rule</code>, nft, iptables, ip6tables, sysctl, <code>wg set</code>, daemon restart, or deploy until a <strong>human</strong> filled Bind. MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS. MUST NOT file an upstream bug from this page. MUST NOT publish real addresses, hostnames, or custom ports.</p></blockquote>
+<blockquote><p>MUST run <code>file</code> on <code>&lt;src-a&gt;</code> / <code>&lt;src-b&gt;</code> / <code>&lt;dest&gt;</code> after Bind is filled. MUST NOT swap filenames to “fix” display without confirming format. MUST NOT apply netfilter from this page.</p></blockquote>
 <h2 id="procedure">Procedure</h2>
-<p>Placeholders only until Bind is filled: <code>&lt;cloud-vps&gt;</code>, <code>&lt;lan-pi&gt;</code>, <code>&lt;overlay-peer&gt;</code>, <code>&lt;exit-node&gt;</code>, <code>&lt;wg-iface&gt;</code>, <code>&lt;gcp-nic&gt;</code>, plus the Bind extras on this page.</p>
 <h3>Copy-paste commands (after Bind)</h3>
 <pre><code class="language-bash">file &lt;src-a&gt; &lt;src-b&gt;
 # After copy: file &lt;dest&gt;</code></pre>
@@ -157,13 +155,13 @@ Extension ≠ format. Do not swap look-alike attachments.</code></pre>
 <h2 id="expected-samples">Expected samples</h2>
 <pre><code class="language-text">hero.png: JPEG image data   # trap: named png, is jpeg</code></pre>
 <h2 id="verify">Verify</h2>
-<ul><li>file agrees on both ends.</li><li>HTML src matches.</li><li>ICMP / small ping success was <strong>not</strong> used as the pass criterion when this spec names TCP, SSH, or HTTPS.</li><li>Bind table was filled by a human before any live <code>ip</code> / nft / iptables change.</li></ul>
+<ul><li>file agrees on both ends.</li><li>HTML src matches.</li></ul>
 <h2 id="must-not" class="must-not">MUST NOT</h2>
-<ul><li>MUST NOT swap look-alike attachments without file.</li><li>MUST NOT re-process unless asked.</li><li>MUST NOT apply live network or firewall changes until Bind is filled by a human.</li><li>MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.</li><li>MUST NOT publish hostnames, addresses, ULAs, or custom ports.</li></ul>
+<ul><li>MUST NOT swap look-alike attachments without file.</li><li>MUST NOT re-process unless asked.</li><li>MUST NOT publish hostnames, addresses, ULAs, or custom ports.</li></ul>
+<h2 id="page-changelog">Page changelog</h2>
+<ul><li>Edition 2 (8 Sep 2026, Mountain Time): Trap-specific Bind and agent stop rule (review cleanup).</li></ul>
 <h2 id="related-specs">Related specs</h2>
 <ul><li><a href="../web/10-one-blocking-stylesheet-variable-fonts.html">OEN-10</a></li></ul>
-<h2 id="prior-art-not-novel">Prior art (Not novel)</h2>
-<p>file(1) is Unix 101. This note is extension≠format at deploy time.</p>
       </article>
     </main>
     <footer class="site-footer">

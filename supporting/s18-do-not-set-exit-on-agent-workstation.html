@@ -120,18 +120,18 @@
     <main id="main">
       <article>
         <h1>Do not set exit-node on the agent workstation</h1>
-        <p class="meta-line"><span>OEN-S18</span> · supporting · edition 1 · 2026-09-08</p>
+        <p class="meta-line"><span>OEN-S18</span> · supporting · edition 2 · 2026-09-08</p>
         <h2 id="context">Context</h2>
 <p>Selecting an exit on the Cursor/agent host can strand the session (hairpin, DNS, or a bad cloud exit). Overlay SSH to nodes does not require an exit.</p>
 
-<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>LAN</dt><dd>Local Area Network</dd><dt>WAN</dt><dd>Wide Area Network</dd><dt>TCP</dt><dd>Transmission Control Protocol</dd><dt>MTU</dt><dd>Maximum Transmission Unit</dd><dt>ICMP</dt><dd>Internet Control Message Protocol</dd><dt>HTTPS</dt><dd>Hypertext Transfer Protocol Secure</dd><dt>DNS</dt><dd>Domain Name System</dd><dt>GCP</dt><dd>Google Cloud Platform</dd><dt>VM</dt><dd>virtual machine</dd><dt>NIC</dt><dd>network interface card</dd><dt>nft</dt><dd>nftables (Linux packet filter)</dd><dt>Pi</dt><dd>single-board computer (Raspberry Pi class)</dd></dl></section>
+<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>DNS</dt><dd>Domain Name System</dd><dt>LAN</dt><dd>Local Area Network</dd><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>Pi</dt><dd>single-board computer (Raspberry Pi class)</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>VM</dt><dd>virtual machine</dd><dt>VPS</dt><dd>Virtual Private Server</dd></dl></section>
 <h2 id="topology">Topology</h2>
 <pre><code class="language-text">[agent workstation] --set exit-node--&gt;  loses general internet when exit is wrong
 Soak exits on &lt;lan-pi&gt; / &lt;overlay-peer&gt;
 Overlay SSH first; nmap only after a failed connect</code></pre>
 <h2 id="bind">Bind</h2>
 <p>Fill this table <strong>before</strong> any live change. Do <strong>not</strong> paste real values back into public notes.</p>
-<table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><code>&lt;exit-node&gt;</code></td><td>Overlay exit node</td><td>Cloud VM or LAN Pi used as exit</td></tr><tr><td><code>&lt;overlay-peer&gt;</code></td><td>Soak client (<strong>not</strong> the agent workstation)</td><td>LAN Pi</td></tr><tr><td><code>&lt;user&gt;</code></td><td>SSH user</td><td>Guest</td></tr><tr><td><code>&lt;overlay-tun&gt;</code></td><td>Overlay tun on the exit</td><td>Iface</td></tr><tr><td><code>&lt;gcp-nic&gt;</code></td><td>Public NIC on a Google Cloud guest</td><td>Iface; omit on non-GCP exits</td></tr><tr><td><code>&lt;wan-iface&gt;</code></td><td>WAN / public NIC</td><td>Iface</td></tr><tr><td><code>&lt;mss4&gt;</code> / <code>&lt;mss6&gt;</code></td><td>Computed from underlay or overlay tun MTU</td><td>Formulas</td></tr></tbody></table>
+<table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><code>&lt;overlay-peer&gt;</code></td><td>Soak client (not the agent workstation)</td><td>LAN Pi or phone</td></tr><tr><td><code>&lt;exit-node&gt;</code></td><td>Overlay exit node</td><td>Cloud VM or LAN Pi</td></tr><tr><td><code>&lt;lan-pi&gt;</code></td><td>Always-on LAN Pi</td><td>LAN Pi</td></tr><tr><td><code>&lt;cloud-vps&gt;</code></td><td>Cloud VPS under test</td><td>Cloud VPS</td></tr></tbody></table>
 <h2 id="formulas">Formulas</h2>
 <p>MUST NOT select &lt;exit-node&gt; on the agent/Cursor workstation unless the operator asks.</p>
 <h2 id="method">Method</h2>
@@ -139,9 +139,8 @@ Overlay SSH first; nmap only after a failed connect</code></pre>
 <h2 id="consequences">Consequences</h2>
 <p>Agent sessions keep internet. Exit tests still happen on a Pi.</p>
 <h2 id="agent-stop-rule">Agent stop rule</h2>
-<blockquote><p>A coding agent MUST emit a <strong>bound runbook</strong> (placeholders replaced from Bind). MUST NOT apply live <code>ip rule</code>, nft, iptables, ip6tables, sysctl, <code>wg set</code>, daemon restart, or deploy until a <strong>human</strong> filled Bind. MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS. MUST NOT file an upstream bug from this page. MUST NOT publish real addresses, hostnames, or custom ports.</p></blockquote>
+<blockquote><p>MUST NOT <code>tailscale set --exit-node</code> on the agent workstation unless the operator asks. This spec does not apply if <code>&lt;overlay-impl&gt;</code> is not tailscale-compatible. MUST soak exits from <code>&lt;overlay-peer&gt;</code> or a phone. MUST NOT apply netfilter from this page.</p></blockquote>
 <h2 id="procedure">Procedure</h2>
-<p>Placeholders only until Bind is filled: <code>&lt;cloud-vps&gt;</code>, <code>&lt;lan-pi&gt;</code>, <code>&lt;overlay-peer&gt;</code>, <code>&lt;exit-node&gt;</code>, <code>&lt;wg-iface&gt;</code>, <code>&lt;gcp-nic&gt;</code>, plus the Bind extras on this page.</p>
 <h3>Copy-paste commands (after Bind)</h3>
 <pre><code class="language-bash"># On the workstation: confirm exit unset
 # On &lt;overlay-peer&gt;: select &lt;exit-node&gt; briefly, curl, then clear</code></pre>
@@ -158,13 +157,13 @@ Overlay SSH first; nmap only after a failed connect</code></pre>
 <h2 id="expected-samples">Expected samples</h2>
 <pre><code class="language-text"># workstation: ExitNode: (none)</code></pre>
 <h2 id="verify">Verify</h2>
-<ul><li>Workstation exit unset.</li><li>Exit soak documented on a Pi or phone.</li><li>ICMP / small ping success was <strong>not</strong> used as the pass criterion when this spec names TCP, SSH, or HTTPS.</li><li>Bind table was filled by a human before any live <code>ip</code> / nft / iptables change.</li></ul>
+<ul><li>Workstation exit unset.</li><li>Exit soak documented on a Pi or phone.</li></ul>
 <h2 id="must-not" class="must-not">MUST NOT</h2>
-<ul><li>MUST NOT set exit on the agent workstation to reproduce.</li><li>MUST NOT nmap before the first connect when using connect wrappers.</li><li>MUST NOT apply live network or firewall changes until Bind is filled by a human.</li><li>MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.</li><li>MUST NOT publish hostnames, addresses, ULAs, or custom ports.</li></ul>
+<ul><li>MUST NOT set exit on the agent workstation to reproduce.</li><li>MUST NOT nmap before the first connect when using connect wrappers.</li><li>MUST NOT publish hostnames, addresses, ULAs, or custom ports.</li></ul>
+<h2 id="page-changelog">Page changelog</h2>
+<ul><li>Edition 2 (8 Sep 2026, Mountain Time): Trap-specific Bind and agent stop rule (review cleanup).</li></ul>
 <h2 id="related-specs">Related specs</h2>
 <ul><li><a href="../networking/17-gcp-overlay-exit.html">OEN-17</a></li><li><a href="s21-cloud-exit-hairpin-lan.html">OEN-S21</a></li></ul>
-<h2 id="prior-art-not-novel">Prior art (Not novel)</h2>
-<p>Exit nodes are documented. This note is “not on the agent workstation” as a hard MUST NOT.</p>
       </article>
     </main>
     <footer class="site-footer">

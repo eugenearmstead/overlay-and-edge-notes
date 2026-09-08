@@ -120,18 +120,18 @@
     <main id="main">
       <article>
         <h1>Reconnect during overlay peer-API outage sticks after heal</h1>
-        <p class="meta-line"><span>OEN-S28</span> · supporting · edition 1 · 2026-09-08</p>
+        <p class="meta-line"><span>OEN-S28</span> · supporting · edition 2 · 2026-09-08</p>
         <h2 id="context">Context</h2>
 <p>Backs <a href="../networking/14-exit-dns-is-peerapi.html">OEN-14</a>. Sticky client after outage.</p>
 
-<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>LAN</dt><dd>Local Area Network</dd><dt>WAN</dt><dd>Wide Area Network</dd><dt>TCP</dt><dd>Transmission Control Protocol</dd><dt>MTU</dt><dd>Maximum Transmission Unit</dd><dt>ICMP</dt><dd>Internet Control Message Protocol</dd><dt>HTTPS</dt><dd>Hypertext Transfer Protocol Secure</dd><dt>DNS</dt><dd>Domain Name System</dd><dt>DoH</dt><dd>DNS over HTTPS</dd><dt>GCP</dt><dd>Google Cloud Platform</dd><dt>VM</dt><dd>virtual machine</dd><dt>NIC</dt><dd>network interface card</dd><dt>API</dt><dd>application programming interface</dd><dt>PeerAPI</dt><dd>overlay peer application-programming interface (exit DNS over HTTPS)</dd><dt>RD</dt><dd>Recursion Desired (DNS flag)</dd><dt>nft</dt><dd>nftables (Linux packet filter)</dd><dt>Pi</dt><dd>single-board computer (Raspberry Pi class)</dd></dl></section>
+<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>API</dt><dd>application programming interface</dd><dt>DNS</dt><dd>Domain Name System</dd><dt>DoH</dt><dd>DNS over HTTPS</dd><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>PeerAPI</dt><dd>overlay peer application-programming interface (exit DNS over HTTPS)</dd><dt>RD</dt><dd>Recursion Desired (DNS flag)</dd></dl></section>
 <h2 id="topology">Topology</h2>
 <pre><code class="language-text">Phone reconnects while PeerAPI DoH is dead
 PeerAPI heals  --&gt;  that phone stays stuck until client toggle
 Heal exit stub, not coordinator DNS yaml</code></pre>
 <h2 id="bind">Bind</h2>
 <p>Fill this table <strong>before</strong> any live change. Do <strong>not</strong> paste real values back into public notes.</p>
-<table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><code>&lt;exit-node&gt;</code></td><td>Overlay exit node</td><td>Cloud VM or LAN Pi used as exit</td></tr><tr><td><code>&lt;overlay-peer&gt;</code></td><td>Soak client (<strong>not</strong> the agent workstation)</td><td>LAN Pi</td></tr><tr><td><code>&lt;user&gt;</code></td><td>SSH user</td><td>Guest</td></tr><tr><td><code>&lt;overlay-tun&gt;</code></td><td>Overlay tun on the exit</td><td>Iface</td></tr><tr><td><code>&lt;gcp-nic&gt;</code></td><td>Public NIC on a Google Cloud guest</td><td>Iface; omit on non-GCP exits</td></tr><tr><td><code>&lt;wan-iface&gt;</code></td><td>WAN / public NIC</td><td>Iface</td></tr><tr><td><code>&lt;mss4&gt;</code> / <code>&lt;mss6&gt;</code></td><td>Computed from underlay or overlay tun MTU</td><td>Formulas</td></tr></tbody></table>
+<table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><em>(none)</em></td><td>No packet-path Bind for this trap</td><td>Use the git host, origin, or API the operator already has</td></tr></tbody></table>
 <h2 id="formulas">Formulas</h2>
 <p>Empty use_with_exit_node does not open PeerAPI.</p>
 <h2 id="method">Method</h2>
@@ -139,9 +139,8 @@ Heal exit stub, not coordinator DNS yaml</code></pre>
 <h2 id="consequences">Consequences</h2>
 <p>New clients work; stuck phones need a toggle, not a coordinator bounce.</p>
 <h2 id="agent-stop-rule">Agent stop rule</h2>
-<blockquote><p>A coding agent MUST emit a <strong>bound runbook</strong> (placeholders replaced from Bind). MUST NOT apply live <code>ip rule</code>, nft, iptables, ip6tables, sysctl, <code>wg set</code>, daemon restart, or deploy until a <strong>human</strong> filled Bind. MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS. MUST NOT file an upstream bug from this page. MUST NOT publish real addresses, hostnames, or custom ports.</p></blockquote>
+<blockquote><p>MUST heal PeerAPI on the exit, then toggle the stuck client, after Bind is filled. MUST NOT rewrite coordinator DNS yaml for one sticky client. MUST NOT apply netfilter from this page.</p></blockquote>
 <h2 id="procedure">Procedure</h2>
-<p>Placeholders only until Bind is filled: <code>&lt;cloud-vps&gt;</code>, <code>&lt;lan-pi&gt;</code>, <code>&lt;overlay-peer&gt;</code>, <code>&lt;exit-node&gt;</code>, <code>&lt;wg-iface&gt;</code>, <code>&lt;gcp-nic&gt;</code>, plus the Bind extras on this page.</p>
 <h3>Copy-paste commands (after Bind)</h3>
 <pre><code class="language-bash"># After stub heal: new client works. Stuck phone: exit off/on or app toggle.</code></pre>
 <ol><li><strong>P1 — Heal exit DoH.</strong><br>
@@ -157,13 +156,13 @@ Heal exit stub, not coordinator DNS yaml</code></pre>
 <h2 id="expected-samples">Expected samples</h2>
 <pre><code class="language-text"># new client DoH 200; sticky phone still DNS_PROBE until toggle</code></pre>
 <h2 id="verify">Verify</h2>
-<ul><li>New client DoH works after heal.</li><li>Stuck client documented as toggle, not yaml.</li><li>ICMP / small ping success was <strong>not</strong> used as the pass criterion when this spec names TCP, SSH, or HTTPS.</li><li>Bind table was filled by a human before any live <code>ip</code> / nft / iptables change.</li></ul>
+<ul><li>New client DoH works after heal.</li><li>Stuck client documented as toggle, not yaml.</li></ul>
 <h2 id="must-not" class="must-not">MUST NOT</h2>
-<ul><li>MUST NOT change coordinator DNS yaml to heal PeerAPI.</li><li>MUST NOT expect empty use_with_exit_node to open PeerAPI.</li><li>MUST NOT apply live network or firewall changes until Bind is filled by a human.</li><li>MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.</li><li>MUST NOT publish hostnames, addresses, ULAs, or custom ports.</li></ul>
+<ul><li>MUST NOT change coordinator DNS yaml to heal PeerAPI.</li><li>MUST NOT expect empty use_with_exit_node to open PeerAPI.</li><li>MUST NOT publish hostnames, addresses, ULAs, or custom ports.</li></ul>
+<h2 id="page-changelog">Page changelog</h2>
+<ul><li>Edition 2 (8 Sep 2026, Mountain Time): Trap-specific Bind and agent stop rule (review cleanup).</li></ul>
 <h2 id="related-specs">Related specs</h2>
 <ul><li><a href="../networking/14-exit-dns-is-peerapi.html">OEN-14</a></li><li><a href="../networking/05-exit-peerapi-dns-stub.html">OEN-05</a></li></ul>
-<h2 id="prior-art-not-novel">Prior art (Not novel)</h2>
-<p>Sticky DNS caches are known. This note is reconnect-during-PeerAPI-outage staying stuck after heal.</p>
       </article>
     </main>
     <footer class="site-footer">

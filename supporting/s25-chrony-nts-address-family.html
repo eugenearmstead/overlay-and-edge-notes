@@ -120,18 +120,16 @@
     <main id="main">
       <article>
         <h1>Network Time Security chrony address-family flags need a newer chrony than the distro</h1>
-        <p class="meta-line"><span>OEN-S25</span> · supporting · edition 1 · 2026-09-08</p>
+        <p class="meta-line"><span>OEN-S25</span> · supporting · edition 2 · 2026-09-08</p>
         <h2 id="context">Context</h2>
 <p>Backs <a href="../networking/15-split-host-vs-overlay-resolver.html">OEN-15</a> host stack on the VPS. Distro chrony rejects <code>ipv6</code>/<code>ipv4</code> NTS server flags.</p>
 
-<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>VPS</dt><dd>Virtual Private Server</dd><dt>LAN</dt><dd>Local Area Network</dd><dt>WAN</dt><dd>Wide Area Network</dd><dt>TCP</dt><dd>Transmission Control Protocol</dd><dt>MSS</dt><dd>Maximum Segment Size</dd><dt>MTU</dt><dd>Maximum Transmission Unit</dd><dt>ICMP</dt><dd>Internet Control Message Protocol</dd><dt>HTTPS</dt><dd>Hypertext Transfer Protocol Secure</dd><dt>IPv4</dt><dd>Internet Protocol version 4</dd><dt>IPv6</dt><dd>Internet Protocol version 6</dd><dt>WireGuard</dt><dd>UDP-based VPN protocol</dd><dt>DNS</dt><dd>Domain Name System</dd><dt>PeerAPI</dt><dd>overlay peer application-programming interface (exit DNS over HTTPS)</dd><dt>nft</dt><dd>nftables (Linux packet filter)</dd><dt>ControlPath</dt><dd>OpenSSH multiplexing socket path option</dd><dt>NTS</dt><dd>Network Time Security</dd><dt>Pi</dt><dd>single-board computer (Raspberry Pi class)</dd><dt>Cloudflare</dt><dd>content delivery and Workers platform</dd><dt>chrony</dt><dd>NTP/NTS time daemon</dd><dt>NTP</dt><dd>Network Time Protocol</dd></dl></section>
+<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>chrony</dt><dd>NTP/NTS time daemon</dd><dt>Cloudflare</dt><dd>content delivery and Workers platform</dd><dt>ControlPath</dt><dd>OpenSSH multiplexing socket path option</dd><dt>DNS</dt><dd>Domain Name System</dd><dt>IPv4</dt><dd>Internet Protocol version 4</dd><dt>IPv6</dt><dd>Internet Protocol version 6</dd><dt>NTP</dt><dd>Network Time Protocol</dd><dt>NTS</dt><dd>Network Time Security</dd><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>PeerAPI</dt><dd>overlay peer application-programming interface (exit DNS over HTTPS)</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>VPS</dt><dd>Virtual Private Server</dd></dl></section>
 <h2 id="topology">Topology</h2>
-<pre><code class="language-text">Distro chrony rejects NTS server ipv6/ipv4 flags
-Newer chrony + Cloudflare NTS; try v6 then v4
-Host time MUST NOT depend on the commercial tunnel</code></pre>
+<p>N/A — DNS</p>
 <h2 id="bind">Bind</h2>
 <p>Fill this table <strong>before</strong> any live change. Do <strong>not</strong> paste real values back into public notes.</p>
-<table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><code>&lt;cloud-vps&gt;</code></td><td>Overlay SSH target</td><td>Cloud VPS</td></tr><tr><td><code>&lt;lan-pi&gt;</code></td><td>Overlay SSH target</td><td>LAN Pi</td></tr><tr><td><code>&lt;user&gt;</code></td><td>SSH user</td><td>Guest account</td></tr><tr><td><code>&lt;wg-iface&gt;</code></td><td>Commercial WireGuard iface</td><td>Router or VPS client</td></tr><tr><td><code>&lt;wan-iface&gt;</code></td><td>WAN iface</td><td>Router</td></tr><tr><td><code>&lt;lan-bridge&gt;</code></td><td>LAN bridge</td><td>Router (MTU 1500)</td></tr><tr><td><code>&lt;overlay-tun&gt;</code></td><td>Overlay tun iface</td><td>Node under test</td></tr><tr><td><code>&lt;wg-mtu&gt;</code></td><td>MTU integer from <code>ip link</code></td><td>Measured</td></tr><tr><td><code>&lt;mss4&gt;</code> / <code>&lt;mss6&gt;</code></td><td>Computed MSS</td><td>Formulas</td></tr><tr><td><code>&lt;vps-public-v4&gt;</code> / <code>&lt;vps-public-v6&gt;</code></td><td>VPS public addresses</td><td>WAN; never publish</td></tr><tr><td><code>&lt;overlay-v4&gt;</code> / <code>&lt;overlay-v6&gt;</code></td><td>Overlay addresses</td><td>Overlay; never publish</td></tr></tbody></table>
+<table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><code>&lt;user&gt;</code></td><td>SSH user</td><td>Guest account</td></tr><tr><td><code>&lt;cloud-vps&gt;</code></td><td>Cloud VPS under test</td><td>Cloud VPS</td></tr></tbody></table>
 <h2 id="formulas">Formulas</h2>
 <p>Upgrade chrony; do not comment out NTS to make it start.</p>
 <h2 id="method">Method</h2>
@@ -139,9 +137,8 @@ Host time MUST NOT depend on the commercial tunnel</code></pre>
 <h2 id="consequences">Consequences</h2>
 <p>NTS works. Distro package is not blamed forever.</p>
 <h2 id="agent-stop-rule">Agent stop rule</h2>
-<blockquote><p>A coding agent MUST emit a <strong>bound runbook</strong> (placeholders replaced from Bind). MUST NOT apply live <code>ip rule</code>, nft, iptables, ip6tables, sysctl, <code>wg set</code>, daemon restart, or deploy until a <strong>human</strong> filled Bind. MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS. MUST NOT file an upstream bug from this page. MUST NOT publish real addresses, hostnames, or custom ports.</p></blockquote>
+<blockquote><p>MUST emit bound chrony/NTS version and address-family checks after Bind is filled. MUST NOT comment out NTS to make distro chrony start. MUST NOT apply netfilter from this page.</p></blockquote>
 <h2 id="procedure">Procedure</h2>
-<p>Placeholders only until Bind is filled: <code>&lt;cloud-vps&gt;</code>, <code>&lt;lan-pi&gt;</code>, <code>&lt;overlay-peer&gt;</code>, <code>&lt;exit-node&gt;</code>, <code>&lt;wg-iface&gt;</code>, <code>&lt;gcp-nic&gt;</code>, plus the Bind extras on this page.</p>
 <h3>Copy-paste commands (after Bind)</h3>
 <pre><code class="language-bash">ssh -o ControlPath=none &lt;user&gt;@&lt;cloud-vps&gt; &#x27;chronyd --version; chronyc sources || true&#x27;</code></pre>
 <ol><li><strong>P1 — chrony version.</strong><br>
@@ -157,13 +154,13 @@ Host time MUST NOT depend on the commercial tunnel</code></pre>
 <h2 id="expected-samples">Expected samples</h2>
 <pre><code class="language-text"># old: invalid directive ipv6</code></pre>
 <h2 id="verify">Verify</h2>
-<ul><li>NTS selected in chronyc.</li><li>Tunnel-down host still steps time or at least still resolves.</li><li>ICMP / small ping success was <strong>not</strong> used as the pass criterion when this spec names TCP, SSH, or HTTPS.</li><li>Bind table was filled by a human before any live <code>ip</code> / nft / iptables change.</li></ul>
+<ul><li>NTS selected in chronyc.</li><li>Tunnel-down host still steps time or at least still resolves.</li></ul>
 <h2 id="must-not" class="must-not">MUST NOT</h2>
-<ul><li>MUST NOT drop NTS because the distro binary cannot parse flags — upgrade chrony.</li><li>MUST NOT pin time to the tunnel.</li><li>MUST NOT apply live network or firewall changes until Bind is filled by a human.</li><li>MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.</li><li>MUST NOT publish hostnames, addresses, ULAs, or custom ports.</li></ul>
+<ul><li>MUST NOT drop NTS because the distro binary cannot parse flags — upgrade chrony.</li><li>MUST NOT pin time to the tunnel.</li><li>MUST NOT publish hostnames, addresses, ULAs, or custom ports.</li></ul>
+<h2 id="page-changelog">Page changelog</h2>
+<ul><li>Edition 2 (8 Sep 2026, Mountain Time): Trap-specific Bind and agent stop rule (review cleanup).</li></ul>
 <h2 id="related-specs">Related specs</h2>
 <ul><li><a href="../networking/15-split-host-vs-overlay-resolver.html">OEN-15</a></li></ul>
-<h2 id="prior-art-not-novel">Prior art (Not novel)</h2>
-<p>NTS is documented. This note is distro chrony rejecting address-family flags.</p>
       </article>
     </main>
     <footer class="site-footer">

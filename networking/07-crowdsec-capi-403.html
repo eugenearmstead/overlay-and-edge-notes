@@ -127,20 +127,18 @@
     <main id="main">
       <article>
         <h1>CrowdSec Central API HTTP 403 from native health probes</h1>
-        <p class="meta-line"><span>OEN-07</span> · original · edition 1 · 2026-09-08</p>
+        <p class="meta-line"><span>OEN-07</span> · original · edition 2 · 2026-09-08</p>
         <h2 id="context">Context</h2>
 <p>CrowdSec Central API (CAPI) HTTP <strong>403 Forbidden</strong> on a <strong>native</strong> (non-Docker) Virtual Private Server (VPS) looks like “CrowdSec is broken.” Docker <code>healthcheck: cscli capi status</code> is already documented (~20 logins / 50 minutes → about one hour ban). The unique add-on is <strong>stacked systemd health plus a fleet collector</strong> calling the same CLI every fifteen minutes (plus retries).</p>
 <p>A leftover <code>/etc/hosts</code> <strong>A-record pin</strong> for <code>api.crowdsec.net</code> forces Go onto <strong>banned IPv4</strong> while IPv6 still returns <strong>401</strong> on a dummy enroll (IP accepted, auth expected to fail). Dummy unauthenticated enroll POST is a 401-versus-403 matrix <strong>without</strong> more <code>cscli</code>.</p>
 <p>CAPI egress on this class of host is the <strong>public NIC</strong>, not the commercial tunnel. MUST NOT publish real public IPs. Generic: “VPS IPv4 banned, IPv6 still accepted.” Distinct from <a href="21-shared-vpn-nat-crowdsec-ban.html">OEN-21</a> (shared VPN NAT house ban).</p>
 
-<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>VPS</dt><dd>Virtual Private Server</dd><dt>VPN</dt><dd>Virtual Private Network</dd><dt>TCP</dt><dd>Transmission Control Protocol</dd><dt>ICMP</dt><dd>Internet Control Message Protocol</dd><dt>HTTP</dt><dd>Hypertext Transfer Protocol</dd><dt>HTTPS</dt><dd>Hypertext Transfer Protocol Secure</dd><dt>IP</dt><dd>Internet Protocol</dd><dt>IPv4</dt><dd>Internet Protocol version 4</dd><dt>IPv6</dt><dd>Internet Protocol version 6</dd><dt>NAT</dt><dd>network address translation</dd><dt>NIC</dt><dd>network interface card</dd><dt>API</dt><dd>application programming interface</dd><dt>CLI</dt><dd>command-line interface</dd><dt>CAPI</dt><dd>CrowdSec Central API</dd><dt>nft</dt><dd>nftables (Linux packet filter)</dd><dt>ControlPath</dt><dd>OpenSSH multiplexing socket path option</dd><dt>JSON</dt><dd>JavaScript Object Notation</dd><dt>UI</dt><dd>user interface</dd><dt>systemd</dt><dd>Linux service manager</dd><dt>CrowdSec</dt><dd>open-source IDS/IPS with a Central API</dd><dt>POST</dt><dd>HTTP method</dd><dt>AAAA</dt><dd>DNS IPv6 address record</dd></dl></section>
+<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>AAAA</dt><dd>DNS IPv6 address record</dd><dt>API</dt><dd>application programming interface</dd><dt>CAPI</dt><dd>CrowdSec Central API</dd><dt>CLI</dt><dd>command-line interface</dd><dt>ControlPath</dt><dd>OpenSSH multiplexing socket path option</dd><dt>CrowdSec</dt><dd>open-source IDS/IPS with a Central API</dd><dt>HTTP</dt><dd>Hypertext Transfer Protocol</dd><dt>IP</dt><dd>Internet Protocol</dd><dt>IPv4</dt><dd>Internet Protocol version 4</dd><dt>IPv6</dt><dd>Internet Protocol version 6</dd><dt>JSON</dt><dd>JavaScript Object Notation</dd><dt>NAT</dt><dd>network address translation</dd><dt>nft</dt><dd>nftables (Linux packet filter)</dd><dt>NIC</dt><dd>network interface card</dd><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>POST</dt><dd>HTTP method</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>systemd</dt><dd>Linux service manager</dd><dt>UI</dt><dd>user interface</dd><dt>VPN</dt><dd>Virtual Private Network</dd><dt>VPS</dt><dd>Virtual Private Server</dd></dl></section>
 <h2 id="topology">Topology</h2>
-<pre><code class="language-text">[native systemd host] --HTTPS--&gt; CrowdSec Central API
-    stacked health + collector calling `cscli capi status`  --&gt;  login budget  --&gt; HTTP 403
-    leftover /etc/hosts A-record pin  --&gt;  Go uses banned IPv4 while IPv6 still 401</code></pre>
+<p>N/A — API</p>
 <h2 id="bind">Bind</h2>
 <p>Fill this table <strong>before</strong> any live change. Do <strong>not</strong> paste real values back into public notes.</p>
-<table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><code>&lt;cloud-vps&gt;</code></td><td>Native CrowdSec host</td><td>Cloud VPS</td></tr><tr><td><code>&lt;user&gt;</code></td><td>SSH user</td><td>Guest</td></tr></tbody></table>
+<table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><code>&lt;user&gt;</code></td><td>SSH user</td><td>Guest account</td></tr><tr><td><code>&lt;cloud-vps&gt;</code></td><td>Cloud VPS under test</td><td>Cloud VPS</td></tr></tbody></table>
 <h2 id="formulas">Formulas</h2>
 <p>Free-tier order of magnitude: about <strong>20 CAPI logins / 50 minutes / source IP</strong> then ~1 hour of HTTP 403. Cache status; dummy unauthenticated enroll POST for 401 vs 403 <strong>without</strong> more <code>cscli</code>.</p>
 <h2 id="decision">Decision</h2>
@@ -149,14 +147,13 @@
 <h2 id="consequences">Consequences</h2>
 <ul><li>IPv6 CAPI keeps working while IPv4 cools down.</li><li>Health probes stop re-banning the VPS.</li><li>Console “enrolled” is not confused with a fleet dashboard 403.</li></ul>
 <h2 id="agent-stop-rule">Agent stop rule</h2>
-<blockquote><p>A coding agent MUST emit a <strong>bound runbook</strong> (placeholders replaced from Bind). MUST NOT apply live <code>ip rule</code>, nft, iptables, ip6tables, sysctl, <code>wg set</code>, daemon restart, or deploy until a <strong>human</strong> filled Bind. MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS. MUST NOT file an upstream bug from this page. MUST NOT publish real addresses, hostnames, or custom ports.</p></blockquote>
+<blockquote><p>MUST emit the dummy unauthenticated enroll POST per address family after <code>&lt;cloud-vps&gt;</code> is filled. MUST NOT loop <code>cscli capi status</code>. MUST NOT apply nft or iptables from this page. MUST NOT file a CrowdSec upstream bug from this page.</p></blockquote>
 <h2 id="procedure">Procedure</h2>
-<p>Placeholders only until Bind is filled: <code>&lt;cloud-vps&gt;</code>, <code>&lt;lan-pi&gt;</code>, <code>&lt;overlay-peer&gt;</code>, <code>&lt;exit-node&gt;</code>, <code>&lt;wg-iface&gt;</code>, <code>&lt;gcp-nic&gt;</code>, plus the Bind extras on this page.</p>
 <h3>Copy-paste commands (after Bind)</h3>
 <pre><code class="language-bash">ssh -o ControlPath=none &lt;user&gt;@&lt;cloud-vps&gt; &#x27;systemctl is-active crowdsec; grep -n crowdsec /etc/hosts || true&#x27;
 # Dummy enroll POST (no credentials) v4 vs v6 — expect 401 (accepted path) vs 403 (banned family)
-curl -4 -sS -o /dev/null -w &#x27;%{http_code}\n&#x27; --max-time 15 -X POST https://api.crowdsec.net/v2/watchers
-curl -6 -sS -o /dev/null -w &#x27;%{http_code}\n&#x27; --max-time 15 -X POST https://api.crowdsec.net/v2/watchers</code></pre>
+curl -4 -sS -o /dev/null -w &#x27;%{http_code}\n&#x27; --max-time 15 -X POST https://api.crowdsec.net/v3/watchers/enroll
+curl -6 -sS -o /dev/null -w &#x27;%{http_code}\n&#x27; --max-time 15 -X POST https://api.crowdsec.net/v3/watchers/enroll</code></pre>
 <p>MUST NOT loop <code>cscli capi status</code>. Nested probes MUST read a cache (<a href="../supporting/s34-crowdsec-capi-login-budget.html">OEN-S34</a>).</p>
 <ol><li><strong>P1 — Stop looping cscli.</strong><br>
 - <strong>Action:</strong> Disable or rate-limit systemd health and fleet collector units that run <code>cscli capi status</code>. Do not run it “to check again.”<br>
@@ -177,13 +174,13 @@ curl -6 -sS -o /dev/null -w &#x27;%{http_code}\n&#x27; --max-time 15 -X POST htt
 # Other family still accepted (example)
 401</code></pre>
 <h2 id="verify">Verify</h2>
-<ul><li>Dummy enroll: 401 on at least one family on this VPS.</li><li>No api.crowdsec.net A pin in hosts.</li><li>At most rare cscli capi status (cached).</li><li>Console shows enrolled after one successful status.</li><li>ICMP / small ping success was <strong>not</strong> used as the pass criterion when this spec names TCP, SSH, or HTTPS.</li><li>Bind table was filled by a human before any live <code>ip</code> / nft / iptables change.</li></ul>
+<ul><li>Dummy enroll: 401 on at least one family on this VPS.</li><li>No api.crowdsec.net A pin in hosts.</li><li>At most rare cscli capi status (cached).</li><li>Console shows enrolled after one successful status.</li></ul>
 <h2 id="must-not" class="must-not">MUST NOT</h2>
-<ul><li>MUST NOT loop cscli capi status or console enroll.</li><li>MUST NOT pin api.crowdsec.net to an A record.</li><li>MUST NOT publish VPS public IPs or control-host names.</li><li>MUST NOT treat a fleet dashboard “CAPI push FAIL” as proof of not enrolled without parsing console status.</li><li>MUST NOT route CAPI “through the tunnel” as the first fix — default egress is often already the public NIC.</li><li>MUST NOT apply live network or firewall changes until Bind is filled by a human.</li><li>MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.</li><li>MUST NOT publish hostnames, addresses, ULAs, or custom ports.</li></ul>
+<ul><li>MUST NOT loop cscli capi status or console enroll.</li><li>MUST NOT pin api.crowdsec.net to an A record.</li><li>MUST NOT publish VPS public IPs or control-host names.</li><li>MUST NOT treat a fleet dashboard “CAPI push FAIL” as proof of not enrolled without parsing console status.</li><li>MUST NOT route CAPI “through the tunnel” as the first fix — default egress is often already the public NIC.</li><li>MUST NOT publish hostnames, addresses, ULAs, or custom ports.</li></ul>
+<h2 id="page-changelog">Page changelog</h2>
+<ul><li>Edition 2 (8 Sep 2026, Mountain Time): Trap-specific Bind and agent stop rule (review cleanup).</li></ul>
 <h2 id="related-specs">Related specs</h2>
 <ul><li><a href="../supporting/s34-crowdsec-capi-login-budget.html">OEN-S34 CrowdSec free-tier CAPI login budget</a></li><li><a href="21-shared-vpn-nat-crowdsec-ban.html">OEN-21 Shared VPN NAT house ban</a></li><li><a href="15-split-host-vs-overlay-resolver.html">OEN-15 Split host vs overlay resolver</a></li></ul>
-<h2 id="prior-art-not-novel">Prior art (Not novel)</h2>
-<p>Docker healthcheck CAPI bans are documented. This spec’s claim is native systemd + fleet collector + hosts A-pin + 401/403 dummy matrix without more cscli.</p>
       </article>
     </main>
     <footer class="site-footer">

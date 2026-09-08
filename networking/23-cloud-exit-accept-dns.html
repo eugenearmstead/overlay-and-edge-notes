@@ -126,12 +126,12 @@
     <main id="main">
       <article>
         <h1>Cloud-exit accept-dns=true pretty-prints, breaks overlay peer-API DNS</h1>
-        <p class="meta-line"><span>OEN-23</span> · original · edition 1 · 2026-09-08</p>
+        <p class="meta-line"><span>OEN-23</span> · original · edition 2 · 2026-09-08</p>
         <h2 id="context">Context</h2>
 <p>On Google Compute Engine (GCE)-like hosts, <code>tailscale dns query</code> with <code>accept-dns=false</code> often shows metadata <code>169.254.169.254</code>. Turning <code>accept-dns=true</code> makes the display pretty and <strong>breaks</strong> the overlay peer-API (PeerAPI) Recursion Desired (RD)=0 exit Domain Name System (DNS) path (<a href="19-unbound-refuses-rd0.html">OEN-19</a>, <a href="14-exit-dns-is-peerapi.html">OEN-14</a>, <a href="17-gcp-overlay-exit.html">OEN-17</a>).</p>
 <p>Host <code>dig</code> is not the exit-client DNS over HTTPS (DoH) path.</p>
 
-<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>LAN</dt><dd>Local Area Network</dd><dt>WAN</dt><dd>Wide Area Network</dd><dt>TCP</dt><dd>Transmission Control Protocol</dd><dt>MTU</dt><dd>Maximum Transmission Unit</dd><dt>ICMP</dt><dd>Internet Control Message Protocol</dd><dt>HTTP</dt><dd>Hypertext Transfer Protocol</dd><dt>HTTPS</dt><dd>Hypertext Transfer Protocol Secure</dd><dt>DNS</dt><dd>Domain Name System</dd><dt>DoH</dt><dd>DNS over HTTPS</dd><dt>GCP</dt><dd>Google Cloud Platform</dd><dt>GCE</dt><dd>Google Compute Engine</dd><dt>VM</dt><dd>virtual machine</dd><dt>NIC</dt><dd>network interface card</dd><dt>API</dt><dd>application programming interface</dd><dt>PeerAPI</dt><dd>overlay peer application-programming interface (exit DNS over HTTPS)</dd><dt>RD</dt><dd>Recursion Desired (DNS flag)</dd><dt>nft</dt><dd>nftables (Linux packet filter)</dd><dt>ControlPath</dt><dd>OpenSSH multiplexing socket path option</dd><dt>JSON</dt><dd>JavaScript Object Notation</dd><dt>Pi</dt><dd>single-board computer (Raspberry Pi class)</dd><dt>REFUSES</dt><dd>DNS response code meaning the server will not answer</dd><dt>Unbound</dt><dd>validating recursive DNS resolver</dd><dt>NOERROR</dt><dd>DNS response code meaning the query succeeded</dd></dl></section>
+<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>API</dt><dd>application programming interface</dd><dt>CLI</dt><dd>command-line interface</dd><dt>ControlPath</dt><dd>OpenSSH multiplexing socket path option</dd><dt>DNS</dt><dd>Domain Name System</dd><dt>DoH</dt><dd>DNS over HTTPS</dd><dt>GCE</dt><dd>Google Compute Engine</dd><dt>GCP</dt><dd>Google Cloud Platform</dd><dt>HTTP</dt><dd>Hypertext Transfer Protocol</dd><dt>HTTPS</dt><dd>Hypertext Transfer Protocol Secure</dd><dt>JSON</dt><dd>JavaScript Object Notation</dd><dt>LAN</dt><dd>Local Area Network</dd><dt>NOERROR</dt><dd>DNS response code meaning the query succeeded</dd><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>PeerAPI</dt><dd>overlay peer application-programming interface (exit DNS over HTTPS)</dd><dt>Pi</dt><dd>single-board computer (Raspberry Pi class)</dd><dt>RD</dt><dd>Recursion Desired (DNS flag)</dd><dt>REFUSES</dt><dd>DNS response code meaning the server will not answer</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>Unbound</dt><dd>validating recursive DNS resolver</dd><dt>VM</dt><dd>virtual machine</dd></dl></section>
 <h2 id="topology">Topology</h2>
 <pre><code class="language-text">[GCE-like &lt;exit-node&gt;]
     accept-dns=false:  dns query may show metadata 169.254.169.254  (pretty-print, ignore)
@@ -139,7 +139,7 @@
 Host dig ≠ exit-client DoH</code></pre>
 <h2 id="bind">Bind</h2>
 <p>Fill this table <strong>before</strong> any live change. Do <strong>not</strong> paste real values back into public notes.</p>
-<table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><code>&lt;exit-node&gt;</code></td><td>Overlay exit node</td><td>Cloud VM or LAN Pi used as exit</td></tr><tr><td><code>&lt;overlay-peer&gt;</code></td><td>Soak client (<strong>not</strong> the agent workstation)</td><td>LAN Pi</td></tr><tr><td><code>&lt;user&gt;</code></td><td>SSH user</td><td>Guest</td></tr><tr><td><code>&lt;overlay-tun&gt;</code></td><td>Overlay tun on the exit</td><td>Iface</td></tr><tr><td><code>&lt;gcp-nic&gt;</code></td><td>Public NIC on a Google Cloud guest</td><td>Iface; omit on non-GCP exits</td></tr><tr><td><code>&lt;wan-iface&gt;</code></td><td>WAN / public NIC</td><td>Iface</td></tr><tr><td><code>&lt;mss4&gt;</code> / <code>&lt;mss6&gt;</code></td><td>Computed from underlay or overlay tun MTU</td><td>Formulas</td></tr></tbody></table>
+<table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><code>&lt;overlay-impl&gt;</code></td><td>Overlay implementation class</td><td><code>tailscale-compatible</code> or other — stop and translate CLI</td></tr><tr><td><code>&lt;user&gt;</code></td><td>SSH user</td><td>Guest account</td></tr><tr><td><code>&lt;exit-node&gt;</code></td><td>Overlay exit node</td><td>Cloud VM or LAN Pi</td></tr><tr><td><code>&lt;overlay-peer&gt;</code></td><td>Soak client (not the agent workstation)</td><td>LAN Pi or phone</td></tr></tbody></table>
 <h2 id="formulas">Formulas</h2>
 <p>Do not “fix DNS display” on an exit VM. Metadata resolver is not PeerAPI.</p>
 <h2 id="decision">Decision</h2>
@@ -147,9 +147,9 @@ Host dig ≠ exit-client DoH</code></pre>
 <h2 id="consequences">Consequences</h2>
 <ul><li>Pretty guest DNS is sacrificed; exit-client DNS works.</li><li>Metadata resolver is ignored as a canary.</li><li>Operators stop flipping accept-dns during incidents.</li></ul>
 <h2 id="agent-stop-rule">Agent stop rule</h2>
-<blockquote><p>A coding agent MUST emit a <strong>bound runbook</strong> (placeholders replaced from Bind). MUST NOT apply live <code>ip rule</code>, nft, iptables, ip6tables, sysctl, <code>wg set</code>, daemon restart, or deploy until a <strong>human</strong> filled Bind. MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS. MUST NOT file an upstream bug from this page. MUST NOT publish real addresses, hostnames, or custom ports.</p></blockquote>
+<blockquote><p>MUST emit bound <code>accept-dns</code> / <code>tailscale dns query</code> commands only after <code>&lt;overlay-impl&gt;</code> is <code>tailscale-compatible</code>. MUST NOT set <code>accept-dns=true</code> on an exit VM to pretty-print. MUST NOT apply netfilter from this page.</p></blockquote>
 <h2 id="procedure">Procedure</h2>
-<p>Placeholders only until Bind is filled: <code>&lt;cloud-vps&gt;</code>, <code>&lt;lan-pi&gt;</code>, <code>&lt;overlay-peer&gt;</code>, <code>&lt;exit-node&gt;</code>, <code>&lt;wg-iface&gt;</code>, <code>&lt;gcp-nic&gt;</code>, plus the Bind extras on this page.</p>
+<p>This spec does not apply if <code>&lt;overlay-impl&gt;</code> is not tailscale-compatible.</p>
 <h3>Copy-paste commands (after Bind)</h3>
 <pre><code class="language-bash">ssh -o ControlPath=none &lt;user&gt;@&lt;exit-node&gt; &#x27;tailscale status --json | head -c 200&#x27;  # or overlay equivalent; do not paste JSON publicly
 # Keep accept-dns=false on the exit VM. Prove DNS from a non-exit client via PeerAPI.</code></pre>
@@ -170,13 +170,13 @@ Host dig ≠ exit-client DoH</code></pre>
 <pre><code class="language-text"># Guest pretty-print (not exit DoH)
 169.254.169.254</code></pre>
 <h2 id="verify">Verify</h2>
-<ul><li>accept-dns=false on the exit VM.</li><li>PeerAPI DoH from a non-exit client works.</li><li>Guest dns query may still show metadata — ignored.</li><li>Agent workstation exit unset.</li><li>ICMP / small ping success was <strong>not</strong> used as the pass criterion when this spec names TCP, SSH, or HTTPS.</li><li>Bind table was filled by a human before any live <code>ip</code> / nft / iptables change.</li></ul>
+<ul><li>accept-dns=false on the exit VM.</li><li>PeerAPI DoH from a non-exit client works.</li><li>Guest dns query may still show metadata — ignored.</li><li>Agent workstation exit unset.</li></ul>
 <h2 id="must-not" class="must-not">MUST NOT</h2>
-<ul><li>MUST NOT set accept-dns=true on an exit VM to pretty-print.</li><li>MUST NOT treat metadata 169.254.169.254 as PeerAPI.</li><li>MUST NOT publish GCP project or VM names.</li><li>MUST NOT use leak-test 502 as proof the exit is down.</li><li>MUST NOT apply live network or firewall changes until Bind is filled by a human.</li><li>MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.</li><li>MUST NOT publish hostnames, addresses, ULAs, or custom ports.</li></ul>
+<ul><li>MUST NOT set accept-dns=true on an exit VM to pretty-print.</li><li>MUST NOT treat metadata 169.254.169.254 as PeerAPI.</li><li>MUST NOT publish GCP project or VM names.</li><li>MUST NOT use leak-test 502 as proof the exit is down.</li><li>MUST NOT publish hostnames, addresses, ULAs, or custom ports.</li></ul>
+<h2 id="page-changelog">Page changelog</h2>
+<ul><li>Edition 2 (8 Sep 2026, Mountain Time): Trap-specific Bind and agent stop rule (review cleanup).</li></ul>
 <h2 id="related-specs">Related specs</h2>
 <ul><li><a href="17-gcp-overlay-exit.html">OEN-17 Google Cloud overlay exit</a></li><li><a href="14-exit-dns-is-peerapi.html">OEN-14 Exit DNS is PeerAPI</a></li><li><a href="19-unbound-refuses-rd0.html">OEN-19 Unbound REFUSES RD=0</a></li><li><a href="../supporting/s18-do-not-set-exit-on-agent-workstation.html">OEN-S18 Do not set exit on the agent workstation</a></li></ul>
-<h2 id="prior-art-not-novel">Prior art (Not novel)</h2>
-<p>accept-dns is a documented overlay flag. This spec’s claim is pretty-print versus PeerAPI RD=0 on GCE-like exit VMs.</p>
       </article>
     </main>
     <footer class="site-footer">

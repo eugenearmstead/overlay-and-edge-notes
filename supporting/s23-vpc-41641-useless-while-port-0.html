@@ -120,18 +120,18 @@
     <main id="main">
       <article>
         <h1>Cloud firewall UDP 41641 is useless while overlay PORT=0</h1>
-        <p class="meta-line"><span>OEN-S23</span> · supporting · edition 1 · 2026-09-08</p>
+        <p class="meta-line"><span>OEN-S23</span> · supporting · edition 2 · 2026-09-08</p>
         <h2 id="context">Context</h2>
 <p>Empty <code>PORT=</code> can fail daemon start. Opening the cloud firewall while listen is ephemeral is a decoration.</p>
 
-<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>LAN</dt><dd>Local Area Network</dd><dt>WAN</dt><dd>Wide Area Network</dd><dt>TCP</dt><dd>Transmission Control Protocol</dd><dt>UDP</dt><dd>User Datagram Protocol</dd><dt>MTU</dt><dd>Maximum Transmission Unit</dd><dt>ICMP</dt><dd>Internet Control Message Protocol</dd><dt>HTTPS</dt><dd>Hypertext Transfer Protocol Secure</dd><dt>GCP</dt><dd>Google Cloud Platform</dd><dt>VM</dt><dd>virtual machine</dd><dt>VPC</dt><dd>Virtual Private Cloud</dd><dt>NIC</dt><dd>network interface card</dd><dt>nft</dt><dd>nftables (Linux packet filter)</dd><dt>PORT</dt><dd>overlay UDP listen port setting</dd><dt>ControlPath</dt><dd>OpenSSH multiplexing socket path option</dd><dt>Pi</dt><dd>single-board computer (Raspberry Pi class)</dd><dt>UFW</dt><dd>Uncomplicated Firewall</dd><dt>UNCONN</dt><dd>ss(8) unconnected socket state</dd></dl></section>
+<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>ControlPath</dt><dd>OpenSSH multiplexing socket path option</dd><dt>LAN</dt><dd>Local Area Network</dd><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>Pi</dt><dd>single-board computer (Raspberry Pi class)</dd><dt>PORT</dt><dd>overlay UDP listen port setting</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>UDP</dt><dd>User Datagram Protocol</dd><dt>UFW</dt><dd>Uncomplicated Firewall</dd><dt>UNCONN</dt><dd>ss(8) unconnected socket state</dd><dt>VM</dt><dd>virtual machine</dd><dt>VPC</dt><dd>Virtual Private Cloud</dd></dl></section>
 <h2 id="topology">Topology</h2>
 <pre><code class="language-text">VPC allow UDP 41641  +  daemon PORT=0 (ephemeral)  =  decoration
 Empty PORT= can fail start
 Ship PORT=41641 + restart + guest firewall + VPC together</code></pre>
 <h2 id="bind">Bind</h2>
 <p>Fill this table <strong>before</strong> any live change. Do <strong>not</strong> paste real values back into public notes.</p>
-<table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><code>&lt;exit-node&gt;</code></td><td>Overlay exit node</td><td>Cloud VM or LAN Pi used as exit</td></tr><tr><td><code>&lt;overlay-peer&gt;</code></td><td>Soak client (<strong>not</strong> the agent workstation)</td><td>LAN Pi</td></tr><tr><td><code>&lt;user&gt;</code></td><td>SSH user</td><td>Guest</td></tr><tr><td><code>&lt;overlay-tun&gt;</code></td><td>Overlay tun on the exit</td><td>Iface</td></tr><tr><td><code>&lt;gcp-nic&gt;</code></td><td>Public NIC on a Google Cloud guest</td><td>Iface; omit on non-GCP exits</td></tr><tr><td><code>&lt;wan-iface&gt;</code></td><td>WAN / public NIC</td><td>Iface</td></tr><tr><td><code>&lt;mss4&gt;</code> / <code>&lt;mss6&gt;</code></td><td>Computed from underlay or overlay tun MTU</td><td>Formulas</td></tr></tbody></table>
+<table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><code>&lt;user&gt;</code></td><td>SSH user</td><td>Guest account</td></tr><tr><td><code>&lt;exit-node&gt;</code></td><td>Overlay exit node</td><td>Cloud VM or LAN Pi</td></tr></tbody></table>
 <h2 id="formulas">Formulas</h2>
 <p>Production listen MUST be 41641, not a random high port.</p>
 <h2 id="method">Method</h2>
@@ -139,9 +139,8 @@ Ship PORT=41641 + restart + guest firewall + VPC together</code></pre>
 <h2 id="consequences">Consequences</h2>
 <p>Mesh UDP actually arrives. Firewall rules match reality.</p>
 <h2 id="agent-stop-rule">Agent stop rule</h2>
-<blockquote><p>A coding agent MUST emit a <strong>bound runbook</strong> (placeholders replaced from Bind). MUST NOT apply live <code>ip rule</code>, nft, iptables, ip6tables, sysctl, <code>wg set</code>, daemon restart, or deploy until a <strong>human</strong> filled Bind. MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS. MUST NOT file an upstream bug from this page. MUST NOT publish real addresses, hostnames, or custom ports.</p></blockquote>
+<blockquote><p>MUST emit bound overlay listen-port vs cloud-firewall checks after Bind is filled. MUST NOT treat UDP 41641 allow as sufficient while overlay PORT=0. MUST NOT publish project or VM names.</p></blockquote>
 <h2 id="procedure">Procedure</h2>
-<p>Placeholders only until Bind is filled: <code>&lt;cloud-vps&gt;</code>, <code>&lt;lan-pi&gt;</code>, <code>&lt;overlay-peer&gt;</code>, <code>&lt;exit-node&gt;</code>, <code>&lt;wg-iface&gt;</code>, <code>&lt;gcp-nic&gt;</code>, plus the Bind extras on this page.</p>
 <h3>Copy-paste commands (after Bind)</h3>
 <pre><code class="language-bash">ssh -o ControlPath=none &lt;user&gt;@&lt;exit-node&gt; &#x27;ss -ulnp | grep 41641&#x27;</code></pre>
 <ol><li><strong>P1 — ss the listen port.</strong><br>
@@ -157,13 +156,13 @@ Ship PORT=41641 + restart + guest firewall + VPC together</code></pre>
 <h2 id="expected-samples">Expected samples</h2>
 <pre><code class="language-text">UNCONN ... 0.0.0.0:41641</code></pre>
 <h2 id="verify">Verify</h2>
-<ul><li>UDP 41641 listening.</li><li>VPC and guest allow it.</li><li>PORT not empty/0.</li><li>ICMP / small ping success was <strong>not</strong> used as the pass criterion when this spec names TCP, SSH, or HTTPS.</li><li>Bind table was filled by a human before any live <code>ip</code> / nft / iptables change.</li></ul>
+<ul><li>UDP 41641 listening.</li><li>VPC and guest allow it.</li><li>PORT not empty/0.</li></ul>
 <h2 id="must-not" class="must-not">MUST NOT</h2>
-<ul><li>MUST NOT count on VPC 41641 while PORT=0.</li><li>MUST NOT leave PORT empty.</li><li>MUST NOT publish project ids.</li><li>MUST NOT apply live network or firewall changes until Bind is filled by a human.</li><li>MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.</li><li>MUST NOT publish hostnames, addresses, ULAs, or custom ports.</li></ul>
+<ul><li>MUST NOT count on VPC 41641 while PORT=0.</li><li>MUST NOT leave PORT empty.</li><li>MUST NOT publish project ids.</li><li>MUST NOT publish hostnames, addresses, ULAs, or custom ports.</li></ul>
+<h2 id="page-changelog">Page changelog</h2>
+<ul><li>Edition 2 (8 Sep 2026, Mountain Time): Trap-specific Bind and agent stop rule (review cleanup).</li></ul>
 <h2 id="related-specs">Related specs</h2>
 <ul><li><a href="../networking/17-gcp-overlay-exit.html">OEN-17</a></li><li><a href="../networking/01-overlay-ssh-byte-cliff.html">OEN-01</a></li></ul>
-<h2 id="prior-art-not-novel">Prior art (Not novel)</h2>
-<p>Allow UDP 41641 is in every overlay-on-GCP tutorial. This note is PORT=0 making that allow useless.</p>
       </article>
     </main>
     <footer class="site-footer">

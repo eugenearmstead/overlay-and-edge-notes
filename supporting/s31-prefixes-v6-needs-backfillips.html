@@ -120,17 +120,17 @@
     <main id="main">
       <article>
         <h1>prefixes.v6 needs nodes backfillips, not restart alone</h1>
-        <p class="meta-line"><span>OEN-S31</span> · supporting · edition 1 · 2026-09-08</p>
+        <p class="meta-line"><span>OEN-S31</span> · supporting · edition 2 · 2026-09-08</p>
         <h2 id="context">Context</h2>
 <p>Existing nodes do not grow ULA because a flag flipped. New nodes might. Backs <a href="../networking/13-overlay-underlay-ula-layers.html">OEN-13</a>.</p>
 
-<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>VPS</dt><dd>Virtual Private Server</dd><dt>LAN</dt><dd>Local Area Network</dd><dt>WAN</dt><dd>Wide Area Network</dd><dt>TCP</dt><dd>Transmission Control Protocol</dd><dt>MSS</dt><dd>Maximum Segment Size</dd><dt>MTU</dt><dd>Maximum Transmission Unit</dd><dt>ICMP</dt><dd>Internet Control Message Protocol</dd><dt>HTTPS</dt><dd>Hypertext Transfer Protocol Secure</dd><dt>IPv6</dt><dd>Internet Protocol version 6</dd><dt>WireGuard</dt><dd>UDP-based VPN protocol</dd><dt>ULA</dt><dd>unique-local address (IPv6)</dd><dt>nft</dt><dd>nftables (Linux packet filter)</dd><dt>ControlPath</dt><dd>OpenSSH multiplexing socket path option</dd><dt>Pi</dt><dd>single-board computer (Raspberry Pi class)</dd></dl></section>
+<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>CLI</dt><dd>command-line interface</dd><dt>ControlPath</dt><dd>OpenSSH multiplexing socket path option</dd><dt>HTTPS</dt><dd>Hypertext Transfer Protocol Secure</dd><dt>IPv6</dt><dd>Internet Protocol version 6</dd><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>ULA</dt><dd>unique-local address (IPv6)</dd><dt>VPS</dt><dd>Virtual Private Server</dd></dl></section>
 <h2 id="topology">Topology</h2>
 <pre><code class="language-text">prefixes.v6 enabled  +  restart only  --&gt;  tailscale ip -6 empty on EXISTING nodes
 Need nodes backfillips --force then restart</code></pre>
 <h2 id="bind">Bind</h2>
 <p>Fill this table <strong>before</strong> any live change. Do <strong>not</strong> paste real values back into public notes.</p>
-<table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><code>&lt;cloud-vps&gt;</code></td><td>Overlay SSH target</td><td>Cloud VPS</td></tr><tr><td><code>&lt;lan-pi&gt;</code></td><td>Overlay SSH target</td><td>LAN Pi</td></tr><tr><td><code>&lt;user&gt;</code></td><td>SSH user</td><td>Guest account</td></tr><tr><td><code>&lt;wg-iface&gt;</code></td><td>Commercial WireGuard iface</td><td>Router or VPS client</td></tr><tr><td><code>&lt;wan-iface&gt;</code></td><td>WAN iface</td><td>Router</td></tr><tr><td><code>&lt;lan-bridge&gt;</code></td><td>LAN bridge</td><td>Router (MTU 1500)</td></tr><tr><td><code>&lt;overlay-tun&gt;</code></td><td>Overlay tun iface</td><td>Node under test</td></tr><tr><td><code>&lt;wg-mtu&gt;</code></td><td>MTU integer from <code>ip link</code></td><td>Measured</td></tr><tr><td><code>&lt;mss4&gt;</code> / <code>&lt;mss6&gt;</code></td><td>Computed MSS</td><td>Formulas</td></tr><tr><td><code>&lt;vps-public-v4&gt;</code> / <code>&lt;vps-public-v6&gt;</code></td><td>VPS public addresses</td><td>WAN; never publish</td></tr><tr><td><code>&lt;overlay-v4&gt;</code> / <code>&lt;overlay-v6&gt;</code></td><td>Overlay addresses</td><td>Overlay; never publish</td></tr></tbody></table>
+<table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><code>&lt;overlay-impl&gt;</code></td><td>Overlay implementation class</td><td><code>tailscale-compatible</code> or other — stop and translate CLI</td></tr><tr><td><code>&lt;user&gt;</code></td><td>SSH user</td><td>Guest account</td></tr><tr><td><code>&lt;cloud-vps&gt;</code></td><td>Cloud VPS under test</td><td>Cloud VPS</td></tr></tbody></table>
 <h2 id="formulas">Formulas</h2>
 <p>Do not bind HTTPS to missing ULA.</p>
 <h2 id="method">Method</h2>
@@ -138,9 +138,9 @@ Need nodes backfillips --force then restart</code></pre>
 <h2 id="consequences">Consequences</h2>
 <p>Existing nodes get overlay IPv6. Binds that waited for ULA can start.</p>
 <h2 id="agent-stop-rule">Agent stop rule</h2>
-<blockquote><p>A coding agent MUST emit a <strong>bound runbook</strong> (placeholders replaced from Bind). MUST NOT apply live <code>ip rule</code>, nft, iptables, ip6tables, sysctl, <code>wg set</code>, daemon restart, or deploy until a <strong>human</strong> filled Bind. MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS. MUST NOT file an upstream bug from this page. MUST NOT publish real addresses, hostnames, or custom ports.</p></blockquote>
+<blockquote><p>MUST emit bound <code>nodes backfillips</code> after <code>&lt;overlay-impl&gt;</code> is <code>tailscale-compatible</code>. MUST NOT expect <code>tailscale ip -6</code> on existing nodes from prefixes.v6 + restart alone. MUST NOT apply netfilter from this page.</p></blockquote>
 <h2 id="procedure">Procedure</h2>
-<p>Placeholders only until Bind is filled: <code>&lt;cloud-vps&gt;</code>, <code>&lt;lan-pi&gt;</code>, <code>&lt;overlay-peer&gt;</code>, <code>&lt;exit-node&gt;</code>, <code>&lt;wg-iface&gt;</code>, <code>&lt;gcp-nic&gt;</code>, plus the Bind extras on this page.</p>
+<p>This spec does not apply if <code>&lt;overlay-impl&gt;</code> is not tailscale-compatible.</p>
 <h3>Copy-paste commands (after Bind)</h3>
 <pre><code class="language-bash">ssh -o ControlPath=none &lt;user&gt;@&lt;cloud-vps&gt; &#x27;tailscale ip -6 || true&#x27;
 # Coordinator: backfill existing nodes (private ops), then restart those nodes.</code></pre>
@@ -157,13 +157,13 @@ Need nodes backfillips --force then restart</code></pre>
 <h2 id="expected-samples">Expected samples</h2>
 <pre><code class="language-text"># empty ip -6 after restart-only</code></pre>
 <h2 id="verify">Verify</h2>
-<ul><li>Existing node has overlay v6 after backfill+restart.</li><li>Restart-only was not enough.</li><li>ICMP / small ping success was <strong>not</strong> used as the pass criterion when this spec names TCP, SSH, or HTTPS.</li><li>Bind table was filled by a human before any live <code>ip</code> / nft / iptables change.</li></ul>
+<ul><li>Existing node has overlay v6 after backfill+restart.</li><li>Restart-only was not enough.</li></ul>
 <h2 id="must-not" class="must-not">MUST NOT</h2>
-<ul><li>MUST NOT claim restart alone backfills prefixes.v6.</li><li>MUST NOT publish node IDs or ULAs.</li><li>MUST NOT apply live network or firewall changes until Bind is filled by a human.</li><li>MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.</li><li>MUST NOT publish hostnames, addresses, ULAs, or custom ports.</li></ul>
+<ul><li>MUST NOT claim restart alone backfills prefixes.v6.</li><li>MUST NOT publish node IDs or ULAs.</li><li>MUST NOT publish hostnames, addresses, ULAs, or custom ports.</li></ul>
+<h2 id="page-changelog">Page changelog</h2>
+<ul><li>Edition 2 (8 Sep 2026, Mountain Time): Trap-specific Bind and agent stop rule (review cleanup).</li></ul>
 <h2 id="related-specs">Related specs</h2>
 <ul><li><a href="../networking/13-overlay-underlay-ula-layers.html">OEN-13</a></li></ul>
-<h2 id="prior-art-not-novel">Prior art (Not novel)</h2>
-<p>Prefix enable is documented. This note is existing nodes needing backfillips --force.</p>
       </article>
     </main>
     <footer class="site-footer">

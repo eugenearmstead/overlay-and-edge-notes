@@ -120,11 +120,11 @@
     <main id="main">
       <article>
         <h1>Wi-Fi underlay vs cellular underlay to the same cloud exit</h1>
-        <p class="meta-line"><span>OEN-S26</span> · supporting · edition 1 · 2026-09-08</p>
+        <p class="meta-line"><span>OEN-S26</span> · supporting · edition 2 · 2026-09-08</p>
         <h2 id="context">Context</h2>
 <p>Distinct from <a href="../networking/20-lan-ula-happy-eyeballs-leak.html">OEN-20</a> (LAN ULA Happy-Eyeballs while an exit is selected). This is two underlays to the same cloud exit.</p>
 
-<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>LAN</dt><dd>Local Area Network</dd><dt>WAN</dt><dd>Wide Area Network</dd><dt>TCP</dt><dd>Transmission Control Protocol</dd><dt>MTU</dt><dd>Maximum Transmission Unit</dd><dt>ICMP</dt><dd>Internet Control Message Protocol</dd><dt>DF</dt><dd>don&#x27;t-fragment (IP flag)</dd><dt>HTTPS</dt><dd>Hypertext Transfer Protocol Secure</dd><dt>IP</dt><dd>Internet Protocol</dd><dt>IPv4</dt><dd>Internet Protocol version 4</dd><dt>IPv6</dt><dd>Internet Protocol version 6</dd><dt>WG</dt><dd>WireGuard</dd><dt>WireGuard</dt><dd>UDP-based VPN protocol</dd><dt>NAT</dt><dd>network address translation</dd><dt>ULA</dt><dd>unique-local address (IPv6)</dd><dt>GCP</dt><dd>Google Cloud Platform</dd><dt>VM</dt><dd>virtual machine</dd><dt>NIC</dt><dd>network interface card</dd><dt>nft</dt><dd>nftables (Linux packet filter)</dd><dt>Pi</dt><dd>single-board computer (Raspberry Pi class)</dd><dt>Happy-Eyeballs</dt><dd>dual-stack connection racing (RFC 8305)</dd><dt>PC</dt><dd>personal computer</dd></dl></section>
+<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>GCP</dt><dd>Google Cloud Platform</dd><dt>Happy-Eyeballs</dt><dd>dual-stack connection racing (RFC 8305)</dd><dt>IPv4</dt><dd>Internet Protocol version 4</dd><dt>IPv6</dt><dd>Internet Protocol version 6</dd><dt>LAN</dt><dd>Local Area Network</dd><dt>MTU</dt><dd>Maximum Transmission Unit</dd><dt>NAT</dt><dd>network address translation</dd><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>PC</dt><dd>personal computer</dd><dt>Pi</dt><dd>single-board computer (Raspberry Pi class)</dd><dt>ULA</dt><dd>unique-local address (IPv6)</dd><dt>VM</dt><dd>virtual machine</dd><dt>WG</dt><dd>WireGuard</dd></dl></section>
 <h2 id="topology">Topology</h2>
 <pre><code class="language-text">Same &lt;exit-node&gt;, two underlays:
   home Wi-Fi MAY encapsulate overlay inside commercial WG
@@ -133,24 +133,14 @@ v4 cloud / v6 home leak is NOT &quot;GCP broken&quot;
 Distinct from [OEN-20](../networking/20-lan-ula-happy-eyeballs-leak.html)</code></pre>
 <h2 id="bind">Bind</h2>
 <p>Fill this table <strong>before</strong> any live change. Do <strong>not</strong> paste real values back into public notes.</p>
-<table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><code>&lt;exit-node&gt;</code></td><td>Overlay exit node</td><td>Cloud VM or LAN Pi used as exit</td></tr><tr><td><code>&lt;overlay-peer&gt;</code></td><td>Soak client (<strong>not</strong> the agent workstation)</td><td>LAN Pi</td></tr><tr><td><code>&lt;user&gt;</code></td><td>SSH user</td><td>Guest</td></tr><tr><td><code>&lt;overlay-tun&gt;</code></td><td>Overlay tun on the exit</td><td>Iface</td></tr><tr><td><code>&lt;gcp-nic&gt;</code></td><td>Public NIC on a Google Cloud guest</td><td>Iface; omit on non-GCP exits</td></tr><tr><td><code>&lt;wan-iface&gt;</code></td><td>WAN / public NIC</td><td>Iface</td></tr><tr><td><code>&lt;mss4&gt;</code> / <code>&lt;mss6&gt;</code></td><td>Computed from underlay or overlay tun MTU</td><td>Formulas</td></tr></tbody></table>
-<h2 id="formulas">Formulas</h2>
-<pre><code class="language-text"># Measure &lt;wg-mtu&gt; from: ip link show &lt;wg-iface&gt;
-mss4 = &lt;wg-mtu&gt; - 40    # IPv4 TCP (20-byte IP + 20-byte TCP)
-mss6 = &lt;wg-mtu&gt; - 60    # IPv6 TCP (40-byte IPv6 + 20-byte TCP)
-# IPv4 DF ping: IP size ≈ payload + 28
-# IPv6 DF ping: IP size ≈ payload + 48
-# Historical 1160 / 1146-byte SSH cliff = wrong-scope clamp, not this recipe.
-# LAN bridge MTU MUST stay 1500.</code></pre>
-<p>See <a href="../networking/01-overlay-ssh-byte-cliff.html">OEN-01</a> and <a href="../supporting/s01-pmtud-size-ladder.html">OEN-S01</a>.</p>
+<table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><code>&lt;exit-node&gt;</code></td><td>Overlay exit node</td><td>Cloud VM or LAN Pi</td></tr></tbody></table>
 <h2 id="method">Method</h2>
 <p>Always A/B Wi-Fi vs cellular before changing GCP NAT/MTU. MUST NOT treat a Wi-Fi-only v6 leak as a broken cloud exit.</p>
 <h2 id="consequences">Consequences</h2>
 <p>Fewer pointless GCP MTU changes.</p>
 <h2 id="agent-stop-rule">Agent stop rule</h2>
-<blockquote><p>A coding agent MUST emit a <strong>bound runbook</strong> (placeholders replaced from Bind). MUST NOT apply live <code>ip rule</code>, nft, iptables, ip6tables, sysctl, <code>wg set</code>, daemon restart, or deploy until a <strong>human</strong> filled Bind. MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS. MUST NOT file an upstream bug from this page. MUST NOT publish real addresses, hostnames, or custom ports.</p></blockquote>
+<blockquote><p>MUST soak the same exit from Wi-Fi and cellular after Bind is filled. MUST NOT declare a cloud exit broken when only one underlay fails. MUST NOT apply netfilter from this page.</p></blockquote>
 <h2 id="procedure">Procedure</h2>
-<p>Placeholders only until Bind is filled: <code>&lt;cloud-vps&gt;</code>, <code>&lt;lan-pi&gt;</code>, <code>&lt;overlay-peer&gt;</code>, <code>&lt;exit-node&gt;</code>, <code>&lt;wg-iface&gt;</code>, <code>&lt;gcp-nic&gt;</code>, plus the Bind extras on this page.</p>
 <h3>Copy-paste commands (after Bind)</h3>
 <pre><code class="language-bash"># A/B: curl -4/-6 on Wi-Fi vs cellular with the same exit selected (phone), not the agent PC</code></pre>
 <ol><li><strong>P1 — Same exit, two underlays.</strong><br>
@@ -166,13 +156,13 @@ mss6 = &lt;wg-mtu&gt; - 60    # IPv6 TCP (40-byte IPv6 + 20-byte TCP)
 <h2 id="expected-samples">Expected samples</h2>
 <pre><code class="language-text"># Wi-Fi v6 egress = home tunnel prefix; cellular v6 = cloud</code></pre>
 <h2 id="verify">Verify</h2>
-<ul><li>Wi-Fi vs cellular matrix recorded.</li><li>GCP not blamed for a Wi-Fi-only encapsulate leak.</li><li>ICMP / small ping success was <strong>not</strong> used as the pass criterion when this spec names TCP, SSH, or HTTPS.</li><li>Bind table was filled by a human before any live <code>ip</code> / nft / iptables change.</li></ul>
+<ul><li>Wi-Fi vs cellular matrix recorded.</li><li>GCP not blamed for a Wi-Fi-only encapsulate leak.</li></ul>
 <h2 id="must-not" class="must-not">MUST NOT</h2>
-<ul><li>MUST NOT keep changing GCP MTU for a Wi-Fi/cellular split.</li><li>MUST NOT publish underlay IPs.</li><li>MUST NOT apply live network or firewall changes until Bind is filled by a human.</li><li>MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.</li><li>MUST NOT publish hostnames, addresses, ULAs, or custom ports.</li></ul>
+<ul><li>MUST NOT keep changing GCP MTU for a Wi-Fi/cellular split.</li><li>MUST NOT publish underlay IPs.</li><li>MUST NOT publish hostnames, addresses, ULAs, or custom ports.</li></ul>
+<h2 id="page-changelog">Page changelog</h2>
+<ul><li>Edition 2 (8 Sep 2026, Mountain Time): Trap-specific Bind and agent stop rule (review cleanup).</li></ul>
 <h2 id="related-specs">Related specs</h2>
 <ul><li><a href="../networking/20-lan-ula-happy-eyeballs-leak.html">OEN-20</a></li><li><a href="../networking/17-gcp-overlay-exit.html">OEN-17</a></li><li><a href="../networking/16-commercial-wg-endpoint-rotation.html">OEN-16</a></li></ul>
-<h2 id="prior-art-not-novel">Prior art (Not novel)</h2>
-<p>Different underlays are obvious. This note is the false “GCP exit is broken” when only Wi-Fi encapsulates.</p>
       </article>
     </main>
     <footer class="site-footer">

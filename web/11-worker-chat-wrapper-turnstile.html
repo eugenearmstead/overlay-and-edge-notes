@@ -126,20 +126,17 @@
     <main id="main">
       <article>
         <h1>Worker chat wrapper, Turnstile, sanitize large-language-model drift</h1>
-        <p class="meta-line"><span>OEN-11</span> · original · edition 1 · 2026-09-08</p>
+        <p class="meta-line"><span>OEN-11</span> · original · edition 2 · 2026-09-08</p>
         <h2 id="context">Context</h2>
 <p>Worker chat on a static site: iframe the Worker only when copy is stable. Otherwise a same-origin wrapper (<code>chatbot.html</code>) plus optional nginx <code>/chatbot-api/</code> proxy. Send official frequently asked questions (FAQ) every request. Strip forbidden phrases client-side before display. Gate the iframe with Turnstile. Bilingual privacy links.</p>
 <p>MUST NOT publish lead-feed URLs, Access audience (AUD) values, Signal, or device-snapshot as a tracking recipe. <a href="08-worker-html-localhost-debug.html">OEN-08</a> still applies to the wrapper HTML.</p>
 
-<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>TCP</dt><dd>Transmission Control Protocol</dd><dt>ICMP</dt><dd>Internet Control Message Protocol</dd><dt>HTTPS</dt><dd>Hypertext Transfer Protocol Secure</dd><dt>HTML</dt><dd>HyperText Markup Language</dd><dt>CSS</dt><dd>Cascading Style Sheets</dd><dt>JS</dt><dd>JavaScript</dd><dt>API</dt><dd>application programming interface</dd><dt>nft</dt><dd>nftables (Linux packet filter)</dd><dt>FAQ</dt><dd>frequently asked questions</dd><dt>URL</dt><dd>Uniform Resource Locator</dd><dt>UI</dt><dd>user interface</dd><dt>Playwright</dt><dd>browser automation and test runner</dd><dt>Turnstile</dt><dd>Cloudflare bot challenge widget</dd><dt>AUD</dt><dd>OAuth audience identifier</dd><dt>DOM</dt><dd>Document Object Model</dd><dt>NAP</dt><dd>name, address, and phone (local-business citation data)</dd></dl></section>
+<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>API</dt><dd>application programming interface</dd><dt>AUD</dt><dd>OAuth audience identifier</dd><dt>CSS</dt><dd>Cascading Style Sheets</dd><dt>DOM</dt><dd>Document Object Model</dd><dt>FAQ</dt><dd>frequently asked questions</dd><dt>HTML</dt><dd>HyperText Markup Language</dd><dt>HTTPS</dt><dd>Hypertext Transfer Protocol Secure</dd><dt>JS</dt><dd>JavaScript</dd><dt>NAP</dt><dd>name, address, and phone (local-business citation data)</dd><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>Playwright</dt><dd>browser automation and test runner</dd><dt>Turnstile</dt><dd>Cloudflare bot challenge widget</dd><dt>UI</dt><dd>user interface</dd><dt>URL</dt><dd>Uniform Resource Locator</dd></dl></section>
 <h2 id="topology">Topology</h2>
-<pre><code class="language-text">[static origin]
-    iframe Worker chat     -- only if copy is stable
-    else chatbot.html wrapper + optional same-origin /chatbot-api/ proxy
-    FAQ every request; strip forbidden phrases before paint; Turnstile gate</code></pre>
+<p>N/A — deploy</p>
 <h2 id="bind">Bind</h2>
 <p>Fill this table <strong>before</strong> any live change. Do <strong>not</strong> paste real values back into public notes.</p>
-<table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><code>&lt;worker-root&gt;</code></td><td>Worker / UI source tree</td><td>Directory on the workstation</td></tr><tr><td><code>&lt;live-url&gt;</code></td><td>Public HTTPS origin</td><td>URL the browser loads</td></tr><tr><td><code>&lt;preview-url&gt;</code></td><td>Preview origin if used</td><td>URL</td></tr><tr><td><code>&lt;html-path&gt;</code></td><td>Path that becomes a Response body</td><td>File glob</td></tr></tbody></table>
+<table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><code>&lt;worker-root&gt;</code></td><td>Worker / UI source tree</td><td>Directory</td></tr><tr><td><code>&lt;live-url&gt;</code></td><td>Public HTTPS origin</td><td>URL</td></tr></tbody></table>
 <h2 id="formulas">Formulas</h2>
 <p>MUST NOT publish lead-feed URLs, Access AUDs, or device-snapshot recipes. <a href="08-worker-html-localhost-debug.html">OEN-08</a> still applies.</p>
 <h2 id="decision">Decision</h2>
@@ -147,9 +144,8 @@
 <h2 id="consequences">Consequences</h2>
 <ul><li>Drifted phrases never reach the visitor.</li><li>Turnstile reduces anonymous scrape of the iframe.</li><li>Privacy links stay on the wrapper, not only the Worker origin.</li></ul>
 <h2 id="agent-stop-rule">Agent stop rule</h2>
-<blockquote><p>A coding agent MUST emit a <strong>bound runbook</strong> (placeholders replaced from Bind). MUST NOT apply live <code>ip rule</code>, nft, iptables, ip6tables, sysctl, <code>wg set</code>, daemon restart, or deploy until a <strong>human</strong> filled Bind. MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS. MUST NOT file an upstream bug from this page. MUST NOT publish real addresses, hostnames, or custom ports.</p></blockquote>
+<blockquote><p>MUST emit wrapper vs iframe and Turnstile checks with <code>&lt;live-url&gt;</code> filled. MUST NOT deploy until Bind is filled. MUST NOT publish site secrets, Access ids, or prompt text that identifies a lab. MUST NOT apply netfilter from this page.</p></blockquote>
 <h2 id="procedure">Procedure</h2>
-<p>Placeholders only until Bind is filled: <code>&lt;cloud-vps&gt;</code>, <code>&lt;lan-pi&gt;</code>, <code>&lt;overlay-peer&gt;</code>, <code>&lt;exit-node&gt;</code>, <code>&lt;wg-iface&gt;</code>, <code>&lt;gcp-nic&gt;</code>, plus the Bind extras on this page.</p>
 <h3>Copy-paste commands (after Bind)</h3>
 <pre><code class="language-bash">rg -n &quot;127\\.0\\.0\\.1:7450|X-Debug-Session-Id|/ingest/&quot; &lt;worker-root&gt; || true
 curl -sS -o /dev/null -w &#x27;%{http_code}\n&#x27; --max-time 15 &lt;live-url&gt;/chatbot.html</code></pre>
@@ -169,13 +165,13 @@ curl -sS -o /dev/null -w &#x27;%{http_code}\n&#x27; --max-time 15 &lt;live-url&g
 <h2 id="expected-samples">Expected samples</h2>
 <pre><code class="language-text"># No ingest strings in view-source; Turnstile present before chat UI</code></pre>
 <h2 id="verify">Verify</h2>
-<ul><li>Wrapper or iframe policy is documented and matches live HTML.</li><li>Forbidden phrases cannot render.</li><li>Turnstile gates the chat.</li><li>No localhost ingest; no lead-feed or Access AUDs in the public spec or page.</li><li>ICMP / small ping success was <strong>not</strong> used as the pass criterion when this spec names TCP, SSH, or HTTPS.</li><li>Bind table was filled by a human before any live <code>ip</code> / nft / iptables change.</li></ul>
+<ul><li>Wrapper or iframe policy is documented and matches live HTML.</li><li>Forbidden phrases cannot render.</li><li>Turnstile gates the chat.</li><li>No localhost ingest; no lead-feed or Access AUDs in the public spec or page.</li></ul>
 <h2 id="must-not" class="must-not">MUST NOT</h2>
-<ul><li>MUST NOT publish lead-feed URLs, Access AUDs, Signal, or device-snapshot recipes.</li><li>MUST NOT ship localhost debug beacons in the wrapper.</li><li>MUST NOT iframe an unstable Worker without a sanitizer.</li><li>MUST NOT skip bilingual privacy links the site already uses elsewhere.</li><li>MUST NOT apply live network or firewall changes until Bind is filled by a human.</li><li>MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.</li><li>MUST NOT publish hostnames, addresses, ULAs, or custom ports.</li></ul>
+<ul><li>MUST NOT publish lead-feed URLs, Access AUDs, Signal, or device-snapshot recipes.</li><li>MUST NOT ship localhost debug beacons in the wrapper.</li><li>MUST NOT iframe an unstable Worker without a sanitizer.</li><li>MUST NOT skip bilingual privacy links the site already uses elsewhere.</li><li>MUST NOT publish hostnames, addresses, ULAs, or custom ports.</li></ul>
+<h2 id="page-changelog">Page changelog</h2>
+<ul><li>Edition 2 (8 Sep 2026, Mountain Time): Trap-specific Bind and agent stop rule (review cleanup).</li></ul>
 <h2 id="related-specs">Related specs</h2>
 <ul><li><a href="08-worker-html-localhost-debug.html">OEN-08 Localhost debug beacons</a></li><li><a href="10-one-blocking-stylesheet-variable-fonts.html">OEN-10 One blocking stylesheet</a></li><li><a href="../supporting/s06-do-not-ship-html-only.html">OEN-S06 Do not ship HTML-only</a></li><li><a href="../supporting/s09-playwright-desktop-iphone-pixel.html">OEN-S09 Playwright three devices</a></li></ul>
-<h2 id="prior-art-not-novel">Prior art (Not novel)</h2>
-<p>Turnstile and iframe chat are documented. This spec’s claim is wrapper-when-drift plus client sanitize plus FAQ-every-request plus what not to publish.</p>
       </article>
     </main>
     <footer class="site-footer">

@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>OEN-S06: Do not ship HTML-only — Overlay and Edge Notes</title>
     <meta name="description" content="CSS, JavaScript, and images must return 200. A layout-destroying miss looks like a CSS bug.">
-    <meta name="keywords" content="do not ship HTML-only, CSS 404 looks like CSS bug, JS images must 200, layout destroying miss, rsync HTML without assets, static site missing chrome.css, Cloudflare origin 404 CSS, deploy incomplete assets, HTML 200 CSS 404, verify every static URL, Playwright asset 200, tmpfs origin missing files">
-    <meta name="citation_keywords" content="do not ship HTML-only, CSS 404 looks like CSS bug, JS images must 200, layout destroying miss, rsync HTML without assets, static site missing chrome.css, Cloudflare origin 404 CSS, deploy incomplete assets, HTML 200 CSS 404, verify every static URL, Playwright asset 200, tmpfs origin missing files">
+    <meta name="keywords" content="do not ship HTML-only, CSS 404 looks like CSS bug, JS images must 200, layout destroying miss, rsync HTML without assets, static site missing &lt;site.css&gt;, Cloudflare origin 404 CSS, deploy incomplete assets, HTML 200 CSS 404, verify every static URL, Playwright asset 200, tmpfs origin missing files">
+    <meta name="citation_keywords" content="do not ship HTML-only, CSS 404 looks like CSS bug, JS images must 200, layout destroying miss, rsync HTML without assets, static site missing &lt;site.css&gt;, Cloudflare origin 404 CSS, deploy incomplete assets, HTML 200 CSS 404, verify every static URL, Playwright asset 200, tmpfs origin missing files">
     <link rel="canonical" href="https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s06-do-not-ship-html-only.html">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -52,7 +52,7 @@
         "JS images must 200",
         "layout destroying miss",
         "rsync HTML without assets",
-        "static site missing chrome.css",
+        "static site missing <site.css>",
         "Cloudflare origin 404 CSS",
         "deploy incomplete assets",
         "HTML 200 CSS 404",
@@ -120,32 +120,25 @@
     <main id="main">
       <article>
         <h1>Do not ship HTML-only</h1>
-        <p class="meta-line"><span>OEN-S06</span> · supporting · edition 1 · 2026-09-08</p>
+        <p class="meta-line"><span>OEN-S06</span> · supporting · edition 2 · 2026-09-08</p>
         <h2 id="context">Context</h2>
 <p>HTML-only rsync to the wrong tree looks deployed. Layout explodes. Operators rewrite CSS.</p>
 
-<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>TCP</dt><dd>Transmission Control Protocol</dd><dt>ICMP</dt><dd>Internet Control Message Protocol</dd><dt>HTTPS</dt><dd>Hypertext Transfer Protocol Secure</dd><dt>HTML</dt><dd>HyperText Markup Language</dd><dt>CSS</dt><dd>Cascading Style Sheets</dd><dt>JS</dt><dd>JavaScript</dd><dt>nft</dt><dd>nftables (Linux packet filter)</dd><dt>URL</dt><dd>Uniform Resource Locator</dd><dt>UI</dt><dd>user interface</dd><dt>RAM</dt><dd>random-access memory</dd><dt>tmpfs</dt><dd>temporary file system in RAM</dd><dt>Playwright</dt><dd>browser automation and test runner</dd><dt>Wrangler</dt><dd>Cloudflare Workers command-line tool</dd></dl></section>
+<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>CSS</dt><dd>Cascading Style Sheets</dd><dt>HTML</dt><dd>HyperText Markup Language</dd><dt>HTTP</dt><dd>Hypertext Transfer Protocol</dd><dt>HTTPS</dt><dd>Hypertext Transfer Protocol Secure</dd><dt>JS</dt><dd>JavaScript</dd><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>Playwright</dt><dd>browser automation and test runner</dd><dt>RAM</dt><dd>random-access memory</dd><dt>URL</dt><dd>Uniform Resource Locator</dd></dl></section>
 <h2 id="topology">Topology</h2>
-<pre><code class="language-text">[HTML 200] + [chrome.css 404]  looks like a &quot;CSS bug&quot;
-Ship HTML + CSS + JS + images together</code></pre>
+<p>N/A — deploy</p>
 <h2 id="bind">Bind</h2>
 <p>Fill this table <strong>before</strong> any live change. Do <strong>not</strong> paste real values back into public notes.</p>
-<table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><code>&lt;worker-root&gt;</code></td><td>Worker / UI source tree</td><td>Directory on the workstation</td></tr><tr><td><code>&lt;live-url&gt;</code></td><td>Public HTTPS origin</td><td>URL the browser loads</td></tr><tr><td><code>&lt;preview-url&gt;</code></td><td>Preview origin if used</td><td>URL</td></tr><tr><td><code>&lt;html-path&gt;</code></td><td>Path that becomes a Response body</td><td>File glob</td></tr></tbody></table>
-<h2 id="formulas">Formulas</h2>
-<pre><code class="language-text"># Predeploy MUST fail the ship on client-executed matches:
-#   127.0.0.1:7450   localhost:7450   /ingest/   X-Debug-Session-Id
-# Merge ≠ live Worker. Wait ~10 minutes, then Wrangler if the Git build never started.
-# Cache: Workers-edit tokens often lack Cache Purge. ?v= does not replace zone purge for HTML.</code></pre>
+<table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><code>&lt;live-url&gt;</code></td><td>Public HTTPS origin</td><td>URL</td></tr><tr><td><code>&lt;site.css&gt;</code></td><td>Origin stylesheet filename</td><td>Asset</td></tr></tbody></table>
 <h2 id="method">Method</h2>
 <p>Ship CSS/JS/images with HTML. Check 200s. Canonical disk then RAM origin is <a href="s08-canonical-disk-tmpfs-origin.html">OEN-S08</a>.</p>
 <h2 id="consequences">Consequences</h2>
 <p>“CSS bugs” that were 404s go away.</p>
 <h2 id="agent-stop-rule">Agent stop rule</h2>
-<blockquote><p>A coding agent MUST emit a <strong>bound runbook</strong> (placeholders replaced from Bind). MUST NOT apply live <code>ip rule</code>, nft, iptables, ip6tables, sysctl, <code>wg set</code>, daemon restart, or deploy until a <strong>human</strong> filled Bind. MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS. MUST NOT file an upstream bug from this page. MUST NOT publish real addresses, hostnames, or custom ports.</p></blockquote>
+<blockquote><p>MUST emit a bound asset-curl list (<code>&lt;live-url&gt;</code> + every href/src) after Bind is filled. MUST NOT deploy until that list is HTTP 200. MUST NOT call a 404 stylesheet a CSS bug. MUST NOT file an upstream CSS/browser bug from this page.</p></blockquote>
 <h2 id="procedure">Procedure</h2>
-<p>Placeholders only until Bind is filled: <code>&lt;cloud-vps&gt;</code>, <code>&lt;lan-pi&gt;</code>, <code>&lt;overlay-peer&gt;</code>, <code>&lt;exit-node&gt;</code>, <code>&lt;wg-iface&gt;</code>, <code>&lt;gcp-nic&gt;</code>, plus the Bind extras on this page.</p>
 <h3>Copy-paste commands (after Bind)</h3>
-<pre><code class="language-bash">for u in &lt;live-url&gt; &lt;live-url&gt;/chrome.css; do curl -sS -o /dev/null -w &#x27;%{http_code} %{url_effective}\n&#x27; --max-time 15 &quot;$u&quot;; done</code></pre>
+<pre><code class="language-bash">for u in &lt;live-url&gt; &lt;live-url&gt;/&lt;site.css&gt;; do curl -sS -o /dev/null -w &#x27;%{http_code} %{url_effective}\n&#x27; --max-time 15 &quot;$u&quot;; done</code></pre>
 <ol><li><strong>P1 — List assets in the new HTML.</strong><br>
 - <strong>Action:</strong> Extract href/src. curl each with -o /dev/null -w &#x27;%{http_code}&#x27;.<br>
 - <strong>Expected:</strong> All 200.<br>
@@ -158,15 +151,15 @@ Ship HTML + CSS + JS + images together</code></pre>
 - <strong>On failure:</strong> Do not skip because “it was only HTML.”</li></ol>
 <h2 id="expected-samples">Expected samples</h2>
 <pre><code class="language-text">200 https://example.example/
-404 https://example.example/chrome.css</code></pre>
+404 https://example.example/&lt;site.css&gt;</code></pre>
 <h2 id="verify">Verify</h2>
-<ul><li>Asset URLs 200.</li><li>Correct tree synced.</li><li>ICMP / small ping success was <strong>not</strong> used as the pass criterion when this spec names TCP, SSH, or HTTPS.</li><li>Bind table was filled by a human before any live <code>ip</code> / nft / iptables change.</li></ul>
+<ul><li>Asset URLs 200.</li><li>Correct tree synced.</li></ul>
 <h2 id="must-not" class="must-not">MUST NOT</h2>
-<ul><li>MUST NOT call a 404 stylesheet a CSS bug.</li><li>MUST NOT HTML-only rsync to the RAM tree.</li><li>MUST NOT apply live network or firewall changes until Bind is filled by a human.</li><li>MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.</li><li>MUST NOT publish hostnames, addresses, ULAs, or custom ports.</li></ul>
+<ul><li>MUST NOT call a 404 stylesheet a CSS bug.</li><li>MUST NOT HTML-only rsync to the RAM tree.</li><li>MUST NOT publish hostnames, addresses, ULAs, or custom ports.</li></ul>
+<h2 id="page-changelog">Page changelog</h2>
+<ul><li>Edition 2 (8 Sep 2026, Mountain Time): Trap-specific Bind and agent stop rule (review cleanup).</li></ul>
 <h2 id="related-specs">Related specs</h2>
 <ul><li><a href="s08-canonical-disk-tmpfs-origin.html">OEN-S08</a></li><li><a href="../web/10-one-blocking-stylesheet-variable-fonts.html">OEN-10</a></li></ul>
-<h2 id="prior-art-not-novel">Prior art (Not novel)</h2>
-<p>Broken asset 404s are obvious in hindsight. This note exists because they present as design bugs.</p>
       </article>
     </main>
     <footer class="site-footer">

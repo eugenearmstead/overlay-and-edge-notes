@@ -120,18 +120,16 @@
     <main id="main">
       <article>
         <h1>Restart=always on a missing unit hung the workstation</h1>
-        <p class="meta-line"><span>OEN-S13</span> · supporting · edition 1 · 2026-09-08</p>
+        <p class="meta-line"><span>OEN-S13</span> · supporting · edition 2 · 2026-09-08</p>
         <h2 id="context">Context</h2>
 <p>Always-on jobs belong on an always-on host. A user systemd unit with Restart=always and a vanished ExecStart can peg a workstation. Leftover units may bind another host’s addresses.</p>
 
-<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>VPS</dt><dd>Virtual Private Server</dd><dt>LAN</dt><dd>Local Area Network</dd><dt>TCP</dt><dd>Transmission Control Protocol</dd><dt>ICMP</dt><dd>Internet Control Message Protocol</dd><dt>HTTPS</dt><dd>Hypertext Transfer Protocol Secure</dd><dt>nft</dt><dd>nftables (Linux packet filter)</dd><dt>Pi</dt><dd>single-board computer (Raspberry Pi class)</dd><dt>systemd</dt><dd>Linux service manager</dd></dl></section>
+<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>API</dt><dd>application programming interface</dd><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>Pi</dt><dd>single-board computer (Raspberry Pi class)</dd><dt>systemd</dt><dd>Linux service manager</dd><dt>VPS</dt><dd>Virtual Private Server</dd></dl></section>
 <h2 id="topology">Topology</h2>
-<pre><code class="language-text">systemd --user Restart=always + missing ExecStart
---&gt; 150k+ failed restarts on a 2-core workstation
-Leftover units may bind another host&#x27;s addresses</code></pre>
+<p>N/A — deploy</p>
 <h2 id="bind">Bind</h2>
 <p>Fill this table <strong>before</strong> any live change. Do <strong>not</strong> paste real values back into public notes.</p>
-<table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><code>&lt;repo-changelog&gt;</code></td><td>Canonical Markdown file in the private ops repo</td><td>Path class, not inventory</td></tr><tr><td><code>&lt;on-device-changelog&gt;</code></td><td>On-device copy for that node class</td><td>Path class</td></tr><tr><td><code>&lt;node&gt;</code></td><td>Role name (cloud VPS, LAN Pi, router, workstation)</td><td>Role, not hostname</td></tr></tbody></table>
+<table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><em>(none)</em></td><td>No packet-path Bind for this trap</td><td>Use the git host, origin, or API the operator already has</td></tr></tbody></table>
 <h2 id="formulas">Formulas</h2>
 <p>Always-on jobs belong on an always-on host, not the agent workstation.</p>
 <h2 id="method">Method</h2>
@@ -139,9 +137,8 @@ Leftover units may bind another host&#x27;s addresses</code></pre>
 <h2 id="consequences">Consequences</h2>
 <p>Workstation load returns to normal. Foreign binds go away.</p>
 <h2 id="agent-stop-rule">Agent stop rule</h2>
-<blockquote><p>A coding agent MUST emit a <strong>bound runbook</strong> (placeholders replaced from Bind). MUST NOT apply live <code>ip rule</code>, nft, iptables, ip6tables, sysctl, <code>wg set</code>, daemon restart, or deploy until a <strong>human</strong> filled Bind. MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS. MUST NOT file an upstream bug from this page. MUST NOT publish real addresses, hostnames, or custom ports.</p></blockquote>
+<blockquote><p>MUST emit the <code>systemctl --user</code> crash-loop audit after Bind is filled. MUST NOT set <code>Restart=always</code> on a unit whose binary may be missing. MUST NOT apply netfilter from this page.</p></blockquote>
 <h2 id="procedure">Procedure</h2>
-<p>Placeholders only until Bind is filled: <code>&lt;cloud-vps&gt;</code>, <code>&lt;lan-pi&gt;</code>, <code>&lt;overlay-peer&gt;</code>, <code>&lt;exit-node&gt;</code>, <code>&lt;wg-iface&gt;</code>, <code>&lt;gcp-nic&gt;</code>, plus the Bind extras on this page.</p>
 <h3>Copy-paste commands (after Bind)</h3>
 <pre><code class="language-bash">systemctl --user --failed
 systemctl --user list-units --type=service --state=failed,activating</code></pre>
@@ -159,13 +156,13 @@ systemctl --user list-units --type=service --state=failed,activating</code></pre
 <pre><code class="language-text">N failed
 # N huge + Restart=always + missing ExecStart</code></pre>
 <h2 id="verify">Verify</h2>
-<ul><li>No crash-loop user units.</li><li>Always-on jobs not on the interactive workstation.</li><li>ICMP / small ping success was <strong>not</strong> used as the pass criterion when this spec names TCP, SSH, or HTTPS.</li><li>Bind table was filled by a human before any live <code>ip</code> / nft / iptables change.</li></ul>
+<ul><li>No crash-loop user units.</li><li>Always-on jobs not on the interactive workstation.</li></ul>
 <h2 id="must-not" class="must-not">MUST NOT</h2>
-<ul><li>MUST NOT Restart=always a missing binary.</li><li>MUST NOT publish timer unit names that identify the lab.</li><li>MUST NOT apply live network or firewall changes until Bind is filled by a human.</li><li>MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.</li><li>MUST NOT publish hostnames, addresses, ULAs, or custom ports.</li></ul>
+<ul><li>MUST NOT Restart=always a missing binary.</li><li>MUST NOT publish timer unit names that identify the lab.</li><li>MUST NOT publish hostnames, addresses, ULAs, or custom ports.</li></ul>
+<h2 id="page-changelog">Page changelog</h2>
+<ul><li>Edition 2 (8 Sep 2026, Mountain Time): Trap-specific Bind and agent stop rule (review cleanup).</li></ul>
 <h2 id="related-specs">Related specs</h2>
 <ul><li><a href="s18-do-not-set-exit-on-agent-workstation.html">OEN-S18</a></li><li><a href="../networking/18-per-node-changelog-contract.html">OEN-18</a></li></ul>
-<h2 id="prior-art-not-novel">Prior art (Not novel)</h2>
-<p>systemd Restart=always is documented. This note is missing ExecStart plus 150k restarts plus foreign binds on a 2-core box.</p>
       </article>
     </main>
     <footer class="site-footer">

@@ -120,11 +120,11 @@
     <main id="main">
       <article>
         <h1>clamp-mss-to-pmtu is a no-op when ICMP is dropped</h1>
-        <p class="meta-line"><span>OEN-S02</span> · supporting · edition 1 · 2026-09-08</p>
+        <p class="meta-line"><span>OEN-S02</span> · supporting · edition 2 · 2026-09-08</p>
         <h2 id="context">Context</h2>
 <p>The usual recipe <code>TCPMSS --clamp-mss-to-pmtu</code> on Local Area Network (LAN)↔Virtual Private Network (VPN) FORWARD does <strong>nothing useful</strong> when Internet Control Message Protocol (ICMP) path MTU discovery (PMTUD) is blackholed — common on commercial WireGuard. Packet counters may increment while Maximum Segment Size (MSS) never changes. Backs <a href="../networking/01-overlay-ssh-byte-cliff.html">OEN-01</a> and <a href="../networking/02-chromium-tls-pmtu.html">OEN-02</a>.</p>
 
-<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>VPS</dt><dd>Virtual Private Server</dd><dt>LAN</dt><dd>Local Area Network</dd><dt>WAN</dt><dd>Wide Area Network</dd><dt>VPN</dt><dd>Virtual Private Network</dd><dt>KB</dt><dd>kilobyte</dd><dt>TCP</dt><dd>Transmission Control Protocol</dd><dt>MSS</dt><dd>Maximum Segment Size</dd><dt>TCPMSS</dt><dd>iptables/nft target that sets TCP Maximum Segment Size</dd><dt>MTU</dt><dd>Maximum Transmission Unit</dd><dt>ICMP</dt><dd>Internet Control Message Protocol</dd><dt>PMTU</dt><dd>path Maximum Transmission Unit</dd><dt>PMTUD</dt><dd>path MTU discovery</dd><dt>DF</dt><dd>don&#x27;t-fragment (IP flag)</dd><dt>HTTPS</dt><dd>Hypertext Transfer Protocol Secure</dd><dt>IP</dt><dd>Internet Protocol</dd><dt>IPv4</dt><dd>Internet Protocol version 4</dd><dt>IPv6</dt><dd>Internet Protocol version 6</dd><dt>WireGuard</dt><dd>UDP-based VPN protocol</dd><dt>nft</dt><dd>nftables (Linux packet filter)</dd><dt>FORWARD</dt><dd>netfilter/iptables forward chain</dd><dt>Pi</dt><dd>single-board computer (Raspberry Pi class)</dd><dt>Chromium</dt><dd>open-source browser engine</dd><dt>Inter</dt><dd>variable sans-serif font family</dd></dl></section>
+<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>Chromium</dt><dd>open-source browser engine</dd><dt>DF</dt><dd>don&#x27;t-fragment (IP flag)</dd><dt>FORWARD</dt><dd>netfilter/iptables forward chain</dd><dt>HTTPS</dt><dd>Hypertext Transfer Protocol Secure</dd><dt>ICMP</dt><dd>Internet Control Message Protocol</dd><dt>KB</dt><dd>kilobyte</dd><dt>LAN</dt><dd>Local Area Network</dd><dt>MSS</dt><dd>Maximum Segment Size</dd><dt>MTU</dt><dd>Maximum Transmission Unit</dd><dt>nft</dt><dd>nftables (Linux packet filter)</dd><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>Pi</dt><dd>single-board computer (Raspberry Pi class)</dd><dt>PMTU</dt><dd>path Maximum Transmission Unit</dd><dt>PMTUD</dt><dd>path MTU discovery</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>TCP</dt><dd>Transmission Control Protocol</dd><dt>TCPMSS</dt><dd>iptables/nft target that sets TCP Maximum Segment Size</dd><dt>VPN</dt><dd>Virtual Private Network</dd><dt>VPS</dt><dd>Virtual Private Server</dd><dt>WAN</dt><dd>Wide Area Network</dd></dl></section>
 <h2 id="topology">Topology</h2>
 <pre><code class="language-text">LAN&lt;-&gt;VPN FORWARD TCPMSS --clamp-mss-to-pmtu
 ICMP frag-needed blackholed  --&gt;  learned PMTU never updates  --&gt;  clamp is a no-op
@@ -133,14 +133,11 @@ FIX: explicit --set-mss &lt;mss4&gt;/&lt;mss6&gt;</code></pre>
 <p>Fill this table <strong>before</strong> any live change. Do <strong>not</strong> paste real values back into public notes.</p>
 <table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><code>&lt;cloud-vps&gt;</code></td><td>Overlay SSH target</td><td>Cloud VPS</td></tr><tr><td><code>&lt;lan-pi&gt;</code></td><td>Overlay SSH target</td><td>LAN Pi</td></tr><tr><td><code>&lt;user&gt;</code></td><td>SSH user</td><td>Guest account</td></tr><tr><td><code>&lt;wg-iface&gt;</code></td><td>Commercial WireGuard iface</td><td>Router or VPS client</td></tr><tr><td><code>&lt;wan-iface&gt;</code></td><td>WAN iface</td><td>Router</td></tr><tr><td><code>&lt;lan-bridge&gt;</code></td><td>LAN bridge</td><td>Router (MTU 1500)</td></tr><tr><td><code>&lt;overlay-tun&gt;</code></td><td>Overlay tun iface</td><td>Node under test</td></tr><tr><td><code>&lt;wg-mtu&gt;</code></td><td>MTU integer from <code>ip link</code></td><td>Measured</td></tr><tr><td><code>&lt;mss4&gt;</code> / <code>&lt;mss6&gt;</code></td><td>Computed MSS</td><td>Formulas</td></tr><tr><td><code>&lt;vps-public-v4&gt;</code> / <code>&lt;vps-public-v6&gt;</code></td><td>VPS public addresses</td><td>WAN; never publish</td></tr><tr><td><code>&lt;overlay-v4&gt;</code> / <code>&lt;overlay-v6&gt;</code></td><td>Overlay addresses</td><td>Overlay; never publish</td></tr></tbody></table>
 <h2 id="formulas">Formulas</h2>
-<pre><code class="language-text"># Measure &lt;wg-mtu&gt; from: ip link show &lt;wg-iface&gt;
-mss4 = &lt;wg-mtu&gt; - 40    # IPv4 TCP (20-byte IP + 20-byte TCP)
-mss6 = &lt;wg-mtu&gt; - 60    # IPv6 TCP (40-byte IPv6 + 20-byte TCP)
-# IPv4 DF ping: IP size ≈ payload + 28
-# IPv6 DF ping: IP size ≈ payload + 48
-# Historical 1160 / 1146-byte SSH cliff = wrong-scope clamp, not this recipe.
+<pre><code class="language-text"># LAN↔VPN explicit MSS (this page):
+mss4_wg = &lt;wg-mtu&gt; - 40
+mss6_wg = &lt;wg-mtu&gt; - 60
+# Historical 1160 / 1146-byte SSH cliff = wrong-scope clamp, not this recipe ([OEN-01](../networking/01-overlay-ssh-byte-cliff.html)).
 # LAN bridge MTU MUST stay 1500.</code></pre>
-<p>See <a href="../networking/01-overlay-ssh-byte-cliff.html">OEN-01</a> and <a href="../supporting/s01-pmtud-size-ladder.html">OEN-S01</a>.</p>
 <h2 id="method">Method</h2>
 <p>Use explicit <code>TCPMSS --set-mss</code> with a value under the tunnel payload (example 1200). MUST NOT treat clamp-to-pmtu as the LAN↔VPN fix when ICMP is dropped.</p>
 <h2 id="consequences">Consequences</h2>
@@ -170,10 +167,10 @@ TCPMSS  ...  clamp to PMTU  pkts:N</code></pre>
 <ul><li>Explicit --set-mss on LAN↔VPN only.</li><li>LAN MTU 1500.</li><li>Browser or SSH symptom gone.</li><li>ICMP / small ping success was <strong>not</strong> used as the pass criterion when this spec names TCP, SSH, or HTTPS.</li><li>Bind table was filled by a human before any live <code>ip</code> / nft / iptables change.</li></ul>
 <h2 id="must-not" class="must-not">MUST NOT</h2>
 <ul><li>MUST NOT rely on --clamp-mss-to-pmtu when ICMP is dropped.</li><li>MUST NOT shrink the LAN bridge to make the ladder green.</li><li>MUST NOT clamp overlay return.</li><li>MUST NOT apply live network or firewall changes until Bind is filled by a human.</li><li>MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.</li><li>MUST NOT publish hostnames, addresses, ULAs, or custom ports.</li></ul>
+<h2 id="page-changelog">Page changelog</h2>
+<ul><li>Edition 2 (8 Sep 2026, Mountain Time): Added overlay-impl Bind and trap-specific terms (review cleanup).</li></ul>
 <h2 id="related-specs">Related specs</h2>
 <ul><li><a href="../networking/01-overlay-ssh-byte-cliff.html">OEN-01</a></li><li><a href="../networking/02-chromium-tls-pmtu.html">OEN-02</a></li><li><a href="s01-pmtud-size-ladder.html">OEN-S01</a></li></ul>
-<h2 id="prior-art-not-novel">Prior art (Not novel)</h2>
-<p>clamp-mss-to-pmtu is the man-page default. This note exists because commercial-VPN ICMP blackholes make it a no-op.</p>
       </article>
     </main>
     <footer class="site-footer">

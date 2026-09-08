@@ -120,34 +120,24 @@
     <main id="main">
       <article>
         <h1>Push small overlay snapshots; do not copy-pull large JSON</h1>
-        <p class="meta-line"><span>OEN-S19</span> · supporting · edition 1 · 2026-09-08</p>
+        <p class="meta-line"><span>OEN-S19</span> · supporting · edition 2 · 2026-09-08</p>
         <h2 id="context">Context</h2>
 <p>Backs <a href="s03-transfer-matrix-controlpath.html">OEN-S03</a> / <a href="../networking/01-overlay-ssh-byte-cliff.html">OEN-01</a>. Large JSON over userspace overlay SSH hangs.</p>
 
-<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>VPS</dt><dd>Virtual Private Server</dd><dt>LAN</dt><dd>Local Area Network</dd><dt>WAN</dt><dd>Wide Area Network</dd><dt>KB</dt><dd>kilobyte</dd><dt>TCP</dt><dd>Transmission Control Protocol</dd><dt>MSS</dt><dd>Maximum Segment Size</dd><dt>MTU</dt><dd>Maximum Transmission Unit</dd><dt>ICMP</dt><dd>Internet Control Message Protocol</dd><dt>DF</dt><dd>don&#x27;t-fragment (IP flag)</dd><dt>HTTPS</dt><dd>Hypertext Transfer Protocol Secure</dd><dt>IP</dt><dd>Internet Protocol</dd><dt>IPv4</dt><dd>Internet Protocol version 4</dd><dt>IPv6</dt><dd>Internet Protocol version 6</dd><dt>WireGuard</dt><dd>UDP-based VPN protocol</dd><dt>nft</dt><dd>nftables (Linux packet filter)</dd><dt>ControlPath</dt><dd>OpenSSH multiplexing socket path option</dd><dt>JSON</dt><dd>JavaScript Object Notation</dd><dt>SCP</dt><dd>secure copy</dd><dt>Pi</dt><dd>single-board computer (Raspberry Pi class)</dd></dl></section>
+<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>ControlPath</dt><dd>OpenSSH multiplexing socket path option</dd><dt>JSON</dt><dd>JavaScript Object Notation</dd><dt>KB</dt><dd>kilobyte</dd><dt>LAN</dt><dd>Local Area Network</dd><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>Pi</dt><dd>single-board computer (Raspberry Pi class)</dd><dt>SCP</dt><dd>secure copy</dd><dt>SSH</dt><dd>Secure Shell</dd></dl></section>
 <h2 id="topology">Topology</h2>
 <pre><code class="language-text">[spokes] push small snapshots --&gt; hub
 MUST NOT SCP-pull large JSON over overlay SSH  ([OEN-01](../networking/01-overlay-ssh-byte-cliff.html))</code></pre>
 <h2 id="bind">Bind</h2>
 <p>Fill this table <strong>before</strong> any live change. Do <strong>not</strong> paste real values back into public notes.</p>
-<table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><code>&lt;cloud-vps&gt;</code></td><td>Overlay SSH target</td><td>Cloud VPS</td></tr><tr><td><code>&lt;lan-pi&gt;</code></td><td>Overlay SSH target</td><td>LAN Pi</td></tr><tr><td><code>&lt;user&gt;</code></td><td>SSH user</td><td>Guest account</td></tr><tr><td><code>&lt;wg-iface&gt;</code></td><td>Commercial WireGuard iface</td><td>Router or VPS client</td></tr><tr><td><code>&lt;wan-iface&gt;</code></td><td>WAN iface</td><td>Router</td></tr><tr><td><code>&lt;lan-bridge&gt;</code></td><td>LAN bridge</td><td>Router (MTU 1500)</td></tr><tr><td><code>&lt;overlay-tun&gt;</code></td><td>Overlay tun iface</td><td>Node under test</td></tr><tr><td><code>&lt;wg-mtu&gt;</code></td><td>MTU integer from <code>ip link</code></td><td>Measured</td></tr><tr><td><code>&lt;mss4&gt;</code> / <code>&lt;mss6&gt;</code></td><td>Computed MSS</td><td>Formulas</td></tr><tr><td><code>&lt;vps-public-v4&gt;</code> / <code>&lt;vps-public-v6&gt;</code></td><td>VPS public addresses</td><td>WAN; never publish</td></tr><tr><td><code>&lt;overlay-v4&gt;</code> / <code>&lt;overlay-v6&gt;</code></td><td>Overlay addresses</td><td>Overlay; never publish</td></tr></tbody></table>
-<h2 id="formulas">Formulas</h2>
-<pre><code class="language-text"># Measure &lt;wg-mtu&gt; from: ip link show &lt;wg-iface&gt;
-mss4 = &lt;wg-mtu&gt; - 40    # IPv4 TCP (20-byte IP + 20-byte TCP)
-mss6 = &lt;wg-mtu&gt; - 60    # IPv6 TCP (40-byte IPv6 + 20-byte TCP)
-# IPv4 DF ping: IP size ≈ payload + 28
-# IPv6 DF ping: IP size ≈ payload + 48
-# Historical 1160 / 1146-byte SSH cliff = wrong-scope clamp, not this recipe.
-# LAN bridge MTU MUST stay 1500.</code></pre>
-<p>See <a href="../networking/01-overlay-ssh-byte-cliff.html">OEN-01</a> and <a href="../supporting/s01-pmtud-size-ladder.html">OEN-S01</a>.</p>
+<table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><code>&lt;user&gt;</code></td><td>SSH user</td><td>Guest account</td></tr><tr><td><code>&lt;lan-pi&gt;</code></td><td>Always-on LAN Pi</td><td>LAN Pi</td></tr><tr><td><code>&lt;small-snapshot&gt;</code></td><td>Small overlay status snapshot path</td><td>File the procedure prints</td></tr></tbody></table>
 <h2 id="method">Method</h2>
 <p>Nodes PUSH small files to <code>&lt;lan-pi&gt;</code>. MUST NOT pull multi-megabyte JSON over overlay SSH as the daily collector.</p>
 <h2 id="consequences">Consequences</h2>
 <p>Collectors finish. SSH sessions do not freeze at the cliff.</p>
 <h2 id="agent-stop-rule">Agent stop rule</h2>
-<blockquote><p>A coding agent MUST emit a <strong>bound runbook</strong> (placeholders replaced from Bind). MUST NOT apply live <code>ip rule</code>, nft, iptables, ip6tables, sysctl, <code>wg set</code>, daemon restart, or deploy until a <strong>human</strong> filled Bind. MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS. MUST NOT file an upstream bug from this page. MUST NOT publish real addresses, hostnames, or custom ports.</p></blockquote>
+<blockquote><p>MUST emit bound small-snapshot push commands after Bind is filled. MUST NOT copy-pull multi-megabyte JSON over overlay SSH when <a href="../networking/01-overlay-ssh-byte-cliff.html">OEN-01</a> still cliffs. MUST NOT apply netfilter from this page.</p></blockquote>
 <h2 id="procedure">Procedure</h2>
-<p>Placeholders only until Bind is filled: <code>&lt;cloud-vps&gt;</code>, <code>&lt;lan-pi&gt;</code>, <code>&lt;overlay-peer&gt;</code>, <code>&lt;exit-node&gt;</code>, <code>&lt;wg-iface&gt;</code>, <code>&lt;gcp-nic&gt;</code>, plus the Bind extras on this page.</p>
 <h3>Copy-paste commands (after Bind)</h3>
 <pre><code class="language-bash">ssh -o ControlPath=none &lt;user&gt;@&lt;lan-pi&gt; &#x27;wc -c &lt;small-snapshot&gt;&#x27;
 # If a pull of megabyte JSON hangs, this spec + OEN-01 / OEN-S03</code></pre>
@@ -164,13 +154,13 @@ mss6 = &lt;wg-mtu&gt; - 60    # IPv6 TCP (40-byte IPv6 + 20-byte TCP)
 <h2 id="expected-samples">Expected samples</h2>
 <pre><code class="language-text"># small chunk finishes; large JSON pull hangs at ~1 KB</code></pre>
 <h2 id="verify">Verify</h2>
-<ul><li>Collector uses push-small.</li><li>No SCP-pull of huge JSON over overlay SSH.</li><li>ICMP / small ping success was <strong>not</strong> used as the pass criterion when this spec names TCP, SSH, or HTTPS.</li><li>Bind table was filled by a human before any live <code>ip</code> / nft / iptables change.</li></ul>
+<ul><li>Collector uses push-small.</li><li>No SCP-pull of huge JSON over overlay SSH.</li></ul>
 <h2 id="must-not" class="must-not">MUST NOT</h2>
-<ul><li>MUST NOT SCP-pull large JSON over overlay SSH as the design.</li><li>MUST NOT use the workstation as the hub.</li><li>MUST NOT apply live network or firewall changes until Bind is filled by a human.</li><li>MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.</li><li>MUST NOT publish hostnames, addresses, ULAs, or custom ports.</li></ul>
+<ul><li>MUST NOT SCP-pull large JSON over overlay SSH as the design.</li><li>MUST NOT use the workstation as the hub.</li><li>MUST NOT publish hostnames, addresses, ULAs, or custom ports.</li></ul>
+<h2 id="page-changelog">Page changelog</h2>
+<ul><li>Edition 2 (8 Sep 2026, Mountain Time): Trap-specific Bind and agent stop rule (review cleanup).</li></ul>
 <h2 id="related-specs">Related specs</h2>
 <ul><li><a href="../networking/01-overlay-ssh-byte-cliff.html">OEN-01</a></li><li><a href="s03-transfer-matrix-controlpath.html">OEN-S03</a></li></ul>
-<h2 id="prior-art-not-novel">Prior art (Not novel)</h2>
-<p>Chunked uploads are obvious. This note is overlay SSH byte-cliff as the reason.</p>
       </article>
     </main>
     <footer class="site-footer">
