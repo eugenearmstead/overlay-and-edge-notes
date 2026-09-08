@@ -86,6 +86,10 @@ Public wording uses generic roles: cloud Virtual Private Server (VPS), Local Are
 
 Procedures were proved on real paths and then **rewritten** so they do not identify a lab. Measurements such as “about 1 kilobyte (KB)” or “~1146 bytes” are diagnostic cliffs, not host fingerprints. If a command fails on your fleet, your Maximum Transmission Unit (MTU), Maximum Segment Size (MSS), and firmware differ; do not paste your inventory into a public issue in order to “help.”
 
+## How to report a security issue
+
+Use GitHub private vulnerability reporting only. Open this repository’s Security tab and choose Report a vulnerability. Do not open a public Issue for a security report. Policy: <https://github.com/eugenearmstead/overlay-and-edge-notes/security/policy>
+
 ## GitHub Pages
 
 Canonical HyperText Markup Language (HTML) URLs live at `https://eugenearmstead.github.io/overlay-and-edge-notes/`.

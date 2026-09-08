@@ -36,6 +36,7 @@ Open `http://127.0.0.1:8765/` or open `index.html` as a `file://` URL. Relative 
 - [How humans should read it](#how-to-read-a-spec)
 - [How agents should apply it](AGENTS.md)
 - [Disclosure and license](DISCLOSURE.md) · [DISCLOSURE.html](DISCLOSURE.html)
+- [How to report a security issue](SECURITY.md)
 - [Changelog](CHANGELOG.md) · [changelog.html](changelog.html)
 - [2026 edition index](editions/2026.md)
 

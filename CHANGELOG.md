@@ -61,6 +61,11 @@ terms:
 
 Dated in Mountain Time (MST) for this series. Spec URLs do not change when an edition bumps.
 
+## 2026-09-08 MST — GitHub security policy
+
+- Root security policy: private vulnerability reporting only; no bounty; public Issues remain for docs, not security.
+- Dependabot for GitHub Actions (weekly). CodeQL workflow for the Python builder.
+
 ## 2026-09-08 MST — Failure-string discoverability
 
 - Expanded YAML `keywords` (8–20 real search phrases) and clickable `description` on every spec plus home, disclosure, changelog, and the 2026 index.

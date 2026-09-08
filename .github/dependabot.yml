@@ -1,0 +1,9 @@
+# Dependabot: GitHub Actions weekly.
+# Add a pip (or other) ecosystem here only when a real manifest exists
+# (requirements.txt, pyproject.toml, package.json). Do not invent one.
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
