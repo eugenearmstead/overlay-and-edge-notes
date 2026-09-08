@@ -9,10 +9,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/networking/06-netfilter-off-v6-return.html
 keywords:
-  - exit-node
-  - ipv6
-  - netfilter
-  - fib
+  - "NetfilterMode=off IPv6 blackhole"
+  - "nft prerouting mark FIB"
+  - "ip6tables MARK MASQUERADE"
+  - "overlay ULA /48 table 52"
+  - "FORWARD tunnel overlay 0 packets"
+  - "IPv6 return path blackhole"
+  - "iptables-nft mark before fib"
+  - "exit node IPv6 SNAT"
+  - "Tailscale netfilter off"
+  - "conntrack split nft ip6tables"
+  - "ip -6 route get iif tunnel"
+  - "Headscale ULA return"
 backs: []
 backed_by:
   - OEN-S27

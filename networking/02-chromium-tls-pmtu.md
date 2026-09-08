@@ -9,10 +9,20 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/networking/02-chromium-tls-pmtu.html
 keywords:
-  - path-mtu
-  - chromium
-  - tls
-  - clienthello
+  - "curl 200 chrome ERR_CONNECTION_CLOSED"
+  - "ERR_CONNECTION_CLOSED"
+  - "Chromium TLS handshake fail"
+  - "curl works browser fails"
+  - "ClientHello too large"
+  - "path MTU blackhole"
+  - "Brave HTTPS closed"
+  - "post-quantum ClientHello"
+  - "WireGuard MTU"
+  - "don't-fragment ping"
+  - "TCPMSS"
+  - "ICMP fragmentation needed"
+  - "ERR_TIMED_OUT HTTPS"
+  - "PMTUD blackhole"
 backs: []
 backed_by:
   - OEN-S01

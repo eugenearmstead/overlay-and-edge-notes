@@ -9,9 +9,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s16-never-nft-flush.html
 keywords:
-  - nftables
-  - ufw
-  - crowdsec
+  - "never nft flush ruleset"
+  - "never start nftables.service"
+  - "UFW CrowdSec custom tables"
+  - "tunnel predown named tables only"
+  - "nft flush wipes exit rules"
+  - "stock nftables.service conflict"
+  - "ip6tables MASQUERADE custom"
+  - "do not flush whole ruleset"
+  - "nft delete table named"
+  - "UFW plus nft custom"
+  - "CrowdSec nft coexistence"
+  - "WireGuard predown nft"
 backs:
   - OEN-06
   - OEN-17

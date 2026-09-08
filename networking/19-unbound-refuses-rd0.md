@@ -9,10 +9,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/networking/19-unbound-refuses-rd0.html
 keywords:
-  - unbound
-  - peerapi
-  - rd
-  - dns
+  - "Unbound REFUSES RD=0"
+  - "PeerAPI Recursion Desired off"
+  - "dnsmasq loopback Unbound REFUSED"
+  - "dig +norecurse REFUSED"
+  - "RD-stub before Unbound"
+  - "looks like Unbound is down"
+  - "exit DoH RD=0"
+  - "local upstream RD=0 refuse"
+  - "Headscale PeerAPI Unbound"
+  - "force RD=1 stub"
+  - "dnsmasq remote RD=0 works"
+  - "PeerAPI DNS REFUSED"
 backs: []
 backed_by:
   - OEN-05

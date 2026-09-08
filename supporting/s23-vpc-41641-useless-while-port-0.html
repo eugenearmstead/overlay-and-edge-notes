@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>OEN-S23: Cloud firewall UDP 41641 is useless while overlay PORT=0 — Overlay and Edge Notes</title>
     <meta name="description" content="A VPC allow for UDP 41641 does nothing while the overlay daemon has PORT=0 (ephemeral). Ship PORT, daemon restart, guest firewall, and VPC together. Never leave PORT empty.">
+    <meta name="keywords" content="VPC UDP 41641 useless PORT=0, overlay PORT must be 41641, never leave PORT empty, cloud firewall 41641 no-op, Tailscale PORT=0 ephemeral, ship PORT daemon UFW VPC together, GCE allow 41641 still down, overlay listen port 0, Headscale UDP 41641, empty PORT daemon fail, fixed overlay UDP port, VPC rule while PORT=0">
+    <meta name="citation_keywords" content="VPC UDP 41641 useless PORT=0, overlay PORT must be 41641, never leave PORT empty, cloud firewall 41641 no-op, Tailscale PORT=0 ephemeral, ship PORT daemon UFW VPC together, GCE allow 41641 still down, overlay listen port 0, Headscale UDP 41641, empty PORT daemon fail, fixed overlay UDP port, VPC rule while PORT=0">
     <link rel="canonical" href="https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s23-vpc-41641-useless-while-port-0.html">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -43,7 +45,21 @@
       "url": "https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s23-vpc-41641-useless-while-port-0.html",
       "identifier": "OEN-S23",
       "license": "https://creativecommons.org/licenses/by/4.0/",
-      "inLanguage": "en"
+      "inLanguage": "en",
+      "keywords": [
+        "VPC UDP 41641 useless PORT=0",
+        "overlay PORT must be 41641",
+        "never leave PORT empty",
+        "cloud firewall 41641 no-op",
+        "Tailscale PORT=0 ephemeral",
+        "ship PORT daemon UFW VPC together",
+        "GCE allow 41641 still down",
+        "overlay listen port 0",
+        "Headscale UDP 41641",
+        "empty PORT daemon fail",
+        "fixed overlay UDP port",
+        "VPC rule while PORT=0"
+      ]
     },
     {
       "@type": "HowTo",

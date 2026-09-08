@@ -9,10 +9,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/web/10-one-blocking-stylesheet-variable-fonts.html
 keywords:
-  - core-web-vitals
-  - css
-  - fonts
-  - lcp
+  - "render-blocking stylesheet PSI drop"
+  - "variable font re-download woff2"
+  - "one generated chrome.css"
+  - "LCP preload media-split"
+  - "Core Web Vitals fonts"
+  - "per-weight variable filenames"
+  - "PageSpeed mobile 77 to 72"
+  - "preload at most two woff2"
+  - "latin latin-ext only"
+  - "defer decorative font"
+  - "Cloudflare Worker CSS"
+  - "LCP portrait preload"
 backs: []
 backed_by:
   - OEN-S06

@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>OEN-06: Netfilter-off IPv6 return-path blackhole — Overlay and Edge Notes</title>
     <meta name="description" content="With overlay netfilter off, an nft prerouting mark does not win the first IPv6 route lookup. Use one ip6tables path and install the overlay unique-local /48 on table 52 and main.">
+    <meta name="keywords" content="NetfilterMode=off IPv6 blackhole, nft prerouting mark FIB, ip6tables MARK MASQUERADE, overlay ULA /48 table 52, FORWARD tunnel overlay 0 packets, IPv6 return path blackhole, iptables-nft mark before fib, exit node IPv6 SNAT, Tailscale netfilter off, conntrack split nft ip6tables, ip -6 route get iif tunnel, Headscale ULA return">
+    <meta name="citation_keywords" content="NetfilterMode=off IPv6 blackhole, nft prerouting mark FIB, ip6tables MARK MASQUERADE, overlay ULA /48 table 52, FORWARD tunnel overlay 0 packets, IPv6 return path blackhole, iptables-nft mark before fib, exit node IPv6 SNAT, Tailscale netfilter off, conntrack split nft ip6tables, ip -6 route get iif tunnel, Headscale ULA return">
     <link rel="canonical" href="https://eugenearmstead.github.io/overlay-and-edge-notes/networking/06-netfilter-off-v6-return.html">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -43,7 +45,21 @@
       "url": "https://eugenearmstead.github.io/overlay-and-edge-notes/networking/06-netfilter-off-v6-return.html",
       "identifier": "OEN-06",
       "license": "https://creativecommons.org/licenses/by/4.0/",
-      "inLanguage": "en"
+      "inLanguage": "en",
+      "keywords": [
+        "NetfilterMode=off IPv6 blackhole",
+        "nft prerouting mark FIB",
+        "ip6tables MARK MASQUERADE",
+        "overlay ULA /48 table 52",
+        "FORWARD tunnel overlay 0 packets",
+        "IPv6 return path blackhole",
+        "iptables-nft mark before fib",
+        "exit node IPv6 SNAT",
+        "Tailscale netfilter off",
+        "conntrack split nft ip6tables",
+        "ip -6 route get iif tunnel",
+        "Headscale ULA return"
+      ]
     },
     {
       "@type": "HowTo",

@@ -9,9 +9,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s19-push-small-overlay-snapshots.html
 keywords:
-  - ssh
-  - json
-  - byte-cliff
+  - "push small overlay snapshots"
+  - "do not SCP-pull large JSON"
+  - "overlay SSH byte cliff JSON"
+  - "fleet snapshot chunks"
+  - "Tailscale SSH large JSON hang"
+  - "push to hub not pull"
+  - "ControlPath=none large scp"
+  - "NDJSON small chunks"
+  - "health snapshot overlay"
+  - "SCP hang 1KB cliff"
+  - "Headscale JSON over SSH"
+  - "push not pull overlay"
 backs:
   - OEN-01
 backed_by: []

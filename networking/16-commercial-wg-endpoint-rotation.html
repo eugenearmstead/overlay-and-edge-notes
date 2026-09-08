@@ -4,7 +4,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>OEN-16: Commercial WireGuard endpoint rotation (IPv6, shuffle bag, hub watch) — Overlay and Edge Notes</title>
-    <meta name="description" content="Rotate a commercial WireGuard client across allowlisted IPv6 endpoints with WAN-path health checks, tunnel unique-local egress verify, a shuffle bag, and a hub watch on an always-on LAN Pi.">
+    <meta name="description" content="IPv6-only WireGuard rotation fails when health checks ride the tunnel: use WAN curl -6, ULA egress verify, a shuffle bag, and a hub watch.">
+    <meta name="keywords" content="WireGuard endpoint rotation, IPv6-only WireGuard endpoint, WireGuard shuffle bag, PersistentKeepalive 25, curl -6 WAN health check, WireGuard handshake stale, commercial WireGuard rotator, tunnel ULA egress verify, hub watch LAN Pi, Endpoint IPv6 port not FQDN, WireGuard hop cooldown, ISP down vs VPN down, allowlisted IPv6 endpoints">
+    <meta name="citation_keywords" content="WireGuard endpoint rotation, IPv6-only WireGuard endpoint, WireGuard shuffle bag, PersistentKeepalive 25, curl -6 WAN health check, WireGuard handshake stale, commercial WireGuard rotator, tunnel ULA egress verify, hub watch LAN Pi, Endpoint IPv6 port not FQDN, WireGuard hop cooldown, ISP down vs VPN down, allowlisted IPv6 endpoints">
     <link rel="canonical" href="https://eugenearmstead.github.io/overlay-and-edge-notes/networking/16-commercial-wg-endpoint-rotation.html">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,7 +20,7 @@
     <meta property="article:author" content="Eugene Armstead">
     <meta property="og:see_also" content="https://www.armsteadent.com/">
     <meta property="og:title" content="OEN-16: Commercial WireGuard endpoint rotation (IPv6, shuffle bag, hub watch) — Overlay and Edge Notes">
-    <meta property="og:description" content="Rotate a commercial WireGuard client across allowlisted IPv6 endpoints with WAN-path health checks, tunnel unique-local egress verify, a shuffle bag, and a hub watch on an always-on LAN Pi.">
+    <meta property="og:description" content="IPv6-only WireGuard rotation fails when health checks ride the tunnel: use WAN curl -6, ULA egress verify, a shuffle bag, and a hub watch.">
     <meta property="og:url" content="https://eugenearmstead.github.io/overlay-and-edge-notes/networking/16-commercial-wg-endpoint-rotation.html">
     <meta property="og:type" content="article">
     <meta property="article:published_time" content="2026-09-07">
@@ -30,7 +32,7 @@
       "@type": "TechArticle",
       "@id": "https://eugenearmstead.github.io/overlay-and-edge-notes/networking/16-commercial-wg-endpoint-rotation.html#article",
       "headline": "Commercial WireGuard endpoint rotation (IPv6, shuffle bag, hub watch)",
-      "description": "Rotate a commercial WireGuard client across allowlisted IPv6 endpoints with WAN-path health checks, tunnel unique-local egress verify, a shuffle bag, and a hub watch on an always-on LAN Pi.",
+      "description": "IPv6-only WireGuard rotation fails when health checks ride the tunnel: use WAN curl -6, ULA egress verify, a shuffle bag, and a hub watch.",
       "datePublished": "2026-09-07",
       "author": {
         "@type": "Person",
@@ -43,12 +45,27 @@
       "url": "https://eugenearmstead.github.io/overlay-and-edge-notes/networking/16-commercial-wg-endpoint-rotation.html",
       "identifier": "OEN-16",
       "license": "https://creativecommons.org/licenses/by/4.0/",
-      "inLanguage": "en"
+      "inLanguage": "en",
+      "keywords": [
+        "WireGuard endpoint rotation",
+        "IPv6-only WireGuard endpoint",
+        "WireGuard shuffle bag",
+        "PersistentKeepalive 25",
+        "curl -6 WAN health check",
+        "WireGuard handshake stale",
+        "commercial WireGuard rotator",
+        "tunnel ULA egress verify",
+        "hub watch LAN Pi",
+        "Endpoint IPv6 port not FQDN",
+        "WireGuard hop cooldown",
+        "ISP down vs VPN down",
+        "allowlisted IPv6 endpoints"
+      ]
     },
     {
       "@type": "HowTo",
       "name": "Commercial WireGuard endpoint rotation (IPv6, shuffle bag, hub watch)",
-      "description": "Rotate a commercial WireGuard client across allowlisted IPv6 endpoints with WAN-path health checks, tunnel unique-local egress verify, a shuffle bag, and a hub watch on an always-on LAN Pi.",
+      "description": "IPv6-only WireGuard rotation fails when health checks ride the tunnel: use WAN curl -6, ULA egress verify, a shuffle bag, and a hub watch.",
       "author": {
         "@type": "Person",
         "name": "Eugene Armstead",

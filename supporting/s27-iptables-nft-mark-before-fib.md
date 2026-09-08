@@ -9,9 +9,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s27-iptables-nft-mark-before-fib.html
 keywords:
-  - iptables-nft
-  - fib
-  - mark
+  - "iptables-nft MARK before fib"
+  - "counters marked route still WAN"
+  - "ip -6 route get iif tunnel"
+  - "ULA /48 table 52 and main"
+  - "split nft ip6tables MASQUERADE"
+  - "conntrack return broken"
+  - "PREROUTING MARK FIB lookup"
+  - "NetfilterMode=off mark"
+  - "overlay ULA missing main"
+  - "ip6tables mangle MARK"
+  - "nft mark not first FIB"
+  - "IPv6 exit return path"
 backs:
   - OEN-06
 backed_by: []

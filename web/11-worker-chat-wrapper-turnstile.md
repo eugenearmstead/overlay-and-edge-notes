@@ -9,10 +9,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/web/11-worker-chat-wrapper-turnstile.html
 keywords:
-  - cloudflare-workers
-  - turnstile
-  - chat
-  - sanitize
+  - "Worker chat iframe vs wrapper"
+  - "Cloudflare Turnstile chat"
+  - "sanitize LLM drift"
+  - "same-origin chatbot.html"
+  - "nginx chatbot-api proxy"
+  - "Turnstile gate iframe"
+  - "strip forbidden phrases client"
+  - "Worker chat FAQ every request"
+  - "Cloudflare Worker chatbot"
+  - "bilingual privacy chat"
+  - "iframe only when copy stable"
+  - "LLM output sanitize"
 backs: []
 backed_by:
   - OEN-S06

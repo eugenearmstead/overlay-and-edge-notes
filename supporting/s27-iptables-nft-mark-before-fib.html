@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>OEN-S27: iptables-nft PREROUTING MARK does not win before the forwarding information base — Overlay and Edge Notes</title>
     <meta name="description" content="Counters look marked; ip -6 route get overlay-ula iif tunnel still shows the WAN NIC. Need mark and overlay ULA /48 on table 52 and main. Split nft plus ip6tables MASQUERADE breaks conntrack.">
+    <meta name="keywords" content="iptables-nft MARK before fib, counters marked route still WAN, ip -6 route get iif tunnel, ULA /48 table 52 and main, split nft ip6tables MASQUERADE, conntrack return broken, PREROUTING MARK FIB lookup, NetfilterMode=off mark, overlay ULA missing main, ip6tables mangle MARK, nft mark not first FIB, IPv6 exit return path">
+    <meta name="citation_keywords" content="iptables-nft MARK before fib, counters marked route still WAN, ip -6 route get iif tunnel, ULA /48 table 52 and main, split nft ip6tables MASQUERADE, conntrack return broken, PREROUTING MARK FIB lookup, NetfilterMode=off mark, overlay ULA missing main, ip6tables mangle MARK, nft mark not first FIB, IPv6 exit return path">
     <link rel="canonical" href="https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s27-iptables-nft-mark-before-fib.html">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -43,7 +45,21 @@
       "url": "https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s27-iptables-nft-mark-before-fib.html",
       "identifier": "OEN-S27",
       "license": "https://creativecommons.org/licenses/by/4.0/",
-      "inLanguage": "en"
+      "inLanguage": "en",
+      "keywords": [
+        "iptables-nft MARK before fib",
+        "counters marked route still WAN",
+        "ip -6 route get iif tunnel",
+        "ULA /48 table 52 and main",
+        "split nft ip6tables MASQUERADE",
+        "conntrack return broken",
+        "PREROUTING MARK FIB lookup",
+        "NetfilterMode=off mark",
+        "overlay ULA missing main",
+        "ip6tables mangle MARK",
+        "nft mark not first FIB",
+        "IPv6 exit return path"
+      ]
     },
     {
       "@type": "HowTo",

@@ -9,10 +9,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/networking/22-delayed-wg-forward-wipe.html
 keywords:
-  - wireguard
-  - forward
-  - boot
-  - watchdog
+  - "delayed WireGuard FORWARD wipe"
+  - "no restart_wgc event boot"
+  - "tunnel UP LAN dead counters 0"
+  - "firmware starts WG minutes later"
+  - "service-event never fires"
+  - "ASUSWRT-Merlin delayed client"
+  - "watchdog re-apply FORWARD"
+  - "do not restart WG from watchdog"
+  - "boot FORWARD then wipe"
+  - "router curl wg LAN no internet"
+  - "periodic FORWARD restore"
+  - "Merlin Starting client delayed"
 backs: []
 backed_by:
   - OEN-S33

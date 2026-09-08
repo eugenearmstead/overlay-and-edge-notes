@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>OEN-S02: clamp-mss-to-pmtu is a no-op when ICMP is dropped — Overlay and Edge Notes</title>
     <meta name="description" content="iptables --clamp-mss-to-pmtu uses learned path MTU. When ICMP fragmentation-needed is blackholed, the clamp does nothing; use explicit --set-mss.">
+    <meta name="keywords" content="clamp-mss-to-pmtu no-op, ICMP blackholed MSS clamp, explicit --set-mss, TCPMSS clamp-mss-to-pmtu, learned PMTU missing, fragmentation-needed dropped, iptables set-mss vs clamp, PMTUD blackhole MSS, don&#x27;t-fragment ping, WireGuard MSS recipe, nft TCPMSS set, path MTU ICMP silent">
+    <meta name="citation_keywords" content="clamp-mss-to-pmtu no-op, ICMP blackholed MSS clamp, explicit --set-mss, TCPMSS clamp-mss-to-pmtu, learned PMTU missing, fragmentation-needed dropped, iptables set-mss vs clamp, PMTUD blackhole MSS, don&#x27;t-fragment ping, WireGuard MSS recipe, nft TCPMSS set, path MTU ICMP silent">
     <link rel="canonical" href="https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s02-clamp-mss-to-pmtu-noop.html">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -43,7 +45,21 @@
       "url": "https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s02-clamp-mss-to-pmtu-noop.html",
       "identifier": "OEN-S02",
       "license": "https://creativecommons.org/licenses/by/4.0/",
-      "inLanguage": "en"
+      "inLanguage": "en",
+      "keywords": [
+        "clamp-mss-to-pmtu no-op",
+        "ICMP blackholed MSS clamp",
+        "explicit --set-mss",
+        "TCPMSS clamp-mss-to-pmtu",
+        "learned PMTU missing",
+        "fragmentation-needed dropped",
+        "iptables set-mss vs clamp",
+        "PMTUD blackhole MSS",
+        "don't-fragment ping",
+        "WireGuard MSS recipe",
+        "nft TCPMSS set",
+        "path MTU ICMP silent"
+      ]
     },
     {
       "@type": "HowTo",

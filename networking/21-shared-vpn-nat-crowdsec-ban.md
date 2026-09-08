@@ -9,10 +9,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/networking/21-shared-vpn-nat-crowdsec-ban.html
 keywords:
-  - crowdsec
-  - nat
-  - vpn
-  - shared-egress
+  - "CrowdSec bans shared VPN NAT"
+  - "whole house CrowdSec ban"
+  - "shared commercial VPN egress"
+  - "CrowdSec sshd Caddy public IP"
+  - "overlay UDP still works SSH dead"
+  - "rotating VPN egress trusted"
+  - "CrowdSec unban bouncer restart"
+  - "one public IP many clients"
+  - "coordination down CrowdSec"
+  - "NAT house ban vs CAPI 403"
+  - "WireGuard shared egress ban"
+  - "CrowdSec decisions VPN hop"
 backs: []
 backed_by:
   - OEN-16

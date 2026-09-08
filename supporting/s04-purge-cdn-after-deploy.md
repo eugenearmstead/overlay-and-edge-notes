@@ -9,9 +9,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s04-purge-cdn-after-deploy.html
 keywords:
-  - cdn
-  - cache-purge
-  - cloudflare
+  - "purge CDN after deploy"
+  - "Workers-edit lacks Cache Purge"
+  - "query string not HTML purge"
+  - "Cloudflare zone purge"
+  - "CDN-Cache-Control no-store"
+  - "?v= cache bust HTML"
+  - "Cloudflare Cache Purge token"
+  - "stale HTML after deploy"
+  - "purge preview URL"
+  - "Wrangler deploy then purge"
+  - "Workers cache API permission"
+  - "HTML still old after ship"
 backs:
   - OEN-08
   - OEN-09

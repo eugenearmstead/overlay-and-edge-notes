@@ -9,10 +9,21 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/networking/01-overlay-ssh-byte-cliff.html
 keywords:
-  - path-mtu
-  - overlay-ssh
-  - double-encapsulation
-  - tcpmss
+  - "overlay SSH hang 1KB"
+  - "Tailscale SSH stall"
+  - "SSH hangs after login"
+  - "overlay SSH byte cliff"
+  - "path MTU"
+  - "TCPMSS"
+  - "double encapsulation"
+  - "don't-fragment ping"
+  - "WireGuard MTU"
+  - "ControlPath=none"
+  - "clamp-mss-to-pmtu"
+  - "userspace Tailscale SSH"
+  - "MSS clamp wrong path"
+  - "LAN MTU 1500"
+  - "Headscale SSH hang"
 backs: []
 backed_by:
   - OEN-S01

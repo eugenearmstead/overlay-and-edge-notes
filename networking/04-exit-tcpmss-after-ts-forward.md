@@ -9,9 +9,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/networking/04-exit-tcpmss-after-ts-forward.html
 keywords:
-  - exit-node
-  - tcpmss
-  - ts-forward
+  - "ts-forward TCPMSS 0 packets"
+  - "TCPMSS after jump ts-forward"
+  - "exit-node TCPMSS never runs"
+  - "Tailscale ts-forward clamp"
+  - "DNS_PROBE_POSSIBLE cellular"
+  - "exit SYN never clamped"
+  - "TCPMSS top of ts-forward"
+  - "ipleak DNS ok HTTP timeout"
+  - "Headscale exit MSS"
+  - "nft jump before clamp"
+  - "path MTU exit node"
+  - "don't-fragment ping"
 backs: []
 backed_by:
   - OEN-S01

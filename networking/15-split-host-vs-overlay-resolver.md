@@ -9,10 +9,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/networking/15-split-host-vs-overlay-resolver.html
 keywords:
-  - dns
-  - unbound
-  - split-horizon
-  - vps
+  - "split host vs overlay resolver"
+  - "loopback Unbound tunnel down"
+  - "tailnet DNS fails tunnel down"
+  - "do not edit resolv.conf VPS"
+  - "coordinator split-horizon DNS"
+  - "host dig vs overlay dig"
+  - "Unbound views commercial tunnel"
+  - "Headscale nameserver view"
+  - "127.0.0.1 still resolves"
+  - "overlay NS timeout expected"
+  - "chrony NTS host stack"
+  - "VPS resolver preference script"
 backs: []
 backed_by:
   - OEN-S25

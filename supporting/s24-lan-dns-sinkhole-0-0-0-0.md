@@ -9,9 +9,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s24-lan-dns-sinkhole-0-0-0-0.html
 keywords:
-  - dns
-  - sinkhole
-  - 0.0.0.0
+  - "LAN DNS 0.0.0.0 sinkhole"
+  - "ERR_CONNECTION_REFUSED 0.0.0.0"
+  - "DNS sinkhole not a site bug"
+  - "LAN dig vs DNS-over-HTTPS"
+  - "temporary /etc/hosts workstation"
+  - "googletagmanager 0.0.0.0"
+  - "Pi-hole style sinkhole"
+  - "operator-approved hosts pin"
+  - "blackhole DNS LAN"
+  - "compare DoH vs LAN resolver"
+  - "analytics curl connection refused"
+  - "not a Cloudflare bug sinkhole"
 backs:
   - OEN-03
   - OEN-10

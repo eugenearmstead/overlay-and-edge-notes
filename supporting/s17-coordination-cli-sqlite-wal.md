@@ -9,9 +9,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s17-coordination-cli-sqlite-wal.html
 keywords:
-  - sqlite
-  - wal
-  - healthcheck
+  - "coordination CLI SQLite WAL block"
+  - "nodes list blocks while serve up"
+  - "Headscale sqlite WAL"
+  - "health check HTTP /health"
+  - "do not use admin CLI health"
+  - "readonly sqlite query"
+  - "CLI hang minutes WAL"
+  - "self-hosted coordination WAL"
+  - "serve up CLI blocked"
+  - "SQLite write-ahead log lock"
+  - "Headscale nodes list timeout"
+  - "healthcheck not CLI"
 backs: []
 backed_by: []
 description: "Coordination nodes-list CLI can block minutes on SQLite WAL while serve is up. Health checks MUST use HTTP /health or a readonly sqlite query, not the admin CLI."

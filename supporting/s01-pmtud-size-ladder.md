@@ -9,9 +9,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s01-pmtud-size-ladder.html
 keywords:
-  - pmtud
-  - df-ping
-  - path-mtu
+  - "don't-fragment ping size ladder"
+  - "ping -M do path MTU"
+  - "ping -6 -M do -s"
+  - "PMTUD size ladder"
+  - "small ICMP large TCP dies"
+  - "DF ping overlay cliff"
+  - "path MTU discovery"
+  - "ICMP success not TCP fix"
+  - "WireGuard PMTU measure"
+  - "IPv4 IPv6 DF ladder"
+  - "path MTU blackhole test"
+  - "overlay SSH PMTUD"
 backs:
   - OEN-01
   - OEN-02

@@ -9,9 +9,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s05-tunnel-preview-stale-hit.html
 keywords:
-  - cloudflare-tunnel
-  - cache
-  - preview
+  - "tunnel preview HIT stale body"
+  - "Cloudflare Tunnel cf-cache-status HIT"
+  - "origin new preview old"
+  - "purge preview URL"
+  - "CDN-Cache-Control no-store HTML"
+  - "cloudflared preview cache"
+  - "stale HIT after origin update"
+  - "Workers preview cache"
+  - "cf-cache-status HIT wrong body"
+  - "tunnel cache purge"
+  - "preview URL still old"
+  - "origin 200 stale CDN"
 backs:
   - OEN-08
   - OEN-09

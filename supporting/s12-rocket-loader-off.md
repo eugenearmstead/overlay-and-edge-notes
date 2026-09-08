@@ -9,9 +9,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s12-rocket-loader-off.html
 keywords:
-  - cloudflare
-  - rocket-loader
-  - javascript
+  - "Rocket Loader Off"
+  - "Cloudflare Rocket Loader inline scripts"
+  - "Rocket Loader breaks analytics"
+  - "Playwright smoke Rocket Loader"
+  - "rewrites inline JavaScript"
+  - "turn Rocket Loader Off"
+  - "GA broken Rocket Loader"
+  - "marketing route Rocket Loader"
+  - "Cloudflare speed Rocket Loader"
+  - "inline script rewrite"
+  - "Workers HTML Rocket Loader"
+  - "smoke test script missing"
 backs:
   - OEN-09
   - OEN-10

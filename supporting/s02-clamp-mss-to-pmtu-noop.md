@@ -9,9 +9,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s02-clamp-mss-to-pmtu-noop.html
 keywords:
-  - tcpmss
-  - pmtud
-  - icmp
+  - "clamp-mss-to-pmtu no-op"
+  - "ICMP blackholed MSS clamp"
+  - "explicit --set-mss"
+  - "TCPMSS clamp-mss-to-pmtu"
+  - "learned PMTU missing"
+  - "fragmentation-needed dropped"
+  - "iptables set-mss vs clamp"
+  - "PMTUD blackhole MSS"
+  - "don't-fragment ping"
+  - "WireGuard MSS recipe"
+  - "nft TCPMSS set"
+  - "path MTU ICMP silent"
 backs:
   - OEN-01
   - OEN-02

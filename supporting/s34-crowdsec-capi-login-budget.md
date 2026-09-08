@@ -9,9 +9,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s34-crowdsec-capi-login-budget.html
 keywords:
-  - crowdsec
-  - capi
-  - rate-limit
+  - "CrowdSec CAPI login budget"
+  - "20 CAPI logins 50 minutes"
+  - "cscli capi 403 one hour"
+  - "cache cscli capi status"
+  - "do not loop capi status"
+  - "free-tier CAPI 403"
+  - "CrowdSec healthcheck budget"
+  - "api.crowdsec.net rate limit"
+  - "Docker healthcheck CAPI ban"
+  - "native probe same budget"
+  - "HTTP 403 CAPI login"
+  - "skip nested CAPI SLI"
 backs:
   - OEN-07
 backed_by: []

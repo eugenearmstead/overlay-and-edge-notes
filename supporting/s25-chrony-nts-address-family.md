@@ -9,9 +9,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s25-chrony-nts-address-family.html
 keywords:
-  - chrony
-  - nts
-  - ntp
+  - "chrony NTS ipv6 flag distro"
+  - "distro chrony parse NTS flags"
+  - "Cloudflare NTS newer chrony"
+  - "try v6 then v4 NTS"
+  - "Network Time Security chrony"
+  - "NTS address-family flags"
+  - "VPS host time NTS"
+  - "chrony ipv6 server option"
+  - "upgrade chrony NTS"
+  - "NTS handshake family"
+  - "coordinator chrony NTS"
+  - "time sync NTS Cloudflare"
 backs:
   - OEN-15
 backed_by: []

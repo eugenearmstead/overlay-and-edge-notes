@@ -9,9 +9,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s30-ts-debug-mtu-below-1280.html
 keywords:
-  - mtu
-  - ipv6
-  - tun
+  - "TS_DEBUG_MTU below 1280"
+  - "overlay IPv6 disabled MTU"
+  - "kernel drops v6 on tun"
+  - "do not use TS_DEBUG_MTU production"
+  - "Tailscale debug MTU IPv6"
+  - "tun IPv6 1280 minimum"
+  - "TS_DEBUG_MTU clamp"
+  - "overlay v6 gone after debug MTU"
+  - "Headscale IPv6 MTU"
+  - "1280 IPv6 minimum"
+  - "debug MTU kills v6"
+  - "tailscaled IPv6 dropped"
 backs:
   - OEN-13
   - OEN-17

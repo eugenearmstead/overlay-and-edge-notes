@@ -9,9 +9,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s03-transfer-matrix-controlpath.html
 keywords:
-  - ssh
-  - controlpath
-  - byte-cliff
+  - "1 KB vs 1 MB SSH matrix"
+  - "ControlPath=none overlay SSH"
+  - "SSH mux death symptom"
+  - "userspace vs kernel SSH"
+  - "Tailscale SSH byte cliff test"
+  - "large scp hang overlay"
+  - "OpenSSH vs Tailscale SSH"
+  - "transfer size matrix"
+  - "overlay SSH 1146 bytes"
+  - "do not trust mux hang"
+  - "ControlMaster stale socket"
+  - "path MTU SSH proof"
 backs:
   - OEN-01
 backed_by: []

@@ -9,9 +9,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s32-dns-leak-test-not-v6-dataplane.html
 keywords:
-  - dns
-  - ipv6
-  - exit-node
+  - "DNS leak-test green not IPv6 data-plane"
+  - "ipleak DNS ok TCP timeout"
+  - "resolver name OK ::/0 dies"
+  - "exit node IPv6 data path"
+  - "DNS vs TCP different paths"
+  - "leak test not enough"
+  - "IPv6 HTTPS timeout exit"
+  - "Headscale ::/0 TCP"
+  - "verify IPv6 IP not DNS only"
+  - "cellular DNS_PROBE vs IP"
+  - "exit v6 forwarding"
+  - "do not trust DNS-only leak test"
 backs:
   - OEN-04
   - OEN-06

@@ -9,9 +9,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s33-router-cron-path-set-e.html
 keywords:
-  - cron
-  - path
-  - watchdog
+  - "router cron PATH omits curl"
+  - "watchdog log() set -e exits"
+  - "cron PATH /usr/sbin missing"
+  - "silent skip stale status"
+  - "ASUSWRT-Merlin cron PATH"
+  - "log function return 1"
+  - "set -e watchdog every tick"
+  - "consumer router cron curl"
+  - "WireGuard watchdog skipped"
+  - "PATH omits /usr/sbin"
+  - "Merlin cru PATH"
+  - "watchdog never runs"
 backs:
   - OEN-12
   - OEN-16

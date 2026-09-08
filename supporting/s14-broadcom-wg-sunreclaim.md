@@ -9,9 +9,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s14-broadcom-wg-sunreclaim.html
 keywords:
-  - wireguard
-  - sunreclaim
-  - broadcom
+  - "Broadcom in-kernel WireGuard SUnreclaim"
+  - "skbuff SUnreclaim leak"
+  - "drop_caches does not free SUnreclaim"
+  - "flow-cache off runner off fail"
+  - "ASUSWRT-Merlin WireGuard memory"
+  - "6-8 MB/h SUnreclaim"
+  - "in-kernel WG leak"
+  - "scheduled reboot workaround"
+  - "skip tables IPv4 IPv6 underlay"
+  - "consumer router SUnreclaim"
+  - "Merlin flow-cache A/B"
+  - "WireGuard kernel slab leak"
 backs:
   - OEN-12
 backed_by: []

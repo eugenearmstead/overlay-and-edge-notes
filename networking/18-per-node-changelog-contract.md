@@ -9,12 +9,21 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/networking/18-per-node-changelog-contract.html
 keywords:
-  - changelog
-  - ops-contract
-  - on-device-copy
+  - "per-node changelog hash mismatch"
+  - "on-device CHANGELOG sync"
+  - "ops repo canonical changelog"
+  - "changelog path class by node"
+  - "sha256sum changelog verify"
+  - "do not invent fake precision"
+  - "timezone labeled not UTC prose"
+  - "router jffs vs VPS vs Pi paths"
+  - "same session changelog"
+  - "homelab changelog contract"
+  - "hashed on-device copy"
+  - "Change Paths Verify entry"
 backs: []
 backed_by: []
-description: Keep a canonical per-node changelog in the ops repo and sync a hashed on-device copy the same session as the change, using path classes that differ by node type.
+description: "Per-node changelog hash mismatch: the ops-repo file is canonical; sync a hashed on-device copy the same session, with path class by node type."
 terms:
   - abbr: OEN
     expansion: Overlay and Edge Notes

@@ -9,9 +9,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s08-canonical-disk-tmpfs-origin.html
 keywords:
-  - tmpfs
-  - pi
-  - origin
+  - "canonical disk tmpfs RAM origin"
+  - "Pi SD wear Cloudflare origin"
+  - "deploy persistent then sync RAM"
+  - "HTML-only rsync wrong tree"
+  - "tmpfs origin Raspberry Pi"
+  - "CDN hits RAM not SD"
+  - "static site tmpfs serve"
+  - "looks deployed wrong root"
+  - "canonical disk tree"
+  - "Pi origin sync-to-RAM"
+  - "nginx tmpfs document root"
+  - "SD card static origin"
 backs:
   - OEN-10
 backed_by: []

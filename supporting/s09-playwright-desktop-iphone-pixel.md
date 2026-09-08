@@ -9,9 +9,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s09-playwright-desktop-iphone-pixel.html
 keywords:
-  - playwright
-  - responsive
-  - qa
+  - "Playwright Desktop iPhone Pixel"
+  - "Chromium device projects"
+  - "layout nav hero three viewports"
+  - "WebKit binaries not required"
+  - "Playwright iPhone smoke"
+  - "Pixel Android project"
+  - "responsive CSS Playwright"
+  - "site smoke Desktop Chrome"
+  - "hero layout regression"
+  - "Playwright test:smoke"
+  - "iOS Android Chromium"
+  - "nav footer legal smoke"
 backs:
   - OEN-10
   - OEN-11

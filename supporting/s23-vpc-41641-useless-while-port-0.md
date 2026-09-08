@@ -9,10 +9,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s23-vpc-41641-useless-while-port-0.html
 keywords:
-  - port
-  - vpc
-  - udp
-  - 41641
+  - "VPC UDP 41641 useless PORT=0"
+  - "overlay PORT must be 41641"
+  - "never leave PORT empty"
+  - "cloud firewall 41641 no-op"
+  - "Tailscale PORT=0 ephemeral"
+  - "ship PORT daemon UFW VPC together"
+  - "GCE allow 41641 still down"
+  - "overlay listen port 0"
+  - "Headscale UDP 41641"
+  - "empty PORT daemon fail"
+  - "fixed overlay UDP port"
+  - "VPC rule while PORT=0"
 backs:
   - OEN-17
   - OEN-01

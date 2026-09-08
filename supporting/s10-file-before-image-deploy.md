@@ -9,8 +9,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s10-file-before-image-deploy.html
 keywords:
-  - images
-  - file-command
+  - "file before image deploy"
+  - "extension is not format"
+  - "PNG is JPEG data"
+  - "do not swap look-alike attachments"
+  - "file(1) source destination"
+  - "map actual type before scp"
+  - "hero photo vs cutout PNG"
+  - "identify alpha channel"
+  - "wrong image filename deploy"
+  - "file command MIME"
+  - "static site image mixup"
+  - "verify file after upload"
 backs:
   - OEN-10
   - OEN-11

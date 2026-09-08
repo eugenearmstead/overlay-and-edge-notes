@@ -9,8 +9,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s18-do-not-set-exit-on-agent-workstation.html
 keywords:
-  - exit-node
-  - workstation
+  - "do not set exit-node on agent workstation"
+  - "tailscale set --exit-node workstation"
+  - "overlay SSH first nmap after fail"
+  - "Cursor workstation exit-node"
+  - "do not test GCP exit from agent"
+  - "hairpin LAN via workstation exit"
+  - "operator must ask exit-node"
+  - "Tailscale exit on workstation"
+  - "debug from overlay SSH"
+  - "nmap after failed connect"
+  - "S18 workstation exit"
+  - "agent must not select exit"
 backs:
   - OEN-17
   - OEN-04

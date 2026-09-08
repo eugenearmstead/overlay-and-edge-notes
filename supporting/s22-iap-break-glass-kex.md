@@ -9,9 +9,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s22-iap-break-glass-kex.html
 keywords:
-  - iap
-  - kex
-  - gcp
+  - "Identity-Aware Proxy break-glass"
+  - "overlay SSH KEX fail GCE"
+  - "tailscale ssh key exchange fail"
+  - "plain OpenSSH overlay :22"
+  - "never gcloud instances reset debug"
+  - "IAP not daily door"
+  - "Google Compute Engine KEX"
+  - "GCP IAP SSH recovery"
+  - "overlay OpenSSH not tailscale ssh"
+  - "GCE image SSH KEX"
+  - "break-glass Identity-Aware Proxy"
+  - "do not reset VM to debug"
 backs:
   - OEN-17
 backed_by: []

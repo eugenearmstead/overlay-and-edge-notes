@@ -3,7 +3,20 @@ title: Disclosure and license
 date_published: 2026-09-07
 author: Eugene Armstead
 author_url: https://www.armsteadent.com/
-description: Author identity, CC-BY-4.0 license, and what this public field-note series is not.
+description: "Author Eugene Armstead, CC-BY-4.0, and what Overlay and Edge Notes is not: named traps with placeholders, not a private network map."
+keywords:
+  - "Overlay and Edge Notes license"
+  - "Eugene Armstead field notes"
+  - "CC-BY-4.0 networking notes"
+  - "placeholders not inventory"
+  - "cloud VPS LAN Pi"
+  - "commercial WireGuard wording"
+  - "self-hosted coordination"
+  - "GitHub Pages overlay notes"
+  - "llms.txt agents"
+  - "do not file upstream from notes"
+  - "CC-BY-4.0"
+  - "armsteadent.com author"
 terms:
   - abbr: OEN
     expansion: Overlay and Edge Notes
@@ -43,6 +56,8 @@ terms:
     expansion: User Datagram Protocol
   - abbr: Pi
     expansion: single-board computer (Raspberry Pi class)
+  - abbr: README
+    expansion: repository citation index in Markdown
 ---
 
 # Disclosure and license
@@ -74,3 +89,7 @@ Procedures were proved on real paths and then **rewritten** so they do not ident
 ## GitHub Pages
 
 Canonical HyperText Markup Language (HTML) URLs live at `https://eugenearmstead.github.io/overlay-and-edge-notes/`.
+
+## How to find these notes
+
+Search the **failure string**. Google indexes GitHub Pages. GitHub.com indexes the README. Agents read `llms.txt`. Examples and the catalog are on the [home page](index.html#find).

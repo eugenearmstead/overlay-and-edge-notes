@@ -9,9 +9,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s28-sticky-reconnect-during-peerapi-outage.html
 keywords:
-  - peerapi
-  - android
-  - reconnect
+  - "sticky reconnect PeerAPI outage"
+  - "phone stuck after PeerAPI heal"
+  - "client toggle after DoH dead"
+  - "heal exit stub not coordinator yaml"
+  - "use_with_exit_node does not open PeerAPI"
+  - "Android exit DNS sticky"
+  - "reconnect during outage"
+  - "PeerAPI recovers client stuck"
+  - "do not change coordinator DNS yaml"
+  - "Headscale PeerAPI sticky"
+  - "exit DoH outage phones"
+  - "toggle exit after heal"
 backs:
   - OEN-14
   - OEN-19

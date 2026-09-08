@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>OEN-04: Exit-node TCP maximum-segment-size clamp after ts-forward never runs — Overlay and Edge Notes</title>
     <meta name="description" content="TCPMSS rules in FORWARD after jump ts-forward never see exit SYNs; insert the clamp at the top of ts-forward and re-apply after the overlay daemon rewrites chains.">
+    <meta name="keywords" content="ts-forward TCPMSS 0 packets, TCPMSS after jump ts-forward, exit-node TCPMSS never runs, Tailscale ts-forward clamp, DNS_PROBE_POSSIBLE cellular, exit SYN never clamped, TCPMSS top of ts-forward, ipleak DNS ok HTTP timeout, Headscale exit MSS, nft jump before clamp, path MTU exit node, don&#x27;t-fragment ping">
+    <meta name="citation_keywords" content="ts-forward TCPMSS 0 packets, TCPMSS after jump ts-forward, exit-node TCPMSS never runs, Tailscale ts-forward clamp, DNS_PROBE_POSSIBLE cellular, exit SYN never clamped, TCPMSS top of ts-forward, ipleak DNS ok HTTP timeout, Headscale exit MSS, nft jump before clamp, path MTU exit node, don&#x27;t-fragment ping">
     <link rel="canonical" href="https://eugenearmstead.github.io/overlay-and-edge-notes/networking/04-exit-tcpmss-after-ts-forward.html">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -43,7 +45,21 @@
       "url": "https://eugenearmstead.github.io/overlay-and-edge-notes/networking/04-exit-tcpmss-after-ts-forward.html",
       "identifier": "OEN-04",
       "license": "https://creativecommons.org/licenses/by/4.0/",
-      "inLanguage": "en"
+      "inLanguage": "en",
+      "keywords": [
+        "ts-forward TCPMSS 0 packets",
+        "TCPMSS after jump ts-forward",
+        "exit-node TCPMSS never runs",
+        "Tailscale ts-forward clamp",
+        "DNS_PROBE_POSSIBLE cellular",
+        "exit SYN never clamped",
+        "TCPMSS top of ts-forward",
+        "ipleak DNS ok HTTP timeout",
+        "Headscale exit MSS",
+        "nft jump before clamp",
+        "path MTU exit node",
+        "don't-fragment ping"
+      ]
     },
     {
       "@type": "HowTo",

@@ -9,10 +9,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/networking/20-lan-ula-happy-eyeballs-leak.html
 keywords:
-  - ula
-  - happy-eyeballs
-  - exit-node
-  - ipv6
+  - "LAN ULA Happy-Eyeballs leak"
+  - "IPv4 takes exit IPv6 leaks"
+  - "Allow LAN Access ULA default"
+  - "browser prefers v6 LAN VPN"
+  - "cellular no ULA fully on exit"
+  - "remote exit half-broken"
+  - "table 52 missing ::/0"
+  - "ip -6 route get via LAN NIC"
+  - "Tailscale exit Happy Eyeballs"
+  - "home LAN ULA vs selected exit"
+  - "curl -4 exit curl -6 leak"
+  - "Wi-Fi vs cellular exit matrix"
 backs: []
 backed_by:
   - OEN-S26

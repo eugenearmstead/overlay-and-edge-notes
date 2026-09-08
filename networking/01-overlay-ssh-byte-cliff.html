@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>OEN-01: Overlay SSH stalls at a byte cliff — Overlay and Edge Notes</title>
     <meta name="description" content="Overlay SSH accepts login then hangs above about 1 KB when mesh underlay double-encapsulates through commercial WireGuard or when MSS is clamped on the wrong path.">
+    <meta name="keywords" content="overlay SSH hang 1KB, Tailscale SSH stall, SSH hangs after login, overlay SSH byte cliff, path MTU, TCPMSS, double encapsulation, don&#x27;t-fragment ping, WireGuard MTU, ControlPath=none, clamp-mss-to-pmtu, userspace Tailscale SSH, MSS clamp wrong path, LAN MTU 1500, Headscale SSH hang">
+    <meta name="citation_keywords" content="overlay SSH hang 1KB, Tailscale SSH stall, SSH hangs after login, overlay SSH byte cliff, path MTU, TCPMSS, double encapsulation, don&#x27;t-fragment ping, WireGuard MTU, ControlPath=none, clamp-mss-to-pmtu, userspace Tailscale SSH, MSS clamp wrong path, LAN MTU 1500, Headscale SSH hang">
     <link rel="canonical" href="https://eugenearmstead.github.io/overlay-and-edge-notes/networking/01-overlay-ssh-byte-cliff.html">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -43,7 +45,24 @@
       "url": "https://eugenearmstead.github.io/overlay-and-edge-notes/networking/01-overlay-ssh-byte-cliff.html",
       "identifier": "OEN-01",
       "license": "https://creativecommons.org/licenses/by/4.0/",
-      "inLanguage": "en"
+      "inLanguage": "en",
+      "keywords": [
+        "overlay SSH hang 1KB",
+        "Tailscale SSH stall",
+        "SSH hangs after login",
+        "overlay SSH byte cliff",
+        "path MTU",
+        "TCPMSS",
+        "double encapsulation",
+        "don't-fragment ping",
+        "WireGuard MTU",
+        "ControlPath=none",
+        "clamp-mss-to-pmtu",
+        "userspace Tailscale SSH",
+        "MSS clamp wrong path",
+        "LAN MTU 1500",
+        "Headscale SSH hang"
+      ]
     },
     {
       "@type": "HowTo",

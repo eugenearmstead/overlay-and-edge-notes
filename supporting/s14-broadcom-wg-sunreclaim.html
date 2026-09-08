@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>OEN-S14: Broadcom in-kernel WireGuard SUnreclaim (flow-cache/runner A/B fail) — Overlay and Edge Notes</title>
     <meta name="description" content="In-kernel WireGuard on a Broadcom consumer router leaked about 6–8 MB/h of SUnreclaim. drop_caches did not free it. Flow-cache off and runner off A/Bs were negative.">
+    <meta name="keywords" content="Broadcom in-kernel WireGuard SUnreclaim, skbuff SUnreclaim leak, drop_caches does not free SUnreclaim, flow-cache off runner off fail, ASUSWRT-Merlin WireGuard memory, 6-8 MB/h SUnreclaim, in-kernel WG leak, scheduled reboot workaround, skip tables IPv4 IPv6 underlay, consumer router SUnreclaim, Merlin flow-cache A/B, WireGuard kernel slab leak">
+    <meta name="citation_keywords" content="Broadcom in-kernel WireGuard SUnreclaim, skbuff SUnreclaim leak, drop_caches does not free SUnreclaim, flow-cache off runner off fail, ASUSWRT-Merlin WireGuard memory, 6-8 MB/h SUnreclaim, in-kernel WG leak, scheduled reboot workaround, skip tables IPv4 IPv6 underlay, consumer router SUnreclaim, Merlin flow-cache A/B, WireGuard kernel slab leak">
     <link rel="canonical" href="https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s14-broadcom-wg-sunreclaim.html">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -43,7 +45,21 @@
       "url": "https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s14-broadcom-wg-sunreclaim.html",
       "identifier": "OEN-S14",
       "license": "https://creativecommons.org/licenses/by/4.0/",
-      "inLanguage": "en"
+      "inLanguage": "en",
+      "keywords": [
+        "Broadcom in-kernel WireGuard SUnreclaim",
+        "skbuff SUnreclaim leak",
+        "drop_caches does not free SUnreclaim",
+        "flow-cache off runner off fail",
+        "ASUSWRT-Merlin WireGuard memory",
+        "6-8 MB/h SUnreclaim",
+        "in-kernel WG leak",
+        "scheduled reboot workaround",
+        "skip tables IPv4 IPv6 underlay",
+        "consumer router SUnreclaim",
+        "Merlin flow-cache A/B",
+        "WireGuard kernel slab leak"
+      ]
     },
     {
       "@type": "HowTo",

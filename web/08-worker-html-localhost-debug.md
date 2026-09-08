@@ -9,10 +9,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/web/08-worker-html-localhost-debug.html
 keywords:
-  - cloudflare-workers
-  - localhost
-  - local-network-access
-  - debug-beacons
+  - "localhost debug beacon Worker"
+  - "127.0.0.1:7450 ingest"
+  - "X-Debug-Session-Id HTML"
+  - "Local Network Access prompt"
+  - "Brave Access other apps"
+  - "Cloudflare Worker localhost fetch"
+  - "do not ship ingest in HTML"
+  - "predeploy 127.0.0.1:7450"
+  - "Cursor debug beacon"
+  - "public HTTPS loopback fetch"
+  - "Worker HTML local-network"
+  - "LNA prompt Cloudflare"
 backs: []
 backed_by: []
 description: Agent debug templates that fetch 127.0.0.1 ingest URLs must never ship in Cloudflare Worker HTML; browsers prompt for local-network access on public HTTPS pages.

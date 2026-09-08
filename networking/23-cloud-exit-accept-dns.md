@@ -9,10 +9,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/networking/23-cloud-exit-accept-dns.html
 keywords:
-  - exit-node
-  - accept-dns
-  - peerapi
-  - gce
+  - "accept-dns=true breaks PeerAPI"
+  - "tailscale dns query pretty print"
+  - "GCE accept-dns metadata 169.254"
+  - "do not fix DNS display on exit"
+  - "accept-dns=false metadata resolver"
+  - "host dig vs exit DoH path"
+  - "cloud exit accept-dns"
+  - "PeerAPI RD=0 after accept-dns"
+  - "Google Compute Engine Tailscale DNS"
+  - "169.254.169.254 not PeerAPI"
+  - "Headscale exit accept-dns"
+  - "pretty dns query broken exit"
 backs: []
 backed_by:
   - OEN-19

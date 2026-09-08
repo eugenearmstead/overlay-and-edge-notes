@@ -9,9 +9,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s21-cloud-exit-hairpin-lan.html
 keywords:
-  - exit-node
-  - hairpin
-  - lan
+  - "cloud exit hairpin LAN HTTP"
+  - "overlay SSH router still works"
+  - "LAN DNS GUI dies with exit"
+  - "not a broken router"
+  - "clear exit on workstation"
+  - "Tailscale exit hairpin home"
+  - "HTTP LAN timeout exit selected"
+  - "Identity-Aware Proxy not this trap"
+  - "Allow LAN Access hairpin"
+  - "cloud exit vs home LAN"
+  - "SSH overlay HTTP LAN fail"
+  - "workstation exit selected"
 backs:
   - OEN-17
 backed_by: []

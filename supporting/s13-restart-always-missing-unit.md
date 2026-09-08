@@ -9,8 +9,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s13-restart-always-missing-unit.html
 keywords:
-  - systemd
-  - restart-always
+  - "Restart=always missing ExecStart"
+  - "systemd crash-loop hung workstation"
+  - "150k failed restarts"
+  - "leftover units bind other host"
+  - "systemctl --user crash loop"
+  - "always-on jobs always-on host"
+  - "Restart=always missing unit"
+  - "2-core box restart storm"
+  - "user systemd hung"
+  - "ExecStart path gone"
+  - "audit crash-loop units"
+  - "systemd StartLimit"
 backs: []
 backed_by: []
 description: "Restart=always on a missing ExecStart produced 150k+ failed restarts plus leftover units binding another host’s addresses on a 2-core box."

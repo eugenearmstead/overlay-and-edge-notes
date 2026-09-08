@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>OEN-15: Split host vs overlay resolver views on the coordinator VPS — Overlay and Edge Notes</title>
     <meta name="description" content="The coordinator host resolver on loopback MUST keep working when the commercial tunnel is down. The overlay nameserver view MAY fail in that state if it forwards through the tunnel.">
+    <meta name="keywords" content="split host vs overlay resolver, loopback Unbound tunnel down, tailnet DNS fails tunnel down, do not edit resolv.conf VPS, coordinator split-horizon DNS, host dig vs overlay dig, Unbound views commercial tunnel, Headscale nameserver view, 127.0.0.1 still resolves, overlay NS timeout expected, chrony NTS host stack, VPS resolver preference script">
+    <meta name="citation_keywords" content="split host vs overlay resolver, loopback Unbound tunnel down, tailnet DNS fails tunnel down, do not edit resolv.conf VPS, coordinator split-horizon DNS, host dig vs overlay dig, Unbound views commercial tunnel, Headscale nameserver view, 127.0.0.1 still resolves, overlay NS timeout expected, chrony NTS host stack, VPS resolver preference script">
     <link rel="canonical" href="https://eugenearmstead.github.io/overlay-and-edge-notes/networking/15-split-host-vs-overlay-resolver.html">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -43,7 +45,21 @@
       "url": "https://eugenearmstead.github.io/overlay-and-edge-notes/networking/15-split-host-vs-overlay-resolver.html",
       "identifier": "OEN-15",
       "license": "https://creativecommons.org/licenses/by/4.0/",
-      "inLanguage": "en"
+      "inLanguage": "en",
+      "keywords": [
+        "split host vs overlay resolver",
+        "loopback Unbound tunnel down",
+        "tailnet DNS fails tunnel down",
+        "do not edit resolv.conf VPS",
+        "coordinator split-horizon DNS",
+        "host dig vs overlay dig",
+        "Unbound views commercial tunnel",
+        "Headscale nameserver view",
+        "127.0.0.1 still resolves",
+        "overlay NS timeout expected",
+        "chrony NTS host stack",
+        "VPS resolver preference script"
+      ]
     },
     {
       "@type": "HowTo",

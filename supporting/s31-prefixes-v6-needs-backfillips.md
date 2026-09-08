@@ -9,9 +9,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s31-prefixes-v6-needs-backfillips.html
 keywords:
-  - prefixes
-  - ula
-  - backfillips
+  - "prefixes.v6 needs backfillips"
+  - "nodes backfillips --force"
+  - "restart alone tailscale ip -6 empty"
+  - "Headscale prefixes.v6 existing nodes"
+  - "ULA missing after enable v6"
+  - "backfillips then restart"
+  - "tailscale ip -6 empty"
+  - "self-hosted coordination ULA"
+  - "existing nodes no IPv6"
+  - "prefixes.v6 rollout"
+  - "Headscale backfillips"
+  - "enable IPv6 overlay nodes"
 backs:
   - OEN-13
 backed_by: []

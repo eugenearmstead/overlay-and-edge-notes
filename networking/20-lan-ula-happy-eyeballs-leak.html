@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>OEN-20: LAN unique-local + remote exit: IPv4 takes the exit, IPv6 leaks — Overlay and Edge Notes</title>
     <meta name="description" content="On home Wi-Fi a remote exit can carry IPv4 while browsers prefer IPv6 via the LAN unique-local default into the commercial VPN. Cellular without that unique-local looks fully on the exit.">
+    <meta name="keywords" content="LAN ULA Happy-Eyeballs leak, IPv4 takes exit IPv6 leaks, Allow LAN Access ULA default, browser prefers v6 LAN VPN, cellular no ULA fully on exit, remote exit half-broken, table 52 missing ::/0, ip -6 route get via LAN NIC, Tailscale exit Happy Eyeballs, home LAN ULA vs selected exit, curl -4 exit curl -6 leak, Wi-Fi vs cellular exit matrix">
+    <meta name="citation_keywords" content="LAN ULA Happy-Eyeballs leak, IPv4 takes exit IPv6 leaks, Allow LAN Access ULA default, browser prefers v6 LAN VPN, cellular no ULA fully on exit, remote exit half-broken, table 52 missing ::/0, ip -6 route get via LAN NIC, Tailscale exit Happy Eyeballs, home LAN ULA vs selected exit, curl -4 exit curl -6 leak, Wi-Fi vs cellular exit matrix">
     <link rel="canonical" href="https://eugenearmstead.github.io/overlay-and-edge-notes/networking/20-lan-ula-happy-eyeballs-leak.html">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -43,7 +45,21 @@
       "url": "https://eugenearmstead.github.io/overlay-and-edge-notes/networking/20-lan-ula-happy-eyeballs-leak.html",
       "identifier": "OEN-20",
       "license": "https://creativecommons.org/licenses/by/4.0/",
-      "inLanguage": "en"
+      "inLanguage": "en",
+      "keywords": [
+        "LAN ULA Happy-Eyeballs leak",
+        "IPv4 takes exit IPv6 leaks",
+        "Allow LAN Access ULA default",
+        "browser prefers v6 LAN VPN",
+        "cellular no ULA fully on exit",
+        "remote exit half-broken",
+        "table 52 missing ::/0",
+        "ip -6 route get via LAN NIC",
+        "Tailscale exit Happy Eyeballs",
+        "home LAN ULA vs selected exit",
+        "curl -4 exit curl -6 leak",
+        "Wi-Fi vs cellular exit matrix"
+      ]
     },
     {
       "@type": "HowTo",

@@ -9,10 +9,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/networking/14-exit-dns-is-peerapi.html
 keywords:
-  - exit-node
-  - peerapi
-  - dns
-  - unbound
+  - "exit DNS is PeerAPI not Unbound"
+  - "PeerAPI DNS"
+  - "dig coordinator works apps dead"
+  - "dns-query DoH exit"
+  - "use_with_exit_node empty"
+  - "resolvectl timeout WireGuard online"
+  - "do not restart coordinator DNS"
+  - "Headscale Unbound vs PeerAPI"
+  - "tailscale dns-query ephemeral port"
+  - "heal PeerAPI on the exit"
+  - "Android exit DNS DoH"
+  - "RD=0 Unbound REFUSED"
 backs: []
 backed_by:
   - OEN-S28

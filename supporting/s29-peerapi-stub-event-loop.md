@@ -9,9 +9,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s29-peerapi-stub-event-loop.html
 keywords:
-  - peerapi
-  - select
-  - recv-q
+  - "PeerAPI stub event-loop blocks"
+  - "UDP recv-Q grows"
+  - "select() sync upstream DNS"
+  - "cellular DNS dies stub"
+  - "thread pool PeerAPI stub"
+  - "upstream timeout stub"
+  - "single-threaded DoH stub"
+  - "recv-Q 160KB DNS"
+  - "exit stub event loop"
+  - "Android exit DNS timeout"
+  - "PeerAPI UDP queue"
+  - "do not block select DNS"
 backs:
   - OEN-05
   - OEN-19

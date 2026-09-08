@@ -9,10 +9,19 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/networking/07-crowdsec-capi-403.html
 keywords:
-  - crowdsec
-  - capi
-  - 403
-  - health-probe
+  - "cscli capi 403"
+  - "CrowdSec CAPI 403"
+  - "CrowdSec Central API Forbidden"
+  - "cscli capi status"
+  - "CrowdSec healthcheck 403"
+  - "systemd CrowdSec probe"
+  - "CAPI IPv4 banned IPv6 401"
+  - "dummy enroll POST 401 vs 403"
+  - "CrowdSec Docker healthcheck"
+  - "api.crowdsec.net 403"
+  - "CAPI login budget"
+  - "native CrowdSec not Docker"
+  - "hosts pin CrowdSec IPv4"
 backs: []
 backed_by:
   - OEN-S34

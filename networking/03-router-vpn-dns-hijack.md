@@ -9,10 +9,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/networking/03-router-vpn-dns-hijack.html
 keywords:
-  - dns
-  - vpn
-  - merlin
-  - dnsvpn2
+  - "router VPN DNS hijack"
+  - "ASUSWRT-Merlin DNSVPN2"
+  - "DNS Server DNAT port 53"
+  - "ERR_TIMED_OUT Tailscale off"
+  - "looks like path MTU"
+  - "LAN DNS hung"
+  - "consumer router VPN DNS"
+  - "DNS hijack vs PMTU"
+  - "WireGuard DNS Server field"
+  - "IPv6 stall DNS"
+  - "destination NAT :53"
+  - "Merlin DNSVPN2"
 backs: []
 backed_by:
   - OEN-S24

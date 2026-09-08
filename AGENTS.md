@@ -16,6 +16,17 @@ If Markdown and HTML disagree, fix Markdown and rebuild.
 
 These pages are meant to be **agent-reproducible**, not only readable. A remote agent MUST be able to emit a bound runbook after a human fills Bind. A remote agent MUST NOT apply live network changes from unbound placeholders.
 
+## How to find a spec
+
+People and agents find these notes by the **failure string**, not a lab name.
+
+1. Google → GitHub Pages (`https://eugenearmstead.github.io/overlay-and-edge-notes/`). Canonical URLs, unique title and meta description, sitemap, robots Allow.
+2. GitHub.com repo search / README citation index.
+3. Agents → `https://eugenearmstead.github.io/overlay-and-edge-notes/llms.txt` and `llms-full.txt`.
+4. Failure-string search: `curl 200 chrome ERR_CONNECTION_CLOSED`, `cscli capi 403`, `ts-forward TCPMSS 0 packets`.
+
+YAML `keywords:` (8–20 real phrases) and `description:` (~150 characters, include the symptom) are the search surface. The HTML builder emits `<meta name="keywords">`, `citation_keywords`, and JSON-LD `keywords`. Do not keyword-stuff. Do not `noindex`.
+
 ## RFC 2119
 
 `MUST`, `MUST NOT`, `SHOULD`, `MAY` in procedures are used as in RFC 2119 / RFC 8174.

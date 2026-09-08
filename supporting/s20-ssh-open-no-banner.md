@@ -9,9 +9,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s20-ssh-open-no-banner.html
 keywords:
-  - ssh
-  - banner
-  - router
+  - "SSH TCP-open with no banner"
+  - "nmap open userspace sick"
+  - "Dropbear no banner"
+  - "consumer router SSH banner missing"
+  - "reboot restores banner PeerAPI"
+  - "TCP open not enough"
+  - "ASUSWRT-Merlin SSH hung"
+  - "overlay SSH no ident"
+  - "userspace SSH sick"
+  - "PeerAPI down with banner"
+  - "router SSH probe banner"
+  - "nmap open filtered SSH"
 backs:
   - OEN-12
   - OEN-14

@@ -218,7 +218,41 @@ HOME_TERMS = [
     {"abbr": "MTU", "expansion": "Maximum Transmission Unit"},
     {"abbr": "HTML", "expansion": "HyperText Markup Language"},
     {"abbr": "WireGuard", "expansion": "UDP-based virtual private network protocol"},
+    {"abbr": "DNS", "expansion": "Domain Name System"},
+    {"abbr": "TCPMSS", "expansion": "iptables/nft target that sets TCP Maximum Segment Size"},
+    {"abbr": "PeerAPI", "expansion": "overlay peer HTTP API (including DNS-over-HTTPS on the exit)"},
+    {"abbr": "README", "expansion": "repository citation index in Markdown"},
+    {"abbr": "URL", "expansion": "Uniform Resource Locator"},
+    {"abbr": "ASUSWRT", "expansion": "ASUS wireless router firmware family"},
+    {"abbr": "canIpForward", "expansion": "Google Cloud IP forwarding flag on a virtual machine"},
+    {"abbr": "CAPI", "expansion": "CrowdSec Central API"},
+    {"abbr": "KB", "expansion": "kilobyte"},
 ]
+
+HOME_KEYWORDS = [
+    "overlay SSH hang 1KB",
+    "curl 200 chrome ERR_CONNECTION_CLOSED",
+    "cscli capi 403",
+    "ts-forward TCPMSS 0 packets",
+    "PeerAPI DNS",
+    "canIpForward exit node",
+    "path MTU",
+    "Tailscale SSH",
+    "Headscale",
+    "WireGuard MTU",
+    "CrowdSec CAPI",
+    "Cloudflare Worker",
+    "Identity-Aware Proxy",
+    "ASUSWRT-Merlin DNSVPN2",
+    "llms.txt",
+    "don't-fragment ping",
+]
+
+HOME_DESCRIPTION = (
+    "Named overlay and edge traps searchable by the failure string: "
+    "curl 200 chrome ERR_CONNECTION_CLOSED, cscli capi 403, overlay SSH hang 1KB. "
+    "By Eugene Armstead."
+)
 
 DISCLOSURE_TERMS = [
     {"abbr": "OEN", "expansion": "Overlay and Edge Notes (this series)"},
@@ -560,22 +594,43 @@ def person_ld() -> dict:
     }
 
 
+def keywords_list(meta: dict | None) -> list[str]:
+    raw = (meta or {}).get("keywords") or []
+    if isinstance(raw, str):
+        raw = [p.strip() for p in raw.split(",")]
+    out: list[str] = []
+    seen: set[str] = set()
+    for item in raw:
+        k = str(item).strip()
+        if not k or k.lower() in seen:
+            continue
+        seen.add(k.lower())
+        out.append(k)
+    return out
+
+
+def keywords_joined(keywords: list[str]) -> str:
+    return ", ".join(keywords)
+
+
 def json_ld_spec(meta: dict, canonical: str, howto: list[dict]) -> str:
     desc = meta.get("description") or meta.get("title") or SITE_NAME
-    graph = [
-        {
-            "@type": "TechArticle",
-            "@id": canonical + "#article",
-            "headline": meta.get("title"),
-            "description": desc,
-            "datePublished": str(meta.get("date_published") or ""),
-            "author": person_ld(),
-            "url": canonical,
-            "identifier": meta.get("id"),
-            "license": LICENSE_URL,
-            "inLanguage": "en",
-        }
-    ]
+    article = {
+        "@type": "TechArticle",
+        "@id": canonical + "#article",
+        "headline": meta.get("title"),
+        "description": desc,
+        "datePublished": str(meta.get("date_published") or ""),
+        "author": person_ld(),
+        "url": canonical,
+        "identifier": meta.get("id"),
+        "license": LICENSE_URL,
+        "inLanguage": "en",
+    }
+    kws = keywords_list(meta)
+    if kws:
+        article["keywords"] = kws
+    graph = [article]
     if howto:
         graph.append(
             {
@@ -589,7 +644,9 @@ def json_ld_spec(meta: dict, canonical: str, howto: list[dict]) -> str:
     return json.dumps({"@context": "https://schema.org", "@graph": graph}, indent=2)
 
 
-def json_ld_website(canonical: str, title: str, desc: str) -> str:
+def json_ld_website(
+    canonical: str, title: str, desc: str, keywords: list[str] | None = None
+) -> str:
     data = {
         "@context": "https://schema.org",
         "@type": "WebSite",
@@ -600,6 +657,8 @@ def json_ld_website(canonical: str, title: str, desc: str) -> str:
         "publisher": person_ld(),
         "license": LICENSE_URL,
     }
+    if keywords:
+        data["keywords"] = keywords
     return json.dumps(data, indent=2)
 
 
@@ -642,12 +701,20 @@ def wrap_page(
     og_type: str = "article",
     published: str | None = None,
     crumbs: list[tuple[str, str | None]] | None = None,
+    keywords: list[str] | None = None,
 ) -> str:
     css = css_href(out_path)
     llms = href_from(out_path, "llms.txt")
     pub = ""
     if published:
         pub = f'\n    <meta property="article:published_time" content="{html.escape(str(published))}">'
+    kw_tags = ""
+    if keywords:
+        joined = html.escape(keywords_joined(keywords))
+        kw_tags = (
+            f'\n    <meta name="keywords" content="{joined}">'
+            f'\n    <meta name="citation_keywords" content="{joined}">'
+        )
     crumb_html = ""
     if crumbs:
         items = []
@@ -663,7 +730,7 @@ def wrap_page(
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{html.escape(title)}</title>
-    <meta name="description" content="{html.escape(description)}">
+    <meta name="description" content="{html.escape(description)}">{kw_tags}
     <link rel="canonical" href="{html.escape(canonical, quote=True)}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -759,6 +826,7 @@ def render_spec(md_path: Path) -> None:
         json_ld=json_ld_spec(meta, canonical, howto),
         published=str(meta.get("date_published") or ""),
         crumbs=crumbs,
+        keywords=keywords_list(meta),
     )
     out_path.write_text(html_out, encoding="utf-8")
     print(f"wrote {out_path.relative_to(ROOT)}")
@@ -784,17 +852,19 @@ def catalog_list_html(section: str, from_page: Path) -> str:
 def write_index() -> None:
     out_path = ROOT / "index.html"
     canonical = f"{SITE_ORIGIN}/"
-    desc = (
-        "Living field notes on overlay SSH path MTU, commercial WireGuard, "
-        "cloud exit nodes, and edge HTML. Written by Eugene Armstead."
-    )
+    desc = HOME_DESCRIPTION
     home_prose = (
         f"{SITE_NAME}\n{desc}\n"
         "Named traps with replicable procedures. Stable IDs that do not reset by year. "
         "Markdown is the source of truth; HTML is generated. "
         "This edition ships original specs and supporting methods. "
         "Year pages are indexes, not copies of specs. "
-        "Disclosure, changelog, agents, crawlers."
+        "Disclosure, changelog, agents, crawlers. "
+        "How to find these notes. Four doors. Google GitHub Pages canonical URL "
+        "sitemap robots Allow. GitHub.com README. Agents llms.txt llms-full.txt. "
+        "Failure-string search curl 200 chrome ERR_CONNECTION_CLOSED cscli capi 403 "
+        "ts-forward TCPMSS 0 packets PeerAPI DNS canIpForward exit node "
+        "ASUSWRT-Merlin DNSVPN2 overlay SSH hang 1KB CAPI."
     )
     assert_terms_cover("index.html", home_prose, HOME_TERMS)
     terms_html = terms_section_html(HOME_TERMS)
@@ -803,6 +873,14 @@ def write_index() -> None:
         <p class="lede">Named traps with replicable procedures. Stable IDs that do not reset by year. Markdown is the source of truth; HTML is generated.</p>
         <p>This edition ships twenty-three original specs and thirty-four supporting methods. Year pages are indexes, not copies of specs.</p>
         {terms_html}
+        <h2 id="find">How to find these notes</h2>
+        <p>Four doors, one tree. Search the <strong>failure string</strong>, not a lab name. This is not a dump of every keyword.</p>
+        <ol>
+          <li><strong>Google</strong> indexes GitHub Pages. Canonical URL, unique title and meta description per page, sitemap, robots Allow. Example searches: <code>curl 200 chrome ERR_CONNECTION_CLOSED</code>, <code>cscli capi 403</code>, <code>ts-forward TCPMSS 0 packets</code>.</li>
+          <li><strong>GitHub.com</strong> repo search and the README citation index.</li>
+          <li><strong>Agents</strong> start at <a href="{href_from(out_path, 'llms.txt')}"><code>llms.txt</code></a> and <a href="{href_from(out_path, 'llms-full.txt')}"><code>llms-full.txt</code></a>.</li>
+          <li><strong>Failure-string search</strong> on Pages or the repo: overlay SSH hang 1KB, PeerAPI DNS, canIpForward exit node, ASUSWRT-Merlin DNSVPN2.</li>
+        </ol>
         <h2 id="about">About</h2>
         <ul>
           <li><a href="{href_from(out_path, 'DISCLOSURE.html')}">Disclosure and license</a></li>
@@ -825,9 +903,10 @@ def write_index() -> None:
         description=desc,
         canonical=canonical,
         body=body,
-        json_ld=json_ld_website(canonical, SITE_NAME, desc),
+        json_ld=json_ld_website(canonical, SITE_NAME, desc, HOME_KEYWORDS),
         og_type="website",
         crumbs=[("Home", None)],
+        keywords=HOME_KEYWORDS,
     )
     out_path.write_text(html_out, encoding="utf-8")
     print("wrote index.html")
@@ -856,20 +935,36 @@ def write_disclosure() -> None:
         description=desc,
         canonical=canonical,
         body=body_wrapped,
-        json_ld=json_ld_website(canonical, title, desc),
+        json_ld=json_ld_website(canonical, title, desc, keywords_list(meta)),
         og_type="article",
         published=str(meta.get("date_published") or date.today().isoformat()),
         crumbs=[("Home", href_from(out_path, "index.html")), ("Disclosure", None)],
+        keywords=keywords_list(meta),
     )
     out_path.write_text(html_out, encoding="utf-8")
     print("wrote DISCLOSURE.html")
+
+
+def llm_one_line(md_path: Path, fallback: str) -> str:
+    meta, _body = parse_frontmatter(md_path.read_text(encoding="utf-8"))
+    blurb = str(meta.get("description") or fallback).strip()
+    blurb = " ".join(blurb.split())
+    if len(blurb) > 280:
+        blurb = blurb[:277].rstrip() + "..."
+    return blurb
 
 
 def write_llms_txt() -> None:
     lines = [
         f"# {SITE_NAME}",
         "",
-        f"> Field notes by {AUTHOR_NAME} ({AUTHOR_URL}). Living specs with stable IDs. CC-BY-4.0. Placeholders only: <cloud-vps>, <lan-pi>, <overlay-peer>, <exit-node>, <wg-iface>, <gcp-nic>.",
+        f"> Field notes by {AUTHOR_NAME} ({AUTHOR_URL}). Living specs with stable IDs. CC-BY-4.0. Placeholders only: <cloud-vps>, <lan-pi>, <overlay-peer>, <exit-node>, <wg-iface>, <gcp-nic>. Search the failure string: curl 200 chrome ERR_CONNECTION_CLOSED; cscli capi 403; ts-forward TCPMSS 0 packets.",
+        "",
+        "## How to find a spec",
+        "",
+        "- Humans: Google (GitHub Pages canonical URLs) or GitHub.com repo / README search.",
+        f"- Agents: this file and [{SITE_ORIGIN}/llms-full.txt]({SITE_ORIGIN}/llms-full.txt).",
+        "- Match the failure string in the one-line descriptions below (llmstxt.org format).",
         "",
         "## Original specs (built)",
         "",
@@ -879,14 +974,16 @@ def write_llms_txt() -> None:
             continue
         if not spec_id.startswith("OEN-S"):
             url = f"{SITE_ORIGIN}/{section}/{slug}.html"
-            lines.append(f"- [{spec_id} {title}]({url}): living spec")
+            blurb = llm_one_line(ROOT / section / f"{slug}.md", title)
+            lines.append(f"- [{spec_id} {title}]({url}): {blurb}")
     lines += ["", "## Supporting specs (built)", ""]
     for spec_id, section, slug, title in CATALOG:
         if not is_built(section, slug):
             continue
         if spec_id.startswith("OEN-S"):
             url = f"{SITE_ORIGIN}/{section}/{slug}.html"
-            lines.append(f"- [{spec_id} {title}]({url}): supporting method")
+            blurb = llm_one_line(ROOT / section / f"{slug}.md", title)
+            lines.append(f"- [{spec_id} {title}]({url}): {blurb}")
     lines += [
         "",
         "## About",
@@ -960,10 +1057,11 @@ def write_frontmatter_page(md_path: Path, *, crumb: str) -> None:
         description=desc,
         canonical=canonical,
         body=body_wrapped,
-        json_ld=json_ld_website(canonical, title, desc),
+        json_ld=json_ld_website(canonical, title, desc, keywords_list(meta)),
         og_type="article",
         published=str(meta.get("date_published") or date.today().isoformat()),
         crumbs=[("Home", href_from(out_path, "index.html")), (crumb, None)],
+        keywords=keywords_list(meta),
     )
     out_path.write_text(html_out, encoding="utf-8")
     print(f"wrote {rel_html.as_posix()}")

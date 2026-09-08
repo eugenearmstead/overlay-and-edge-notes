@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>OEN-17: Google Cloud overlay exit (IP forwarding, listen port, Identity-Aware Proxy) — Overlay and Edge Notes</title>
     <meta name="description" content="A Google Cloud virtual machine can advertise an overlay exit only with IP forwarding, both default routes, a fixed overlay UDP listen port, scoped network address translation, and Identity-Aware Proxy as break-glass — not as the daily door.">
+    <meta name="keywords" content="canIpForward exit node, Google Cloud overlay exit, Identity-Aware Proxy break-glass, advertise 0.0.0.0/0 and ::/0, overlay PORT 41641, Android hides exit without ::/0, ip_forward GCE, do not double ip6tables MASQUERADE, rp_filter=2 GCP NIC, tailscale ssh KEX fail GCE, accept-dns vs PeerAPI, VPC UDP 41641 PORT=0, Headscale GCP exit">
+    <meta name="citation_keywords" content="canIpForward exit node, Google Cloud overlay exit, Identity-Aware Proxy break-glass, advertise 0.0.0.0/0 and ::/0, overlay PORT 41641, Android hides exit without ::/0, ip_forward GCE, do not double ip6tables MASQUERADE, rp_filter=2 GCP NIC, tailscale ssh KEX fail GCE, accept-dns vs PeerAPI, VPC UDP 41641 PORT=0, Headscale GCP exit">
     <link rel="canonical" href="https://eugenearmstead.github.io/overlay-and-edge-notes/networking/17-gcp-overlay-exit.html">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -43,7 +45,22 @@
       "url": "https://eugenearmstead.github.io/overlay-and-edge-notes/networking/17-gcp-overlay-exit.html",
       "identifier": "OEN-17",
       "license": "https://creativecommons.org/licenses/by/4.0/",
-      "inLanguage": "en"
+      "inLanguage": "en",
+      "keywords": [
+        "canIpForward exit node",
+        "Google Cloud overlay exit",
+        "Identity-Aware Proxy break-glass",
+        "advertise 0.0.0.0/0 and ::/0",
+        "overlay PORT 41641",
+        "Android hides exit without ::/0",
+        "ip_forward GCE",
+        "do not double ip6tables MASQUERADE",
+        "rp_filter=2 GCP NIC",
+        "tailscale ssh KEX fail GCE",
+        "accept-dns vs PeerAPI",
+        "VPC UDP 41641 PORT=0",
+        "Headscale GCP exit"
+      ]
     },
     {
       "@type": "HowTo",

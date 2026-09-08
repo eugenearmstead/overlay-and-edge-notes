@@ -9,9 +9,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s15-router-squashfs-jffs.html
 keywords:
-  - squashfs
-  - jffs
-  - backup
+  - "router squashfs 100% full"
+  - "Save settings misses jffs"
+  - "Save JFFS separately"
+  - "logread is OpenWrt"
+  - "Merlin syslog not logread"
+  - "squashfs always 100%"
+  - "ASUSWRT-Merlin jffs scripts"
+  - ".cfg backup without overlay scripts"
+  - "judge USB jffs not root"
+  - "persistent overlay Save"
+  - "consumer router disk 100%"
+  - "jffs scripts not in cfg"
 backs:
   - OEN-12
 backed_by: []

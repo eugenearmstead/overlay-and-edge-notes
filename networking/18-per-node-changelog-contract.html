@@ -4,7 +4,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>OEN-18: Per-node changelog contract (repo + hashed on-device copy) — Overlay and Edge Notes</title>
-    <meta name="description" content="Keep a canonical per-node changelog in the ops repo and sync a hashed on-device copy the same session as the change, using path classes that differ by node type.">
+    <meta name="description" content="Per-node changelog hash mismatch: the ops-repo file is canonical; sync a hashed on-device copy the same session, with path class by node type.">
+    <meta name="keywords" content="per-node changelog hash mismatch, on-device CHANGELOG sync, ops repo canonical changelog, changelog path class by node, sha256sum changelog verify, do not invent fake precision, timezone labeled not UTC prose, router jffs vs VPS vs Pi paths, same session changelog, homelab changelog contract, hashed on-device copy, Change Paths Verify entry">
+    <meta name="citation_keywords" content="per-node changelog hash mismatch, on-device CHANGELOG sync, ops repo canonical changelog, changelog path class by node, sha256sum changelog verify, do not invent fake precision, timezone labeled not UTC prose, router jffs vs VPS vs Pi paths, same session changelog, homelab changelog contract, hashed on-device copy, Change Paths Verify entry">
     <link rel="canonical" href="https://eugenearmstead.github.io/overlay-and-edge-notes/networking/18-per-node-changelog-contract.html">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,7 +20,7 @@
     <meta property="article:author" content="Eugene Armstead">
     <meta property="og:see_also" content="https://www.armsteadent.com/">
     <meta property="og:title" content="OEN-18: Per-node changelog contract (repo + hashed on-device copy) — Overlay and Edge Notes">
-    <meta property="og:description" content="Keep a canonical per-node changelog in the ops repo and sync a hashed on-device copy the same session as the change, using path classes that differ by node type.">
+    <meta property="og:description" content="Per-node changelog hash mismatch: the ops-repo file is canonical; sync a hashed on-device copy the same session, with path class by node type.">
     <meta property="og:url" content="https://eugenearmstead.github.io/overlay-and-edge-notes/networking/18-per-node-changelog-contract.html">
     <meta property="og:type" content="article">
     <meta property="article:published_time" content="2026-09-07">
@@ -30,7 +32,7 @@
       "@type": "TechArticle",
       "@id": "https://eugenearmstead.github.io/overlay-and-edge-notes/networking/18-per-node-changelog-contract.html#article",
       "headline": "Per-node changelog contract (repo + hashed on-device copy)",
-      "description": "Keep a canonical per-node changelog in the ops repo and sync a hashed on-device copy the same session as the change, using path classes that differ by node type.",
+      "description": "Per-node changelog hash mismatch: the ops-repo file is canonical; sync a hashed on-device copy the same session, with path class by node type.",
       "datePublished": "2026-09-07",
       "author": {
         "@type": "Person",
@@ -43,12 +45,26 @@
       "url": "https://eugenearmstead.github.io/overlay-and-edge-notes/networking/18-per-node-changelog-contract.html",
       "identifier": "OEN-18",
       "license": "https://creativecommons.org/licenses/by/4.0/",
-      "inLanguage": "en"
+      "inLanguage": "en",
+      "keywords": [
+        "per-node changelog hash mismatch",
+        "on-device CHANGELOG sync",
+        "ops repo canonical changelog",
+        "changelog path class by node",
+        "sha256sum changelog verify",
+        "do not invent fake precision",
+        "timezone labeled not UTC prose",
+        "router jffs vs VPS vs Pi paths",
+        "same session changelog",
+        "homelab changelog contract",
+        "hashed on-device copy",
+        "Change Paths Verify entry"
+      ]
     },
     {
       "@type": "HowTo",
       "name": "Per-node changelog contract (repo + hashed on-device copy)",
-      "description": "Keep a canonical per-node changelog in the ops repo and sync a hashed on-device copy the same session as the change, using path classes that differ by node type.",
+      "description": "Per-node changelog hash mismatch: the ops-repo file is canonical; sync a hashed on-device copy the same session, with path class by node type.",
       "author": {
         "@type": "Person",
         "name": "Eugene Armstead",

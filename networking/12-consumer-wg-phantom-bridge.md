@@ -9,10 +9,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/networking/12-consumer-wg-phantom-bridge.html
 keywords:
-  - wireguard
-  - merlin
-  - forward
-  - bridge
+  - "WireGuard FORWARD phantom bridge"
+  - "Merlin connected without internet"
+  - "router curl wg LAN dead"
+  - "ASUSWRT-Merlin FORWARD guest bridge"
+  - "restart_wgc wipes FORWARD"
+  - "LAN bridge WireGuard MASQUERADE"
+  - "iptables -C || -I firewall-start"
+  - "consumer router WG no internet"
+  - "delayed Starting client 2"
+  - "guest bridge does not exist"
+  - "WireGuard client FORWARD 0"
+  - "Merlin VPN Director FORWARD"
 backs: []
 backed_by:
   - OEN-22

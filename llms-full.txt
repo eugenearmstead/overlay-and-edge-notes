@@ -13,10 +13,21 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/networking/01-overlay-ssh-byte-cliff.html
 keywords:
-  - path-mtu
-  - overlay-ssh
-  - double-encapsulation
-  - tcpmss
+  - "overlay SSH hang 1KB"
+  - "Tailscale SSH stall"
+  - "SSH hangs after login"
+  - "overlay SSH byte cliff"
+  - "path MTU"
+  - "TCPMSS"
+  - "double encapsulation"
+  - "don't-fragment ping"
+  - "WireGuard MTU"
+  - "ControlPath=none"
+  - "clamp-mss-to-pmtu"
+  - "userspace Tailscale SSH"
+  - "MSS clamp wrong path"
+  - "LAN MTU 1500"
+  - "Headscale SSH hang"
 backs: []
 backed_by:
   - OEN-S01
@@ -397,10 +408,20 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/networking/02-chromium-tls-pmtu.html
 keywords:
-  - path-mtu
-  - chromium
-  - tls
-  - clienthello
+  - "curl 200 chrome ERR_CONNECTION_CLOSED"
+  - "ERR_CONNECTION_CLOSED"
+  - "Chromium TLS handshake fail"
+  - "curl works browser fails"
+  - "ClientHello too large"
+  - "path MTU blackhole"
+  - "Brave HTTPS closed"
+  - "post-quantum ClientHello"
+  - "WireGuard MTU"
+  - "don't-fragment ping"
+  - "TCPMSS"
+  - "ICMP fragmentation needed"
+  - "ERR_TIMED_OUT HTTPS"
+  - "PMTUD blackhole"
 backs: []
 backed_by:
   - OEN-S01
@@ -653,10 +674,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/networking/03-router-vpn-dns-hijack.html
 keywords:
-  - dns
-  - vpn
-  - merlin
-  - dnsvpn2
+  - "router VPN DNS hijack"
+  - "ASUSWRT-Merlin DNSVPN2"
+  - "DNS Server DNAT port 53"
+  - "ERR_TIMED_OUT Tailscale off"
+  - "looks like path MTU"
+  - "LAN DNS hung"
+  - "consumer router VPN DNS"
+  - "DNS hijack vs PMTU"
+  - "WireGuard DNS Server field"
+  - "IPv6 stall DNS"
+  - "destination NAT :53"
+  - "Merlin DNSVPN2"
 backs: []
 backed_by:
   - OEN-S24
@@ -880,9 +909,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/networking/04-exit-tcpmss-after-ts-forward.html
 keywords:
-  - exit-node
-  - tcpmss
-  - ts-forward
+  - "ts-forward TCPMSS 0 packets"
+  - "TCPMSS after jump ts-forward"
+  - "exit-node TCPMSS never runs"
+  - "Tailscale ts-forward clamp"
+  - "DNS_PROBE_POSSIBLE cellular"
+  - "exit SYN never clamped"
+  - "TCPMSS top of ts-forward"
+  - "ipleak DNS ok HTTP timeout"
+  - "Headscale exit MSS"
+  - "nft jump before clamp"
+  - "path MTU exit node"
+  - "don't-fragment ping"
 backs: []
 backed_by:
   - OEN-S01
@@ -1103,10 +1141,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/networking/05-exit-peerapi-dns-stub.html
 keywords:
-  - exit-node
-  - peerapi
-  - dns
-  - loopback
+  - "PeerAPI DNS"
+  - "exit-node PeerAPI stub"
+  - "PeerAPIURL dynamic port"
+  - "Android exit DNS DoH"
+  - "bind stub overlay :53 breaks exit"
+  - "loopback DNS stub RD=1"
+  - "tailscale status PeerAPIURL"
+  - "UDP recv-Q PeerAPI"
+  - "exit DNS not :53"
+  - "Headscale PeerAPI"
+  - "Recursion Desired stub"
+  - "DoH dns-query exit"
 backs: []
 backed_by:
   - OEN-S29
@@ -1332,10 +1378,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/networking/06-netfilter-off-v6-return.html
 keywords:
-  - exit-node
-  - ipv6
-  - netfilter
-  - fib
+  - "NetfilterMode=off IPv6 blackhole"
+  - "nft prerouting mark FIB"
+  - "ip6tables MARK MASQUERADE"
+  - "overlay ULA /48 table 52"
+  - "FORWARD tunnel overlay 0 packets"
+  - "IPv6 return path blackhole"
+  - "iptables-nft mark before fib"
+  - "exit node IPv6 SNAT"
+  - "Tailscale netfilter off"
+  - "conntrack split nft ip6tables"
+  - "ip -6 route get iif tunnel"
+  - "Headscale ULA return"
 backs: []
 backed_by:
   - OEN-S27
@@ -1546,10 +1600,19 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/networking/07-crowdsec-capi-403.html
 keywords:
-  - crowdsec
-  - capi
-  - 403
-  - health-probe
+  - "cscli capi 403"
+  - "CrowdSec CAPI 403"
+  - "CrowdSec Central API Forbidden"
+  - "cscli capi status"
+  - "CrowdSec healthcheck 403"
+  - "systemd CrowdSec probe"
+  - "CAPI IPv4 banned IPv6 401"
+  - "dummy enroll POST 401 vs 403"
+  - "CrowdSec Docker healthcheck"
+  - "api.crowdsec.net 403"
+  - "CAPI login budget"
+  - "native CrowdSec not Docker"
+  - "hosts pin CrowdSec IPv4"
 backs: []
 backed_by:
   - OEN-S34
@@ -1742,10 +1805,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/networking/12-consumer-wg-phantom-bridge.html
 keywords:
-  - wireguard
-  - merlin
-  - forward
-  - bridge
+  - "WireGuard FORWARD phantom bridge"
+  - "Merlin connected without internet"
+  - "router curl wg LAN dead"
+  - "ASUSWRT-Merlin FORWARD guest bridge"
+  - "restart_wgc wipes FORWARD"
+  - "LAN bridge WireGuard MASQUERADE"
+  - "iptables -C || -I firewall-start"
+  - "consumer router WG no internet"
+  - "delayed Starting client 2"
+  - "guest bridge does not exist"
+  - "WireGuard client FORWARD 0"
+  - "Merlin VPN Director FORWARD"
 backs: []
 backed_by:
   - OEN-22
@@ -1962,10 +2033,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/networking/13-overlay-underlay-ula-layers.html
 keywords:
-  - ula
-  - overlay
-  - underlay
-  - ipv6
+  - "overlay vs underlay vs ULA"
+  - "tunnel ULA vs LAN ULA"
+  - "bind overlay v4 and node ULA"
+  - "do not bind WAN ::"
+  - "prefixes.v6 backfillips"
+  - "IPv6-only mesh not ops target"
+  - "Tailscale ULA layers"
+  - "Headscale unique-local"
+  - "ssh overlay v4 rides WAN v6"
+  - "HTTP overlay v6 brackets"
+  - "four address layers"
+  - "TS_DEBUG_MTU overlay IPv6"
 backs: []
 backed_by:
   - OEN-S30
@@ -2165,10 +2244,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/networking/14-exit-dns-is-peerapi.html
 keywords:
-  - exit-node
-  - peerapi
-  - dns
-  - unbound
+  - "exit DNS is PeerAPI not Unbound"
+  - "PeerAPI DNS"
+  - "dig coordinator works apps dead"
+  - "dns-query DoH exit"
+  - "use_with_exit_node empty"
+  - "resolvectl timeout WireGuard online"
+  - "do not restart coordinator DNS"
+  - "Headscale Unbound vs PeerAPI"
+  - "tailscale dns-query ephemeral port"
+  - "heal PeerAPI on the exit"
+  - "Android exit DNS DoH"
+  - "RD=0 Unbound REFUSED"
 backs: []
 backed_by:
   - OEN-S28
@@ -2367,10 +2454,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/networking/15-split-host-vs-overlay-resolver.html
 keywords:
-  - dns
-  - unbound
-  - split-horizon
-  - vps
+  - "split host vs overlay resolver"
+  - "loopback Unbound tunnel down"
+  - "tailnet DNS fails tunnel down"
+  - "do not edit resolv.conf VPS"
+  - "coordinator split-horizon DNS"
+  - "host dig vs overlay dig"
+  - "Unbound views commercial tunnel"
+  - "Headscale nameserver view"
+  - "127.0.0.1 still resolves"
+  - "overlay NS timeout expected"
+  - "chrony NTS host stack"
+  - "VPS resolver preference script"
 backs: []
 backed_by:
   - OEN-S25
@@ -2564,13 +2659,22 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/networking/16-commercial-wg-endpoint-rotation.html
 keywords:
-  - wireguard
-  - ipv6
-  - endpoint-rotation
-  - shuffle-bag
+  - "WireGuard endpoint rotation"
+  - "IPv6-only WireGuard endpoint"
+  - "WireGuard shuffle bag"
+  - "PersistentKeepalive 25"
+  - "curl -6 WAN health check"
+  - "WireGuard handshake stale"
+  - "commercial WireGuard rotator"
+  - "tunnel ULA egress verify"
+  - "hub watch LAN Pi"
+  - "Endpoint IPv6 port not FQDN"
+  - "WireGuard hop cooldown"
+  - "ISP down vs VPN down"
+  - "allowlisted IPv6 endpoints"
 backs: []
 backed_by: []
-description: Rotate a commercial WireGuard client across allowlisted IPv6 endpoints with WAN-path health checks, tunnel unique-local egress verify, a shuffle bag, and a hub watch on an always-on LAN Pi.
+description: "IPv6-only WireGuard rotation fails when health checks ride the tunnel: use WAN curl -6, ULA egress verify, a shuffle bag, and a hub watch."
 terms:
   - abbr: OEN
     expansion: Overlay and Edge Notes
@@ -2799,10 +2903,19 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/networking/17-gcp-overlay-exit.html
 keywords:
-  - exit-node
-  - gcp
-  - canIpForward
-  - peerapi
+  - "canIpForward exit node"
+  - "Google Cloud overlay exit"
+  - "Identity-Aware Proxy break-glass"
+  - "advertise 0.0.0.0/0 and ::/0"
+  - "overlay PORT 41641"
+  - "Android hides exit without ::/0"
+  - "ip_forward GCE"
+  - "do not double ip6tables MASQUERADE"
+  - "rp_filter=2 GCP NIC"
+  - "tailscale ssh KEX fail GCE"
+  - "accept-dns vs PeerAPI"
+  - "VPC UDP 41641 PORT=0"
+  - "Headscale GCP exit"
 backs: []
 backed_by: []
 description: A Google Cloud virtual machine can advertise an overlay exit only with IP forwarding, both default routes, a fixed overlay UDP listen port, scoped network address translation, and Identity-Aware Proxy as break-glass — not as the daily door.
@@ -3056,12 +3169,21 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/networking/18-per-node-changelog-contract.html
 keywords:
-  - changelog
-  - ops-contract
-  - on-device-copy
+  - "per-node changelog hash mismatch"
+  - "on-device CHANGELOG sync"
+  - "ops repo canonical changelog"
+  - "changelog path class by node"
+  - "sha256sum changelog verify"
+  - "do not invent fake precision"
+  - "timezone labeled not UTC prose"
+  - "router jffs vs VPS vs Pi paths"
+  - "same session changelog"
+  - "homelab changelog contract"
+  - "hashed on-device copy"
+  - "Change Paths Verify entry"
 backs: []
 backed_by: []
-description: Keep a canonical per-node changelog in the ops repo and sync a hashed on-device copy the same session as the change, using path classes that differ by node type.
+description: "Per-node changelog hash mismatch: the ops-repo file is canonical; sync a hashed on-device copy the same session, with path class by node type."
 terms:
   - abbr: OEN
     expansion: Overlay and Edge Notes
@@ -3253,10 +3375,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/networking/19-unbound-refuses-rd0.html
 keywords:
-  - unbound
-  - peerapi
-  - rd
-  - dns
+  - "Unbound REFUSES RD=0"
+  - "PeerAPI Recursion Desired off"
+  - "dnsmasq loopback Unbound REFUSED"
+  - "dig +norecurse REFUSED"
+  - "RD-stub before Unbound"
+  - "looks like Unbound is down"
+  - "exit DoH RD=0"
+  - "local upstream RD=0 refuse"
+  - "Headscale PeerAPI Unbound"
+  - "force RD=1 stub"
+  - "dnsmasq remote RD=0 works"
+  - "PeerAPI DNS REFUSED"
 backs: []
 backed_by:
   - OEN-05
@@ -3443,10 +3573,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/networking/20-lan-ula-happy-eyeballs-leak.html
 keywords:
-  - ula
-  - happy-eyeballs
-  - exit-node
-  - ipv6
+  - "LAN ULA Happy-Eyeballs leak"
+  - "IPv4 takes exit IPv6 leaks"
+  - "Allow LAN Access ULA default"
+  - "browser prefers v6 LAN VPN"
+  - "cellular no ULA fully on exit"
+  - "remote exit half-broken"
+  - "table 52 missing ::/0"
+  - "ip -6 route get via LAN NIC"
+  - "Tailscale exit Happy Eyeballs"
+  - "home LAN ULA vs selected exit"
+  - "curl -4 exit curl -6 leak"
+  - "Wi-Fi vs cellular exit matrix"
 backs: []
 backed_by:
   - OEN-S26
@@ -3635,10 +3773,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/networking/21-shared-vpn-nat-crowdsec-ban.html
 keywords:
-  - crowdsec
-  - nat
-  - vpn
-  - shared-egress
+  - "CrowdSec bans shared VPN NAT"
+  - "whole house CrowdSec ban"
+  - "shared commercial VPN egress"
+  - "CrowdSec sshd Caddy public IP"
+  - "overlay UDP still works SSH dead"
+  - "rotating VPN egress trusted"
+  - "CrowdSec unban bouncer restart"
+  - "one public IP many clients"
+  - "coordination down CrowdSec"
+  - "NAT house ban vs CAPI 403"
+  - "WireGuard shared egress ban"
+  - "CrowdSec decisions VPN hop"
 backs: []
 backed_by:
   - OEN-16
@@ -3830,10 +3976,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/networking/22-delayed-wg-forward-wipe.html
 keywords:
-  - wireguard
-  - forward
-  - boot
-  - watchdog
+  - "delayed WireGuard FORWARD wipe"
+  - "no restart_wgc event boot"
+  - "tunnel UP LAN dead counters 0"
+  - "firmware starts WG minutes later"
+  - "service-event never fires"
+  - "ASUSWRT-Merlin delayed client"
+  - "watchdog re-apply FORWARD"
+  - "do not restart WG from watchdog"
+  - "boot FORWARD then wipe"
+  - "router curl wg LAN no internet"
+  - "periodic FORWARD restore"
+  - "Merlin Starting client delayed"
 backs: []
 backed_by:
   - OEN-S33
@@ -4018,10 +4172,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/networking/23-cloud-exit-accept-dns.html
 keywords:
-  - exit-node
-  - accept-dns
-  - peerapi
-  - gce
+  - "accept-dns=true breaks PeerAPI"
+  - "tailscale dns query pretty print"
+  - "GCE accept-dns metadata 169.254"
+  - "do not fix DNS display on exit"
+  - "accept-dns=false metadata resolver"
+  - "host dig vs exit DoH path"
+  - "cloud exit accept-dns"
+  - "PeerAPI RD=0 after accept-dns"
+  - "Google Compute Engine Tailscale DNS"
+  - "169.254.169.254 not PeerAPI"
+  - "Headscale exit accept-dns"
+  - "pretty dns query broken exit"
 backs: []
 backed_by:
   - OEN-19
@@ -4214,10 +4376,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/web/08-worker-html-localhost-debug.html
 keywords:
-  - cloudflare-workers
-  - localhost
-  - local-network-access
-  - debug-beacons
+  - "localhost debug beacon Worker"
+  - "127.0.0.1:7450 ingest"
+  - "X-Debug-Session-Id HTML"
+  - "Local Network Access prompt"
+  - "Brave Access other apps"
+  - "Cloudflare Worker localhost fetch"
+  - "do not ship ingest in HTML"
+  - "predeploy 127.0.0.1:7450"
+  - "Cursor debug beacon"
+  - "public HTTPS loopback fetch"
+  - "Worker HTML local-network"
+  - "LNA prompt Cloudflare"
 backs: []
 backed_by: []
 description: Agent debug templates that fetch 127.0.0.1 ingest URLs must never ship in Cloudflare Worker HTML; browsers prompt for local-network access on public HTTPS pages.
@@ -4404,9 +4574,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/web/09-git-merge-is-not-a-live-worker.html
 keywords:
-  - cloudflare-workers
-  - wrangler
-  - git-deploy
+  - "git merge is not a live Worker"
+  - "Cloudflare Git build lag"
+  - "Wrangler timed fallback"
+  - "Workers-edit token lacks Cache Purge"
+  - "connected Worker never started"
+  - "GitLab merge not deployed"
+  - "wrangler deploy after 10 minutes"
+  - "Cloudflare Builds stuck"
+  - "Rocket Loader Off"
+  - "source of truth vs live Worker"
+  - "Workers cache purge token"
+  - "preview HIT stale body"
 backs: []
 backed_by:
   - OEN-S04
@@ -4587,10 +4766,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/web/10-one-blocking-stylesheet-variable-fonts.html
 keywords:
-  - core-web-vitals
-  - css
-  - fonts
-  - lcp
+  - "render-blocking stylesheet PSI drop"
+  - "variable font re-download woff2"
+  - "one generated chrome.css"
+  - "LCP preload media-split"
+  - "Core Web Vitals fonts"
+  - "per-weight variable filenames"
+  - "PageSpeed mobile 77 to 72"
+  - "preload at most two woff2"
+  - "latin latin-ext only"
+  - "defer decorative font"
+  - "Cloudflare Worker CSS"
+  - "LCP portrait preload"
 backs: []
 backed_by:
   - OEN-S06
@@ -4775,10 +4962,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/web/11-worker-chat-wrapper-turnstile.html
 keywords:
-  - cloudflare-workers
-  - turnstile
-  - chat
-  - sanitize
+  - "Worker chat iframe vs wrapper"
+  - "Cloudflare Turnstile chat"
+  - "sanitize LLM drift"
+  - "same-origin chatbot.html"
+  - "nginx chatbot-api proxy"
+  - "Turnstile gate iframe"
+  - "strip forbidden phrases client"
+  - "Worker chat FAQ every request"
+  - "Cloudflare Worker chatbot"
+  - "bilingual privacy chat"
+  - "iframe only when copy stable"
+  - "LLM output sanitize"
 backs: []
 backed_by:
   - OEN-S06
@@ -4952,9 +5147,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s01-pmtud-size-ladder.html
 keywords:
-  - pmtud
-  - df-ping
-  - path-mtu
+  - "don't-fragment ping size ladder"
+  - "ping -M do path MTU"
+  - "ping -6 -M do -s"
+  - "PMTUD size ladder"
+  - "small ICMP large TCP dies"
+  - "DF ping overlay cliff"
+  - "path MTU discovery"
+  - "ICMP success not TCP fix"
+  - "WireGuard PMTU measure"
+  - "IPv4 IPv6 DF ladder"
+  - "path MTU blackhole test"
+  - "overlay SSH PMTUD"
 backs:
   - OEN-01
   - OEN-02
@@ -5210,9 +5414,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s02-clamp-mss-to-pmtu-noop.html
 keywords:
-  - tcpmss
-  - pmtud
-  - icmp
+  - "clamp-mss-to-pmtu no-op"
+  - "ICMP blackholed MSS clamp"
+  - "explicit --set-mss"
+  - "TCPMSS clamp-mss-to-pmtu"
+  - "learned PMTU missing"
+  - "fragmentation-needed dropped"
+  - "iptables set-mss vs clamp"
+  - "PMTUD blackhole MSS"
+  - "don't-fragment ping"
+  - "WireGuard MSS recipe"
+  - "nft TCPMSS set"
+  - "path MTU ICMP silent"
 backs:
   - OEN-01
   - OEN-02
@@ -5407,9 +5620,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s03-transfer-matrix-controlpath.html
 keywords:
-  - ssh
-  - controlpath
-  - byte-cliff
+  - "1 KB vs 1 MB SSH matrix"
+  - "ControlPath=none overlay SSH"
+  - "SSH mux death symptom"
+  - "userspace vs kernel SSH"
+  - "Tailscale SSH byte cliff test"
+  - "large scp hang overlay"
+  - "OpenSSH vs Tailscale SSH"
+  - "transfer size matrix"
+  - "overlay SSH 1146 bytes"
+  - "do not trust mux hang"
+  - "ControlMaster stale socket"
+  - "path MTU SSH proof"
 backs:
   - OEN-01
 backed_by: []
@@ -5595,9 +5817,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s04-purge-cdn-after-deploy.html
 keywords:
-  - cdn
-  - cache-purge
-  - cloudflare
+  - "purge CDN after deploy"
+  - "Workers-edit lacks Cache Purge"
+  - "query string not HTML purge"
+  - "Cloudflare zone purge"
+  - "CDN-Cache-Control no-store"
+  - "?v= cache bust HTML"
+  - "Cloudflare Cache Purge token"
+  - "stale HTML after deploy"
+  - "purge preview URL"
+  - "Wrangler deploy then purge"
+  - "Workers cache API permission"
+  - "HTML still old after ship"
 backs:
   - OEN-08
   - OEN-09
@@ -5754,9 +5985,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s05-tunnel-preview-stale-hit.html
 keywords:
-  - cloudflare-tunnel
-  - cache
-  - preview
+  - "tunnel preview HIT stale body"
+  - "Cloudflare Tunnel cf-cache-status HIT"
+  - "origin new preview old"
+  - "purge preview URL"
+  - "CDN-Cache-Control no-store HTML"
+  - "cloudflared preview cache"
+  - "stale HIT after origin update"
+  - "Workers preview cache"
+  - "cf-cache-status HIT wrong body"
+  - "tunnel cache purge"
+  - "preview URL still old"
+  - "origin 200 stale CDN"
 backs:
   - OEN-08
   - OEN-09
@@ -5915,9 +6155,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s06-do-not-ship-html-only.html
 keywords:
-  - deploy
-  - css
-  - 404
+  - "do not ship HTML-only"
+  - "CSS 404 looks like CSS bug"
+  - "JS images must 200"
+  - "layout destroying miss"
+  - "rsync HTML without assets"
+  - "static site missing chrome.css"
+  - "Cloudflare origin 404 CSS"
+  - "deploy incomplete assets"
+  - "HTML 200 CSS 404"
+  - "verify every static URL"
+  - "Playwright asset 200"
+  - "tmpfs origin missing files"
 backs:
   - OEN-08
   - OEN-09
@@ -6076,9 +6325,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s07-git-merge-405-pending.html
 keywords:
-  - gitlab
-  - merge
-  - 405
+  - "git merge 405 pending"
+  - "GitLab mergeability 405"
+  - "405 Method Not Allowed merge"
+  - "not a dead token 405"
+  - "contrast real 401"
+  - "merge_status can_be_merged"
+  - "poll merge request 405"
+  - "GitLab REST merge timing"
+  - "unauthorized vs pending merge"
+  - "MR 405 retry"
+  - "token 401 tell operator"
+  - "mergeability still checking"
 backs:
   - OEN-09
 backed_by: []
@@ -6223,9 +6481,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s08-canonical-disk-tmpfs-origin.html
 keywords:
-  - tmpfs
-  - pi
-  - origin
+  - "canonical disk tmpfs RAM origin"
+  - "Pi SD wear Cloudflare origin"
+  - "deploy persistent then sync RAM"
+  - "HTML-only rsync wrong tree"
+  - "tmpfs origin Raspberry Pi"
+  - "CDN hits RAM not SD"
+  - "static site tmpfs serve"
+  - "looks deployed wrong root"
+  - "canonical disk tree"
+  - "Pi origin sync-to-RAM"
+  - "nginx tmpfs document root"
+  - "SD card static origin"
 backs:
   - OEN-10
 backed_by: []
@@ -6381,9 +6648,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s09-playwright-desktop-iphone-pixel.html
 keywords:
-  - playwright
-  - responsive
-  - qa
+  - "Playwright Desktop iPhone Pixel"
+  - "Chromium device projects"
+  - "layout nav hero three viewports"
+  - "WebKit binaries not required"
+  - "Playwright iPhone smoke"
+  - "Pixel Android project"
+  - "responsive CSS Playwright"
+  - "site smoke Desktop Chrome"
+  - "hero layout regression"
+  - "Playwright test:smoke"
+  - "iOS Android Chromium"
+  - "nav footer legal smoke"
 backs:
   - OEN-10
   - OEN-11
@@ -6530,8 +6806,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s10-file-before-image-deploy.html
 keywords:
-  - images
-  - file-command
+  - "file before image deploy"
+  - "extension is not format"
+  - "PNG is JPEG data"
+  - "do not swap look-alike attachments"
+  - "file(1) source destination"
+  - "map actual type before scp"
+  - "hero photo vs cutout PNG"
+  - "identify alpha channel"
+  - "wrong image filename deploy"
+  - "file command MIME"
+  - "static site image mixup"
+  - "verify file after upload"
 backs:
   - OEN-10
   - OEN-11
@@ -6674,9 +6960,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s11-overlay-rdp-acl.html
 keywords:
-  - rdp
-  - acl
-  - overlay
+  - "overlay session-mirror RDP"
+  - "ACL without deny action"
+  - "locked-screen remote desktop"
+  - "Headscale ACL port-range allow"
+  - "GNOME Remote Desktop overlay"
+  - "overlay is an access plane"
+  - "coordination ACL no deny"
+  - "RDP overlay SSH still works"
+  - "Tailscale RDP ACL"
+  - "Allow Locked Remote Desktop"
+  - "generic peers only ACL"
+  - "session mirror not xrdp"
 backs:
   - OEN-01
   - OEN-06
@@ -6841,9 +7136,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s12-rocket-loader-off.html
 keywords:
-  - cloudflare
-  - rocket-loader
-  - javascript
+  - "Rocket Loader Off"
+  - "Cloudflare Rocket Loader inline scripts"
+  - "Rocket Loader breaks analytics"
+  - "Playwright smoke Rocket Loader"
+  - "rewrites inline JavaScript"
+  - "turn Rocket Loader Off"
+  - "GA broken Rocket Loader"
+  - "marketing route Rocket Loader"
+  - "Cloudflare speed Rocket Loader"
+  - "inline script rewrite"
+  - "Workers HTML Rocket Loader"
+  - "smoke test script missing"
 backs:
   - OEN-09
   - OEN-10
@@ -6996,8 +7300,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s13-restart-always-missing-unit.html
 keywords:
-  - systemd
-  - restart-always
+  - "Restart=always missing ExecStart"
+  - "systemd crash-loop hung workstation"
+  - "150k failed restarts"
+  - "leftover units bind other host"
+  - "systemctl --user crash loop"
+  - "always-on jobs always-on host"
+  - "Restart=always missing unit"
+  - "2-core box restart storm"
+  - "user systemd hung"
+  - "ExecStart path gone"
+  - "audit crash-loop units"
+  - "systemd StartLimit"
 backs: []
 backed_by: []
 description: "Restart=always on a missing ExecStart produced 150k+ failed restarts plus leftover units binding another host’s addresses on a 2-core box."
@@ -7138,9 +7452,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s14-broadcom-wg-sunreclaim.html
 keywords:
-  - wireguard
-  - sunreclaim
-  - broadcom
+  - "Broadcom in-kernel WireGuard SUnreclaim"
+  - "skbuff SUnreclaim leak"
+  - "drop_caches does not free SUnreclaim"
+  - "flow-cache off runner off fail"
+  - "ASUSWRT-Merlin WireGuard memory"
+  - "6-8 MB/h SUnreclaim"
+  - "in-kernel WG leak"
+  - "scheduled reboot workaround"
+  - "skip tables IPv4 IPv6 underlay"
+  - "consumer router SUnreclaim"
+  - "Merlin flow-cache A/B"
+  - "WireGuard kernel slab leak"
 backs:
   - OEN-12
 backed_by: []
@@ -7297,9 +7620,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s15-router-squashfs-jffs.html
 keywords:
-  - squashfs
-  - jffs
-  - backup
+  - "router squashfs 100% full"
+  - "Save settings misses jffs"
+  - "Save JFFS separately"
+  - "logread is OpenWrt"
+  - "Merlin syslog not logread"
+  - "squashfs always 100%"
+  - "ASUSWRT-Merlin jffs scripts"
+  - ".cfg backup without overlay scripts"
+  - "judge USB jffs not root"
+  - "persistent overlay Save"
+  - "consumer router disk 100%"
+  - "jffs scripts not in cfg"
 backs:
   - OEN-12
 backed_by: []
@@ -7450,9 +7782,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s16-never-nft-flush.html
 keywords:
-  - nftables
-  - ufw
-  - crowdsec
+  - "never nft flush ruleset"
+  - "never start nftables.service"
+  - "UFW CrowdSec custom tables"
+  - "tunnel predown named tables only"
+  - "nft flush wipes exit rules"
+  - "stock nftables.service conflict"
+  - "ip6tables MASQUERADE custom"
+  - "do not flush whole ruleset"
+  - "nft delete table named"
+  - "UFW plus nft custom"
+  - "CrowdSec nft coexistence"
+  - "WireGuard predown nft"
 backs:
   - OEN-06
   - OEN-17
@@ -7614,9 +7955,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s17-coordination-cli-sqlite-wal.html
 keywords:
-  - sqlite
-  - wal
-  - healthcheck
+  - "coordination CLI SQLite WAL block"
+  - "nodes list blocks while serve up"
+  - "Headscale sqlite WAL"
+  - "health check HTTP /health"
+  - "do not use admin CLI health"
+  - "readonly sqlite query"
+  - "CLI hang minutes WAL"
+  - "self-hosted coordination WAL"
+  - "serve up CLI blocked"
+  - "SQLite write-ahead log lock"
+  - "Headscale nodes list timeout"
+  - "healthcheck not CLI"
 backs: []
 backed_by: []
 description: "Coordination nodes-list CLI can block minutes on SQLite WAL while serve is up. Health checks MUST use HTTP /health or a readonly sqlite query, not the admin CLI."
@@ -7787,8 +8137,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s18-do-not-set-exit-on-agent-workstation.html
 keywords:
-  - exit-node
-  - workstation
+  - "do not set exit-node on agent workstation"
+  - "tailscale set --exit-node workstation"
+  - "overlay SSH first nmap after fail"
+  - "Cursor workstation exit-node"
+  - "do not test GCP exit from agent"
+  - "hairpin LAN via workstation exit"
+  - "operator must ask exit-node"
+  - "Tailscale exit on workstation"
+  - "debug from overlay SSH"
+  - "nmap after failed connect"
+  - "S18 workstation exit"
+  - "agent must not select exit"
 backs:
   - OEN-17
   - OEN-04
@@ -7943,9 +8303,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s19-push-small-overlay-snapshots.html
 keywords:
-  - ssh
-  - json
-  - byte-cliff
+  - "push small overlay snapshots"
+  - "do not SCP-pull large JSON"
+  - "overlay SSH byte cliff JSON"
+  - "fleet snapshot chunks"
+  - "Tailscale SSH large JSON hang"
+  - "push to hub not pull"
+  - "ControlPath=none large scp"
+  - "NDJSON small chunks"
+  - "health snapshot overlay"
+  - "SCP hang 1KB cliff"
+  - "Headscale JSON over SSH"
+  - "push not pull overlay"
 backs:
   - OEN-01
 backed_by: []
@@ -8125,9 +8494,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s20-ssh-open-no-banner.html
 keywords:
-  - ssh
-  - banner
-  - router
+  - "SSH TCP-open with no banner"
+  - "nmap open userspace sick"
+  - "Dropbear no banner"
+  - "consumer router SSH banner missing"
+  - "reboot restores banner PeerAPI"
+  - "TCP open not enough"
+  - "ASUSWRT-Merlin SSH hung"
+  - "overlay SSH no ident"
+  - "userspace SSH sick"
+  - "PeerAPI down with banner"
+  - "router SSH probe banner"
+  - "nmap open filtered SSH"
 backs:
   - OEN-12
   - OEN-14
@@ -8280,9 +8658,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s21-cloud-exit-hairpin-lan.html
 keywords:
-  - exit-node
-  - hairpin
-  - lan
+  - "cloud exit hairpin LAN HTTP"
+  - "overlay SSH router still works"
+  - "LAN DNS GUI dies with exit"
+  - "not a broken router"
+  - "clear exit on workstation"
+  - "Tailscale exit hairpin home"
+  - "HTTP LAN timeout exit selected"
+  - "Identity-Aware Proxy not this trap"
+  - "Allow LAN Access hairpin"
+  - "cloud exit vs home LAN"
+  - "SSH overlay HTTP LAN fail"
+  - "workstation exit selected"
 backs:
   - OEN-17
 backed_by: []
@@ -8445,9 +8832,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s22-iap-break-glass-kex.html
 keywords:
-  - iap
-  - kex
-  - gcp
+  - "Identity-Aware Proxy break-glass"
+  - "overlay SSH KEX fail GCE"
+  - "tailscale ssh key exchange fail"
+  - "plain OpenSSH overlay :22"
+  - "never gcloud instances reset debug"
+  - "IAP not daily door"
+  - "Google Compute Engine KEX"
+  - "GCP IAP SSH recovery"
+  - "overlay OpenSSH not tailscale ssh"
+  - "GCE image SSH KEX"
+  - "break-glass Identity-Aware Proxy"
+  - "do not reset VM to debug"
 backs:
   - OEN-17
 backed_by: []
@@ -8616,10 +9012,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s23-vpc-41641-useless-while-port-0.html
 keywords:
-  - port
-  - vpc
-  - udp
-  - 41641
+  - "VPC UDP 41641 useless PORT=0"
+  - "overlay PORT must be 41641"
+  - "never leave PORT empty"
+  - "cloud firewall 41641 no-op"
+  - "Tailscale PORT=0 ephemeral"
+  - "ship PORT daemon UFW VPC together"
+  - "GCE allow 41641 still down"
+  - "overlay listen port 0"
+  - "Headscale UDP 41641"
+  - "empty PORT daemon fail"
+  - "fixed overlay UDP port"
+  - "VPC rule while PORT=0"
 backs:
   - OEN-17
   - OEN-01
@@ -8784,9 +9188,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s24-lan-dns-sinkhole-0-0-0-0.html
 keywords:
-  - dns
-  - sinkhole
-  - 0.0.0.0
+  - "LAN DNS 0.0.0.0 sinkhole"
+  - "ERR_CONNECTION_REFUSED 0.0.0.0"
+  - "DNS sinkhole not a site bug"
+  - "LAN dig vs DNS-over-HTTPS"
+  - "temporary /etc/hosts workstation"
+  - "googletagmanager 0.0.0.0"
+  - "Pi-hole style sinkhole"
+  - "operator-approved hosts pin"
+  - "blackhole DNS LAN"
+  - "compare DoH vs LAN resolver"
+  - "analytics curl connection refused"
+  - "not a Cloudflare bug sinkhole"
 backs:
   - OEN-03
   - OEN-10
@@ -8945,9 +9358,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s25-chrony-nts-address-family.html
 keywords:
-  - chrony
-  - nts
-  - ntp
+  - "chrony NTS ipv6 flag distro"
+  - "distro chrony parse NTS flags"
+  - "Cloudflare NTS newer chrony"
+  - "try v6 then v4 NTS"
+  - "Network Time Security chrony"
+  - "NTS address-family flags"
+  - "VPS host time NTS"
+  - "chrony ipv6 server option"
+  - "upgrade chrony NTS"
+  - "NTS handshake family"
+  - "coordinator chrony NTS"
+  - "time sync NTS Cloudflare"
 backs:
   - OEN-15
 backed_by: []
@@ -9118,10 +9540,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s26-wifi-vs-cellular-underlay.html
 keywords:
-  - exit-node
-  - underlay
-  - wifi
-  - cellular
+  - "Wi-Fi vs cellular underlay"
+  - "same cloud exit two underlays"
+  - "home Wi-Fi encapsulates overlay"
+  - "cellular direct to cloud"
+  - "IPv4 cloud IPv6 home leak"
+  - "not the GCP exit is broken"
+  - "underlay WireGuard vs cellular"
+  - "split v4/v6 underlay"
+  - "Tailscale exit Wi-Fi cellular"
+  - "Happy-Eyeballs vs underlay"
+  - "phone Wi-Fi tunnel encapsulate"
+  - "cellular overlay path"
 backs:
   - OEN-13
   - OEN-16
@@ -9306,9 +9736,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s27-iptables-nft-mark-before-fib.html
 keywords:
-  - iptables-nft
-  - fib
-  - mark
+  - "iptables-nft MARK before fib"
+  - "counters marked route still WAN"
+  - "ip -6 route get iif tunnel"
+  - "ULA /48 table 52 and main"
+  - "split nft ip6tables MASQUERADE"
+  - "conntrack return broken"
+  - "PREROUTING MARK FIB lookup"
+  - "NetfilterMode=off mark"
+  - "overlay ULA missing main"
+  - "ip6tables mangle MARK"
+  - "nft mark not first FIB"
+  - "IPv6 exit return path"
 backs:
   - OEN-06
 backed_by: []
@@ -9470,9 +9909,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s28-sticky-reconnect-during-peerapi-outage.html
 keywords:
-  - peerapi
-  - android
-  - reconnect
+  - "sticky reconnect PeerAPI outage"
+  - "phone stuck after PeerAPI heal"
+  - "client toggle after DoH dead"
+  - "heal exit stub not coordinator yaml"
+  - "use_with_exit_node does not open PeerAPI"
+  - "Android exit DNS sticky"
+  - "reconnect during outage"
+  - "PeerAPI recovers client stuck"
+  - "do not change coordinator DNS yaml"
+  - "Headscale PeerAPI sticky"
+  - "exit DoH outage phones"
+  - "toggle exit after heal"
 backs:
   - OEN-14
   - OEN-19
@@ -9633,9 +10081,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s29-peerapi-stub-event-loop.html
 keywords:
-  - peerapi
-  - select
-  - recv-q
+  - "PeerAPI stub event-loop blocks"
+  - "UDP recv-Q grows"
+  - "select() sync upstream DNS"
+  - "cellular DNS dies stub"
+  - "thread pool PeerAPI stub"
+  - "upstream timeout stub"
+  - "single-threaded DoH stub"
+  - "recv-Q 160KB DNS"
+  - "exit stub event loop"
+  - "Android exit DNS timeout"
+  - "PeerAPI UDP queue"
+  - "do not block select DNS"
 backs:
   - OEN-05
   - OEN-19
@@ -9797,9 +10254,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s30-ts-debug-mtu-below-1280.html
 keywords:
-  - mtu
-  - ipv6
-  - tun
+  - "TS_DEBUG_MTU below 1280"
+  - "overlay IPv6 disabled MTU"
+  - "kernel drops v6 on tun"
+  - "do not use TS_DEBUG_MTU production"
+  - "Tailscale debug MTU IPv6"
+  - "tun IPv6 1280 minimum"
+  - "TS_DEBUG_MTU clamp"
+  - "overlay v6 gone after debug MTU"
+  - "Headscale IPv6 MTU"
+  - "1280 IPv6 minimum"
+  - "debug MTU kills v6"
+  - "tailscaled IPv6 dropped"
 backs:
   - OEN-13
   - OEN-17
@@ -9959,9 +10425,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s31-prefixes-v6-needs-backfillips.html
 keywords:
-  - prefixes
-  - ula
-  - backfillips
+  - "prefixes.v6 needs backfillips"
+  - "nodes backfillips --force"
+  - "restart alone tailscale ip -6 empty"
+  - "Headscale prefixes.v6 existing nodes"
+  - "ULA missing after enable v6"
+  - "backfillips then restart"
+  - "tailscale ip -6 empty"
+  - "self-hosted coordination ULA"
+  - "existing nodes no IPv6"
+  - "prefixes.v6 rollout"
+  - "Headscale backfillips"
+  - "enable IPv6 overlay nodes"
 backs:
   - OEN-13
 backed_by: []
@@ -10120,9 +10595,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s32-dns-leak-test-not-v6-dataplane.html
 keywords:
-  - dns
-  - ipv6
-  - exit-node
+  - "DNS leak-test green not IPv6 data-plane"
+  - "ipleak DNS ok TCP timeout"
+  - "resolver name OK ::/0 dies"
+  - "exit node IPv6 data path"
+  - "DNS vs TCP different paths"
+  - "leak test not enough"
+  - "IPv6 HTTPS timeout exit"
+  - "Headscale ::/0 TCP"
+  - "verify IPv6 IP not DNS only"
+  - "cellular DNS_PROBE vs IP"
+  - "exit v6 forwarding"
+  - "do not trust DNS-only leak test"
 backs:
   - OEN-04
   - OEN-06
@@ -10293,9 +10777,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s33-router-cron-path-set-e.html
 keywords:
-  - cron
-  - path
-  - watchdog
+  - "router cron PATH omits curl"
+  - "watchdog log() set -e exits"
+  - "cron PATH /usr/sbin missing"
+  - "silent skip stale status"
+  - "ASUSWRT-Merlin cron PATH"
+  - "log function return 1"
+  - "set -e watchdog every tick"
+  - "consumer router cron curl"
+  - "WireGuard watchdog skipped"
+  - "PATH omits /usr/sbin"
+  - "Merlin cru PATH"
+  - "watchdog never runs"
 backs:
   - OEN-12
   - OEN-16
@@ -10449,9 +10942,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s34-crowdsec-capi-login-budget.html
 keywords:
-  - crowdsec
-  - capi
-  - rate-limit
+  - "CrowdSec CAPI login budget"
+  - "20 CAPI logins 50 minutes"
+  - "cscli capi 403 one hour"
+  - "cache cscli capi status"
+  - "do not loop capi status"
+  - "free-tier CAPI 403"
+  - "CrowdSec healthcheck budget"
+  - "api.crowdsec.net rate limit"
+  - "Docker healthcheck CAPI ban"
+  - "native probe same budget"
+  - "HTTP 403 CAPI login"
+  - "skip nested CAPI SLI"
 backs:
   - OEN-07
 backed_by: []

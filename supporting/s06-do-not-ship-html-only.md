@@ -9,9 +9,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s06-do-not-ship-html-only.html
 keywords:
-  - deploy
-  - css
-  - 404
+  - "do not ship HTML-only"
+  - "CSS 404 looks like CSS bug"
+  - "JS images must 200"
+  - "layout destroying miss"
+  - "rsync HTML without assets"
+  - "static site missing chrome.css"
+  - "Cloudflare origin 404 CSS"
+  - "deploy incomplete assets"
+  - "HTML 200 CSS 404"
+  - "verify every static URL"
+  - "Playwright asset 200"
+  - "tmpfs origin missing files"
 backs:
   - OEN-08
   - OEN-09

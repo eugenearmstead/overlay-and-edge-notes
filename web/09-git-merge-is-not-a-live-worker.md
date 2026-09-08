@@ -9,9 +9,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/web/09-git-merge-is-not-a-live-worker.html
 keywords:
-  - cloudflare-workers
-  - wrangler
-  - git-deploy
+  - "git merge is not a live Worker"
+  - "Cloudflare Git build lag"
+  - "Wrangler timed fallback"
+  - "Workers-edit token lacks Cache Purge"
+  - "connected Worker never started"
+  - "GitLab merge not deployed"
+  - "wrangler deploy after 10 minutes"
+  - "Cloudflare Builds stuck"
+  - "Rocket Loader Off"
+  - "source of truth vs live Worker"
+  - "Workers cache purge token"
+  - "preview HIT stale body"
 backs: []
 backed_by:
   - OEN-S04

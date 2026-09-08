@@ -9,9 +9,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s11-overlay-rdp-acl.html
 keywords:
-  - rdp
-  - acl
-  - overlay
+  - "overlay session-mirror RDP"
+  - "ACL without deny action"
+  - "locked-screen remote desktop"
+  - "Headscale ACL port-range allow"
+  - "GNOME Remote Desktop overlay"
+  - "overlay is an access plane"
+  - "coordination ACL no deny"
+  - "RDP overlay SSH still works"
+  - "Tailscale RDP ACL"
+  - "Allow Locked Remote Desktop"
+  - "generic peers only ACL"
+  - "session mirror not xrdp"
 backs:
   - OEN-01
   - OEN-06

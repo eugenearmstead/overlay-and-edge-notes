@@ -4,7 +4,20 @@ date_published: 2026-09-08
 author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/changelog.html
-description: Series changelog for Overlay and Edge Notes. Dated in Mountain Time.
+description: "Overlay and Edge Notes changelog (Mountain Time). Find specs by failure string: ERR_CONNECTION_CLOSED, cscli capi 403, overlay SSH hang 1KB."
+keywords:
+  - "Overlay and Edge Notes changelog"
+  - "OEN monthly delta"
+  - "failure-string search"
+  - "llms.txt"
+  - "path MTU"
+  - "CrowdSec CAPI"
+  - "Tailscale SSH"
+  - "WireGuard MTU"
+  - "GitHub Pages field notes"
+  - "Mountain Time changelog"
+  - "stable spec IDs"
+  - "edition index 2026"
 terms:
   - abbr: OEN
     expansion: Overlay and Edge Notes
@@ -30,11 +43,29 @@ terms:
     expansion: Hypertext Transfer Protocol Secure
   - abbr: nft
     expansion: nftables (Linux packet filter)
+  - abbr: YAML
+    expansion: YAML Ain't Markup Language (frontmatter)
+  - abbr: JSON-LD
+    expansion: JSON for Linking Data
+  - abbr: TCPMSS
+    expansion: iptables/nft target that sets TCP Maximum Segment Size
+  - abbr: README
+    expansion: repository citation index in Markdown
+  - abbr: CAPI
+    expansion: CrowdSec Central API
+  - abbr: DNS
+    expansion: Domain Name System
 ---
 
 # Changelog
 
 Dated in Mountain Time (MST) for this series. Spec URLs do not change when an edition bumps.
+
+## 2026-09-08 MST — Failure-string discoverability
+
+- Expanded YAML `keywords` (8–20 real search phrases) and clickable `description` on every spec plus home, disclosure, changelog, and the 2026 index.
+- The HTML builder emits `<meta name="keywords">`, `citation_keywords`, and JSON-LD `keywords`. `llms.txt` one-liners include the searchable symptom (llmstxt.org format).
+- Home, README, and AGENTS.md document four doors: Google/Pages, GitHub.com, agents/`llms.txt`, failure-string search. Examples: `curl 200 chrome ERR_CONNECTION_CLOSED`, `cscli capi 403`, `ts-forward TCPMSS 0 packets`.
 
 ## 2026-09-08 MST — Agent-reproducible complete series
 

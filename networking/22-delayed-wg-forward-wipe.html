@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>OEN-22: Delayed WireGuard start wipes FORWARD with no restart event — Overlay and Edge Notes</title>
     <meta name="description" content="Boot applies LAN-to-WireGuard FORWARD early; firmware starts the client minutes later and rewrites FORWARD without a restart event. Tunnel is up, LAN is dead, counters stay 0.">
+    <meta name="keywords" content="delayed WireGuard FORWARD wipe, no restart_wgc event boot, tunnel UP LAN dead counters 0, firmware starts WG minutes later, service-event never fires, ASUSWRT-Merlin delayed client, watchdog re-apply FORWARD, do not restart WG from watchdog, boot FORWARD then wipe, router curl wg LAN no internet, periodic FORWARD restore, Merlin Starting client delayed">
+    <meta name="citation_keywords" content="delayed WireGuard FORWARD wipe, no restart_wgc event boot, tunnel UP LAN dead counters 0, firmware starts WG minutes later, service-event never fires, ASUSWRT-Merlin delayed client, watchdog re-apply FORWARD, do not restart WG from watchdog, boot FORWARD then wipe, router curl wg LAN no internet, periodic FORWARD restore, Merlin Starting client delayed">
     <link rel="canonical" href="https://eugenearmstead.github.io/overlay-and-edge-notes/networking/22-delayed-wg-forward-wipe.html">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -43,7 +45,21 @@
       "url": "https://eugenearmstead.github.io/overlay-and-edge-notes/networking/22-delayed-wg-forward-wipe.html",
       "identifier": "OEN-22",
       "license": "https://creativecommons.org/licenses/by/4.0/",
-      "inLanguage": "en"
+      "inLanguage": "en",
+      "keywords": [
+        "delayed WireGuard FORWARD wipe",
+        "no restart_wgc event boot",
+        "tunnel UP LAN dead counters 0",
+        "firmware starts WG minutes later",
+        "service-event never fires",
+        "ASUSWRT-Merlin delayed client",
+        "watchdog re-apply FORWARD",
+        "do not restart WG from watchdog",
+        "boot FORWARD then wipe",
+        "router curl wg LAN no internet",
+        "periodic FORWARD restore",
+        "Merlin Starting client delayed"
+      ]
     },
     {
       "@type": "HowTo",

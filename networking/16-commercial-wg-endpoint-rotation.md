@@ -9,13 +9,22 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/networking/16-commercial-wg-endpoint-rotation.html
 keywords:
-  - wireguard
-  - ipv6
-  - endpoint-rotation
-  - shuffle-bag
+  - "WireGuard endpoint rotation"
+  - "IPv6-only WireGuard endpoint"
+  - "WireGuard shuffle bag"
+  - "PersistentKeepalive 25"
+  - "curl -6 WAN health check"
+  - "WireGuard handshake stale"
+  - "commercial WireGuard rotator"
+  - "tunnel ULA egress verify"
+  - "hub watch LAN Pi"
+  - "Endpoint IPv6 port not FQDN"
+  - "WireGuard hop cooldown"
+  - "ISP down vs VPN down"
+  - "allowlisted IPv6 endpoints"
 backs: []
 backed_by: []
-description: Rotate a commercial WireGuard client across allowlisted IPv6 endpoints with WAN-path health checks, tunnel unique-local egress verify, a shuffle bag, and a hub watch on an always-on LAN Pi.
+description: "IPv6-only WireGuard rotation fails when health checks ride the tunnel: use WAN curl -6, ULA egress verify, a shuffle bag, and a hub watch."
 terms:
   - abbr: OEN
     expansion: Overlay and Edge Notes

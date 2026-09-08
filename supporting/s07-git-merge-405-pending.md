@@ -9,9 +9,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s07-git-merge-405-pending.html
 keywords:
-  - gitlab
-  - merge
-  - 405
+  - "git merge 405 pending"
+  - "GitLab mergeability 405"
+  - "405 Method Not Allowed merge"
+  - "not a dead token 405"
+  - "contrast real 401"
+  - "merge_status can_be_merged"
+  - "poll merge request 405"
+  - "GitLab REST merge timing"
+  - "unauthorized vs pending merge"
+  - "MR 405 retry"
+  - "token 401 tell operator"
+  - "mergeability still checking"
 backs:
   - OEN-09
 backed_by: []

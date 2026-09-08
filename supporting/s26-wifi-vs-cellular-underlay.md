@@ -9,10 +9,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s26-wifi-vs-cellular-underlay.html
 keywords:
-  - exit-node
-  - underlay
-  - wifi
-  - cellular
+  - "Wi-Fi vs cellular underlay"
+  - "same cloud exit two underlays"
+  - "home Wi-Fi encapsulates overlay"
+  - "cellular direct to cloud"
+  - "IPv4 cloud IPv6 home leak"
+  - "not the GCP exit is broken"
+  - "underlay WireGuard vs cellular"
+  - "split v4/v6 underlay"
+  - "Tailscale exit Wi-Fi cellular"
+  - "Happy-Eyeballs vs underlay"
+  - "phone Wi-Fi tunnel encapsulate"
+  - "cellular overlay path"
 backs:
   - OEN-13
   - OEN-16

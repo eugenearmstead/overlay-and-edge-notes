@@ -9,10 +9,19 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/networking/17-gcp-overlay-exit.html
 keywords:
-  - exit-node
-  - gcp
-  - canIpForward
-  - peerapi
+  - "canIpForward exit node"
+  - "Google Cloud overlay exit"
+  - "Identity-Aware Proxy break-glass"
+  - "advertise 0.0.0.0/0 and ::/0"
+  - "overlay PORT 41641"
+  - "Android hides exit without ::/0"
+  - "ip_forward GCE"
+  - "do not double ip6tables MASQUERADE"
+  - "rp_filter=2 GCP NIC"
+  - "tailscale ssh KEX fail GCE"
+  - "accept-dns vs PeerAPI"
+  - "VPC UDP 41641 PORT=0"
+  - "Headscale GCP exit"
 backs: []
 backed_by: []
 description: A Google Cloud virtual machine can advertise an overlay exit only with IP forwarding, both default routes, a fixed overlay UDP listen port, scoped network address translation, and Identity-Aware Proxy as break-glass — not as the daily door.

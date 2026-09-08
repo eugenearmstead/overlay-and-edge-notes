@@ -9,10 +9,18 @@ author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/networking/05-exit-peerapi-dns-stub.html
 keywords:
-  - exit-node
-  - peerapi
-  - dns
-  - loopback
+  - "PeerAPI DNS"
+  - "exit-node PeerAPI stub"
+  - "PeerAPIURL dynamic port"
+  - "Android exit DNS DoH"
+  - "bind stub overlay :53 breaks exit"
+  - "loopback DNS stub RD=1"
+  - "tailscale status PeerAPIURL"
+  - "UDP recv-Q PeerAPI"
+  - "exit DNS not :53"
+  - "Headscale PeerAPI"
+  - "Recursion Desired stub"
+  - "DoH dns-query exit"
 backs: []
 backed_by:
   - OEN-S29
