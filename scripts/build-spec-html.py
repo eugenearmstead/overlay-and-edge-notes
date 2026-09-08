@@ -215,18 +215,8 @@ MIXED_TOKENS = (
 HOME_TERMS = [
     {"abbr": "OEN", "expansion": "Overlay and Edge Notes (this series)"},
     {"abbr": "SSH", "expansion": "Secure Shell"},
-    {"abbr": "MTU", "expansion": "Maximum Transmission Unit"},
     {"abbr": "HTML", "expansion": "HyperText Markup Language"},
-    {"abbr": "WireGuard", "expansion": "UDP-based virtual private network protocol"},
-    {"abbr": "DNS", "expansion": "Domain Name System"},
     {"abbr": "TCPMSS", "expansion": "iptables/nft target that sets TCP Maximum Segment Size"},
-    {"abbr": "PeerAPI", "expansion": "overlay peer HTTP API (including DNS-over-HTTPS on the exit)"},
-    {"abbr": "README", "expansion": "repository citation index in Markdown"},
-    {"abbr": "URL", "expansion": "Uniform Resource Locator"},
-    {"abbr": "ASUSWRT", "expansion": "ASUS wireless router firmware family"},
-    {"abbr": "canIpForward", "expansion": "Google Cloud IP forwarding flag on a virtual machine"},
-    {"abbr": "CAPI", "expansion": "CrowdSec Central API"},
-    {"abbr": "KB", "expansion": "kilobyte"},
 ]
 
 HOME_KEYWORDS = [
@@ -860,27 +850,25 @@ def write_index() -> None:
         "This edition ships original specs and supporting methods. "
         "Year pages are indexes, not copies of specs. "
         "Disclosure, changelog, agents, crawlers. "
-        "How to find these notes. Four doors. Google GitHub Pages canonical URL "
-        "sitemap robots Allow. GitHub.com README. Agents llms.txt llms-full.txt. "
-        "Failure-string search curl 200 chrome ERR_CONNECTION_CLOSED cscli capi 403 "
-        "ts-forward TCPMSS 0 packets PeerAPI DNS canIpForward exit node "
-        "ASUSWRT-Merlin DNSVPN2 overlay SSH hang 1KB CAPI."
+        "How to find these notes. Search the error you hit, not a private lab name. "
+        "Notes live on GitHub Pages. Agents start at llms.txt and optionally llms-full.txt. "
+        "Example searches overlay SSH hang ts-forward TCPMSS 0 packets."
     )
     assert_terms_cover("index.html", home_prose, HOME_TERMS)
     terms_html = terms_section_html(HOME_TERMS)
+    pages_url = html.escape(f"{SITE_ORIGIN}/", quote=True)
     body = f"""      <div class="page-body">
         <h1>{html.escape(SITE_NAME)}</h1>
         <p class="lede">Named traps with replicable procedures. Stable IDs that do not reset by year. Markdown is the source of truth; HTML is generated.</p>
         <p>This edition ships twenty-three original specs and thirty-four supporting methods. Year pages are indexes, not copies of specs.</p>
         {terms_html}
         <h2 id="find">How to find these notes</h2>
-        <p>Four doors, one tree. Search the <strong>failure string</strong>, not a lab name. This is not a dump of every keyword.</p>
-        <ol>
-          <li><strong>Google</strong> indexes GitHub Pages. Canonical URL, unique title and meta description per page, sitemap, robots Allow. Example searches: <code>curl 200 chrome ERR_CONNECTION_CLOSED</code>, <code>cscli capi 403</code>, <code>ts-forward TCPMSS 0 packets</code>.</li>
-          <li><strong>GitHub.com</strong> repo search and the README citation index.</li>
-          <li><strong>Agents</strong> start at <a href="{href_from(out_path, 'llms.txt')}"><code>llms.txt</code></a> and <a href="{href_from(out_path, 'llms-full.txt')}"><code>llms-full.txt</code></a>.</li>
-          <li><strong>Failure-string search</strong> on Pages or the repo: overlay SSH hang 1KB, PeerAPI DNS, canIpForward exit node, ASUSWRT-Merlin DNSVPN2.</li>
-        </ol>
+        <p>Search the error you hit, not a private lab name.</p>
+        <ul>
+          <li>Notes live at <a href="{pages_url}">{html.escape(SITE_ORIGIN)}/</a></li>
+          <li>Agents start at <a href="{href_from(out_path, 'llms.txt')}"><code>llms.txt</code></a> (and optionally <a href="{href_from(out_path, 'llms-full.txt')}"><code>llms-full.txt</code></a>)</li>
+          <li>Example searches: <code>curl 200 chrome ERR_CONNECTION_CLOSED</code>, <code>cscli capi 403</code>, overlay SSH hang / <code>ts-forward TCPMSS 0 packets</code></li>
+        </ul>
         <h2 id="about">About</h2>
         <ul>
           <li><a href="{href_from(out_path, 'DISCLOSURE.html')}">Disclosure and license</a></li>
@@ -962,9 +950,10 @@ def write_llms_txt() -> None:
         "",
         "## How to find a spec",
         "",
-        "- Humans: Google (GitHub Pages canonical URLs) or GitHub.com repo / README search.",
-        f"- Agents: this file and [{SITE_ORIGIN}/llms-full.txt]({SITE_ORIGIN}/llms-full.txt).",
-        "- Match the failure string in the one-line descriptions below (llmstxt.org format).",
+        "- Search the error you hit, not a private lab name.",
+        f"- Notes live at [{SITE_ORIGIN}/]({SITE_ORIGIN}/).",
+        f"- Agents start at this file and optionally [{SITE_ORIGIN}/llms-full.txt]({SITE_ORIGIN}/llms-full.txt).",
+        "- Example searches: curl 200 chrome ERR_CONNECTION_CLOSED; cscli capi 403; overlay SSH hang / ts-forward TCPMSS 0 packets.",
         "",
         "## Original specs (built)",
         "",

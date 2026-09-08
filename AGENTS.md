@@ -18,14 +18,26 @@ These pages are meant to be **agent-reproducible**, not only readable. A remote 
 
 ## How to find a spec
 
-People and agents find these notes by the **failure string**, not a lab name.
+Search the error you hit, not a private lab name. Public Pages home uses this visitor list only (no local-server commands, no sitemap/robots marketing):
 
-1. Google → GitHub Pages (`https://eugenearmstead.github.io/overlay-and-edge-notes/`). Canonical URLs, unique title and meta description, sitemap, robots Allow.
-2. GitHub.com repo search / README citation index.
-3. Agents → `https://eugenearmstead.github.io/overlay-and-edge-notes/llms.txt` and `llms-full.txt`.
-4. Failure-string search: `curl 200 chrome ERR_CONNECTION_CLOSED`, `cscli capi 403`, `ts-forward TCPMSS 0 packets`.
+- Notes live at `https://eugenearmstead.github.io/overlay-and-edge-notes/`
+- Agents start at `https://eugenearmstead.github.io/overlay-and-edge-notes/llms.txt` (and optionally `llms-full.txt`)
+- Example searches: `curl 200 chrome ERR_CONNECTION_CLOSED`, `cscli capi 403`, overlay SSH hang / `ts-forward TCPMSS 0 packets`
 
-YAML `keywords:` (8–20 real phrases) and `description:` (~150 characters, include the symptom) are the search surface. The HTML builder emits `<meta name="keywords">`, `citation_keywords`, and JSON-LD `keywords`. Do not keyword-stuff. Do not `noindex`.
+GitHub.com repo search and the README citation index also work.
+
+YAML `keywords:` (8–20 real phrases) and `description:` (~150 characters, include the symptom) are the search surface. The HTML builder emits `<meta name="keywords">`, `citation_keywords`, and JSON-LD `keywords`, plus unique titles, canonical URLs, sitemap, and robots Allow. Do not keyword-stuff. Do not `noindex`. Do not copy that writer SEO onto the public Pages home “How to find these notes” list.
+
+## Build HTML locally (contributors)
+
+From the repository root:
+
+```bash
+python3 scripts/build-spec-html.py
+python3 -m http.server 8765
+```
+
+Open `http://127.0.0.1:8765/` or open `index.html` as a `file://` URL. Relative CSS works either way. Public generated `index.html` MUST NOT tell visitors to hit loopback.
 
 ## RFC 2119
 

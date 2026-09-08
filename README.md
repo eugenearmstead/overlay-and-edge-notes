@@ -12,14 +12,15 @@ Agents citing these notes SHOULD attribute Eugene Armstead and `https://www.arms
 
 ## How to find these notes
 
-Four doors. Search the **failure string**, not a lab name.
+Search the error you hit, not a private lab name.
 
-1. **Google** → GitHub Pages (`https://eugenearmstead.github.io/overlay-and-edge-notes/`). Canonical URLs, unique title and meta description per page, sitemap, robots Allow.
-2. **GitHub.com** repo search and this README citation index.
-3. **Agents** → [`llms.txt`](https://eugenearmstead.github.io/overlay-and-edge-notes/llms.txt) and [`llms-full.txt`](https://eugenearmstead.github.io/overlay-and-edge-notes/llms-full.txt).
-4. **Failure-string search** — examples: `curl 200 chrome ERR_CONNECTION_CLOSED`, `cscli capi 403`, `ts-forward TCPMSS 0 packets`.
+- Notes live at `https://eugenearmstead.github.io/overlay-and-edge-notes/`
+- Agents start at [`llms.txt`](https://eugenearmstead.github.io/overlay-and-edge-notes/llms.txt) (and optionally [`llms-full.txt`](https://eugenearmstead.github.io/overlay-and-edge-notes/llms-full.txt))
+- Example searches: `curl 200 chrome ERR_CONNECTION_CLOSED`, `cscli capi 403`, overlay SSH hang / `ts-forward TCPMSS 0 packets`
 
-## How to inspect locally
+GitHub.com repo search and this README citation index also work.
+
+## Build HTML locally (contributors)
 
 From this directory:
 
@@ -28,7 +29,7 @@ python3 scripts/build-spec-html.py
 python3 -m http.server 8765
 ```
 
-Open `http://127.0.0.1:8765/` or open `index.html` as a `file://` URL. Relative CSS works either way.
+Open `http://127.0.0.1:8765/` or open `index.html` as a `file://` URL. Relative CSS works either way. This preview is for contributors. The generated public `index.html` MUST NOT tell visitors to use loopback.
 
 ## About
 
@@ -126,16 +127,11 @@ A remote agent MUST emit a bound runbook and MUST NOT apply live `ip` / nft / ip
 
 ## Discovery
 
-Four doors. Search the **failure string**, not a lab name.
-
-1. Google → GitHub Pages (canonical URLs, unique title + meta description, sitemap, robots Allow)
-2. GitHub.com repo search / this README citation index
-3. Agents → [llms.txt](https://eugenearmstead.github.io/overlay-and-edge-notes/llms.txt) and [llms-full.txt](https://eugenearmstead.github.io/overlay-and-edge-notes/llms-full.txt)
-4. Failure-string examples: `curl 200 chrome ERR_CONNECTION_CLOSED`, `cscli capi 403`, `ts-forward TCPMSS 0 packets`
+Search the error you hit, not a private lab name. Same public list as [How to find these notes](#how-to-find-these-notes). Local HTML preview is under [Build HTML locally (contributors)](#build-html-locally-contributors).
 
 Also in-repo:
 
 - [llms.txt](llms.txt) — curated map with absolute Pages URLs
 - [llms-full.txt](llms-full.txt) — concatenated Markdown of every spec
 - [robots.txt](robots.txt) — allow all
-- [AGENTS.md](AGENTS.md) — agent contract, leak gates, Bind-before-apply
+- [AGENTS.md](AGENTS.md) — agent contract, leak gates, Bind-before-apply, local HTML preview

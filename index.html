@@ -92,15 +92,14 @@
         <h1>Overlay and Edge Notes</h1>
         <p class="lede">Named traps with replicable procedures. Stable IDs that do not reset by year. Markdown is the source of truth; HTML is generated.</p>
         <p>This edition ships twenty-three original specs and thirty-four supporting methods. Year pages are indexes, not copies of specs.</p>
-        <section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>OEN</dt><dd>Overlay and Edge Notes (this series)</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>MTU</dt><dd>Maximum Transmission Unit</dd><dt>HTML</dt><dd>HyperText Markup Language</dd><dt>WireGuard</dt><dd>UDP-based virtual private network protocol</dd><dt>DNS</dt><dd>Domain Name System</dd><dt>TCPMSS</dt><dd>iptables/nft target that sets TCP Maximum Segment Size</dd><dt>PeerAPI</dt><dd>overlay peer HTTP API (including DNS-over-HTTPS on the exit)</dd><dt>README</dt><dd>repository citation index in Markdown</dd><dt>URL</dt><dd>Uniform Resource Locator</dd><dt>ASUSWRT</dt><dd>ASUS wireless router firmware family</dd><dt>canIpForward</dt><dd>Google Cloud IP forwarding flag on a virtual machine</dd><dt>CAPI</dt><dd>CrowdSec Central API</dd><dt>KB</dt><dd>kilobyte</dd></dl></section>
+        <section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>OEN</dt><dd>Overlay and Edge Notes (this series)</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>HTML</dt><dd>HyperText Markup Language</dd><dt>TCPMSS</dt><dd>iptables/nft target that sets TCP Maximum Segment Size</dd></dl></section>
         <h2 id="find">How to find these notes</h2>
-        <p>Four doors, one tree. Search the <strong>failure string</strong>, not a lab name. This is not a dump of every keyword.</p>
-        <ol>
-          <li><strong>Google</strong> indexes GitHub Pages. Canonical URL, unique title and meta description per page, sitemap, robots Allow. Example searches: <code>curl 200 chrome ERR_CONNECTION_CLOSED</code>, <code>cscli capi 403</code>, <code>ts-forward TCPMSS 0 packets</code>.</li>
-          <li><strong>GitHub.com</strong> repo search and the README citation index.</li>
-          <li><strong>Agents</strong> start at <a href="llms.txt"><code>llms.txt</code></a> and <a href="llms-full.txt"><code>llms-full.txt</code></a>.</li>
-          <li><strong>Failure-string search</strong> on Pages or the repo: overlay SSH hang 1KB, PeerAPI DNS, canIpForward exit node, ASUSWRT-Merlin DNSVPN2.</li>
-        </ol>
+        <p>Search the error you hit, not a private lab name.</p>
+        <ul>
+          <li>Notes live at <a href="https://eugenearmstead.github.io/overlay-and-edge-notes/">https://eugenearmstead.github.io/overlay-and-edge-notes/</a></li>
+          <li>Agents start at <a href="llms.txt"><code>llms.txt</code></a> (and optionally <a href="llms-full.txt"><code>llms-full.txt</code></a>)</li>
+          <li>Example searches: <code>curl 200 chrome ERR_CONNECTION_CLOSED</code>, <code>cscli capi 403</code>, overlay SSH hang / <code>ts-forward TCPMSS 0 packets</code></li>
+        </ul>
         <h2 id="about">About</h2>
         <ul>
           <li><a href="DISCLOSURE.html">Disclosure and license</a></li>

@@ -4,9 +4,10 @@
 
 ## How to find a spec
 
-- Humans: Google (GitHub Pages canonical URLs) or GitHub.com repo / README search.
-- Agents: this file and [https://eugenearmstead.github.io/overlay-and-edge-notes/llms-full.txt](https://eugenearmstead.github.io/overlay-and-edge-notes/llms-full.txt).
-- Match the failure string in the one-line descriptions below (llmstxt.org format).
+- Search the error you hit, not a private lab name.
+- Notes live at [https://eugenearmstead.github.io/overlay-and-edge-notes/](https://eugenearmstead.github.io/overlay-and-edge-notes/).
+- Agents start at this file and optionally [https://eugenearmstead.github.io/overlay-and-edge-notes/llms-full.txt](https://eugenearmstead.github.io/overlay-and-edge-notes/llms-full.txt).
+- Example searches: curl 200 chrome ERR_CONNECTION_CLOSED; cscli capi 403; overlay SSH hang / ts-forward TCPMSS 0 packets.
 
 ## Original specs (built)
 

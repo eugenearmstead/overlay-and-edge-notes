@@ -61,6 +61,11 @@ terms:
 
 Dated in Mountain Time (MST) for this series. Spec URLs do not change when an edition bumps.
 
+## 2026-09-08 MST — Public vs contributor find copy
+
+- Pages home **How to find these notes** is visitor language only: search the error, the GitHub Pages site, `llms.txt` / `llms-full.txt`, and example failure strings. Removed sitemap / robots / canonical-meta wording from that list.
+- Local HTML preview (`http.server`, loopback, `file://`) lives in `AGENTS.md` and README under **Build HTML locally (contributors)**. Generated public `index.html` does not tell visitors to use a local server.
+
 ## 2026-09-08 MST — GitHub security policy
 
 - Root security policy: private vulnerability reporting only; no bounty; public Issues remain for docs, not security.

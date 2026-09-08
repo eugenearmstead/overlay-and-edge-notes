@@ -92,8 +92,8 @@ Use GitHub private vulnerability reporting only. Open this repository’s Securi
 
 ## GitHub Pages
 
-Canonical HyperText Markup Language (HTML) URLs live at `https://eugenearmstead.github.io/overlay-and-edge-notes/`.
+These notes live at `https://eugenearmstead.github.io/overlay-and-edge-notes/`.
 
 ## How to find these notes
 
-Search the **failure string**. Google indexes GitHub Pages. GitHub.com indexes the README. Agents read `llms.txt`. Examples and the catalog are on the [home page](index.html#find).
+Search the error you hit, not a private lab name. Notes live at `https://eugenearmstead.github.io/overlay-and-edge-notes/`. Agents start at [`llms.txt`](https://eugenearmstead.github.io/overlay-and-edge-notes/llms.txt) (and optionally `llms-full.txt`). Example searches and the catalog are on the [home page](index.html#find). Local HTML preview commands belong in contributor docs (`AGENTS.md`), not on public Pages.
