@@ -172,6 +172,7 @@ ACRONYM_EXCLUDE = {
     "PAYLOAD",
     "AGENTS",
     "ASCII",
+    "ERR",
 }
 
 # Mixed-case tokens that the ALL-CAPS scanner misses.
@@ -217,6 +218,15 @@ HOME_TERMS = [
     {"abbr": "SSH", "expansion": "Secure Shell"},
     {"abbr": "HTML", "expansion": "HyperText Markup Language"},
     {"abbr": "TCPMSS", "expansion": "iptables/nft target that sets TCP Maximum Segment Size"},
+    {"abbr": "KB", "expansion": "kilobyte"},
+    {"abbr": "DNS", "expansion": "Domain Name System"},
+    {"abbr": "MTU", "expansion": "Maximum Transmission Unit"},
+    {"abbr": "HTTPS", "expansion": "Hypertext Transfer Protocol Secure"},
+    {"abbr": "MSS", "expansion": "Maximum Segment Size"},
+    {"abbr": "CAPI", "expansion": "CrowdSec Central API"},
+    {"abbr": "HTTP", "expansion": "Hypertext Transfer Protocol"},
+    {"abbr": "CSS", "expansion": "Cascading Style Sheets"},
+    {"abbr": "Chromium", "expansion": "open-source browser engine"},
 ]
 
 HOME_KEYWORDS = [
@@ -357,6 +367,26 @@ def assert_terms_cover(label: str, text: str, terms: list[dict]) -> None:
     missing = sorted(tok for tok in find_acronyms(text) if tok not in have)
     if missing:
         raise SystemExit(f"{label}: abbreviations missing from terms: {', '.join(missing)}")
+
+
+def term_appears_in_body(abbr: str, text: str) -> bool:
+    """True if a YAML terms.abbr is used in title, description, or body."""
+    if abbr in ACRONYM_EXCLUDE or re.fullmatch(r"P\d+", abbr):
+        return True
+    if abbr == "OEN":
+        return bool(re.search(r"\bOEN", text))
+    escaped = re.escape(abbr)
+    if re.search(rf"(?<![A-Za-z0-9]){escaped}(?![A-Za-z0-9])", text):
+        return True
+    if re.search(rf"(?<![A-Za-z]){escaped}(?![A-Za-z])", text):
+        return True
+    return False
+
+
+def assert_terms_used(label: str, text: str, terms: list[dict]) -> None:
+    unused = [t["abbr"] for t in terms if not term_appears_in_body(t["abbr"], text)]
+    if unused:
+        raise SystemExit(f"{label}: terms never used in body: {', '.join(unused)}")
 
 
 def parse_frontmatter(text: str) -> tuple[dict, str]:
@@ -788,6 +818,7 @@ def render_spec(md_path: Path) -> None:
     body_for_html = strip_markdown_terms_section(body)
     scan_text = f"{title}\n{desc}\n{body_for_html}"
     assert_terms_cover(str(md_path.relative_to(ROOT)), scan_text, terms)
+    assert_terms_used(str(md_path.relative_to(ROOT)), scan_text, terms)
     article_html = md_to_html(body_for_html)
     # Drop duplicate H1 if markdown repeats the title
     article_html = re.sub(r"^<h1>.*?</h1>\n?", "", article_html, count=1)
@@ -827,15 +858,12 @@ def catalog_list_html(section: str, from_page: Path) -> str:
     for spec_id, sec, slug, title in CATALOG:
         if sec != section:
             continue
-        if is_built(sec, slug):
-            href = href_from(from_page, f"{sec}/{slug}.html")
-            items.append(
-                f'<li><span class="id">{html.escape(spec_id)}</span><span><a href="{html.escape(href, quote=True)}">{html.escape(title)}</a></span></li>'
-            )
-        else:
-            items.append(
-                f'<li><span class="id">{html.escape(spec_id)}</span><span>{html.escape(title)} <span class="forthcoming">(forthcoming)</span></span></li>'
-            )
+        if not is_built(sec, slug):
+            raise SystemExit(f"CATALOG lists {spec_id} ({sec}/{slug}) but Markdown is missing")
+        href = href_from(from_page, f"{sec}/{slug}.html")
+        items.append(
+            f'<li><span class="id">{html.escape(spec_id)}</span><span><a href="{html.escape(href, quote=True)}">{html.escape(title)}</a></span></li>'
+        )
     return '<ol class="catalog">' + "".join(items) + "</ol>"
 
 
@@ -852,9 +880,17 @@ def write_index() -> None:
         "Disclosure, changelog, agents, crawlers. "
         "How to find these notes. Search the error you hit, not a private lab name. "
         "Notes live on GitHub Pages. Agents start at llms.txt and optionally llms-full.txt. "
-        "Example searches overlay SSH hang ts-forward TCPMSS 0 packets."
+        "Example searches overlay SSH hang ts-forward TCPMSS 0 packets. "
+        "Symptom to first spec. "
+        "SSH login ok, output hangs ~1 KB. "
+        "curl 200, Chromium ERR_CONNECTION. "
+        "Looks like MTU, actually DNS. "
+        "Exit HTTPS dies, ts-forward MSS counters 0. "
+        "CAPI HTTP 403. "
+        "HTML 200, layout exploded CSS."
     )
     assert_terms_cover("index.html", home_prose, HOME_TERMS)
+    assert_terms_used("index.html", home_prose, HOME_TERMS)
     terms_html = terms_section_html(HOME_TERMS)
     pages_url = html.escape(f"{SITE_ORIGIN}/", quote=True)
     body = f"""      <div class="page-body">
@@ -869,6 +905,18 @@ def write_index() -> None:
           <li>Agents start at <a href="{href_from(out_path, 'llms.txt')}"><code>llms.txt</code></a> (and optionally <a href="{href_from(out_path, 'llms-full.txt')}"><code>llms-full.txt</code></a>)</li>
           <li>Example searches: <code>curl 200 chrome ERR_CONNECTION_CLOSED</code>, <code>cscli capi 403</code>, overlay SSH hang / <code>ts-forward TCPMSS 0 packets</code></li>
         </ul>
+        <h2 id="triage">Symptom to first spec</h2>
+        <table>
+          <thead><tr><th>Symptom</th><th>Start here</th></tr></thead>
+          <tbody>
+            <tr><td>SSH login ok, output hangs ~1 KB</td><td><a href="{href_from(out_path, 'networking/01-overlay-ssh-byte-cliff.html')}">OEN-01</a> + <a href="{href_from(out_path, 'supporting/s01-pmtud-size-ladder.html')}">S01</a> + <a href="{href_from(out_path, 'supporting/s03-transfer-matrix-controlpath.html')}">S03</a></td></tr>
+            <tr><td>curl 200, Chromium ERR_CONNECTION_*</td><td><a href="{href_from(out_path, 'networking/02-chromium-tls-pmtu.html')}">OEN-02</a></td></tr>
+            <tr><td>Looks like MTU, actually DNS</td><td><a href="{href_from(out_path, 'networking/03-router-vpn-dns-hijack.html')}">OEN-03</a></td></tr>
+            <tr><td>Exit HTTPS dies, ts-forward MSS counters 0</td><td><a href="{href_from(out_path, 'networking/04-exit-tcpmss-after-ts-forward.html')}">OEN-04</a> + <a href="{href_from(out_path, 'supporting/s02-clamp-mss-to-pmtu-noop.html')}">S02</a></td></tr>
+            <tr><td>CAPI HTTP 403</td><td><a href="{href_from(out_path, 'networking/07-crowdsec-capi-403.html')}">OEN-07</a> then <a href="{href_from(out_path, 'supporting/s34-crowdsec-capi-login-budget.html')}">S34</a></td></tr>
+            <tr><td>HTML 200, layout exploded</td><td><a href="{href_from(out_path, 'supporting/s06-do-not-ship-html-only.html')}">S06</a> then <a href="{href_from(out_path, 'supporting/s08-canonical-disk-tmpfs-origin.html')}">S08</a></td></tr>
+          </tbody>
+        </table>
         <h2 id="about">About</h2>
         <ul>
           <li><a href="{href_from(out_path, 'DISCLOSURE.html')}">Disclosure and license</a></li>
@@ -910,6 +958,7 @@ def write_disclosure() -> None:
     desc = meta.get("description") or title
     body_for_html = strip_markdown_terms_section(body)
     assert_terms_cover("DISCLOSURE.md", f"{title}\n{desc}\n{body_for_html}", terms)
+    assert_terms_used("DISCLOSURE.md", f"{title}\n{desc}\n{body_for_html}", terms)
     inner = md_to_html(body_for_html)
     inner = re.sub(r"^<h1>.*?</h1>\n?", "", inner, count=1)
     inner = inject_terms_html(inner, terms_section_html(terms))
@@ -1033,6 +1082,7 @@ def write_frontmatter_page(md_path: Path, *, crumb: str) -> None:
     desc = meta.get("description") or title
     body_for_html = strip_markdown_terms_section(body)
     assert_terms_cover(str(md_path.relative_to(ROOT)), f"{title}\n{desc}\n{body_for_html}", terms)
+    assert_terms_used(str(md_path.relative_to(ROOT)), f"{title}\n{desc}\n{body_for_html}", terms)
     inner = md_to_html(body_for_html)
     inner = re.sub(r"^<h1>.*?</h1>\n?", "", inner, count=1)
     inner = inject_terms_html(inner, terms_section_html(terms))

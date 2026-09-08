@@ -20,6 +20,17 @@ Search the error you hit, not a private lab name.
 
 GitHub.com repo search and this README citation index also work.
 
+### Symptom to first spec
+
+| Symptom | Start here |
+|---------|------------|
+| SSH login ok, output hangs ~1 KB | [OEN-01](networking/01-overlay-ssh-byte-cliff.md) + [S01](supporting/s01-pmtud-size-ladder.md) + [S03](supporting/s03-transfer-matrix-controlpath.md) |
+| curl 200, Chromium `ERR_CONNECTION_*` | [OEN-02](networking/02-chromium-tls-pmtu.md) |
+| Looks like MTU, actually DNS | [OEN-03](networking/03-router-vpn-dns-hijack.md) |
+| Exit HTTPS dies, `ts-forward` MSS counters 0 | [OEN-04](networking/04-exit-tcpmss-after-ts-forward.md) + [S02](supporting/s02-clamp-mss-to-pmtu-noop.md) |
+| CAPI HTTP 403 | [OEN-07](networking/07-crowdsec-capi-403.md) then [S34](supporting/s34-crowdsec-capi-login-budget.md) |
+| HTML 200, layout exploded | [S06](supporting/s06-do-not-ship-html-only.md) then [S08](supporting/s08-canonical-disk-tmpfs-origin.md) |
+
 ## Build HTML locally (contributors)
 
 From this directory:

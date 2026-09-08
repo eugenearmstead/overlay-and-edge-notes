@@ -62,17 +62,38 @@ Bindable extras (still not inventory):
 - `<vps-public-v4>` `<vps-public-v6>`
 - `<overlay-v4>` `<overlay-v6>`
 - `<wg-mtu>` `<mss4>` `<mss6>`
+- `<overlay-tun-mtu>` `<overlay-underlay-overhead>`
+- `<overlay-impl>`
 - `<user>`
 
-Public wording: “cloud VPS”, “LAN Pi”, “overlay peer”, “exit node”, “commercial WireGuard”, “self-hosted coordination”, “consumer router VPN client”.
+Public wording: “cloud VPS”, “LAN Pi”, “overlay peer”, “exit node”, “commercial WireGuard”, “self-hosted coordination”, “consumer router VPN client”. Overlay **product CLI** MAY appear in Procedure and keywords after `<overlay-impl>` is on that page (see Option A).
+
+## One named trap per session (Option A)
+
+Work **one** spec at a time. Bind, Formulas, Agent stop rule, and Verify belong to **that trap**.
+
+MUST NOT stamp Maximum Transmission Unit (MTU) / Maximum Segment Size (MSS) Bind rows, `mss4` formulas, a canned five-line Agent stop rule, or Internet Control Message Protocol (ICMP) ping Verify onto Cascading Style Sheets (CSS), CrowdSec, git-merge, or other non-path notes.
+
+- Overlay Bind field `<overlay-impl>`: allowed value `tailscale-compatible`, or “other — stop and translate CLI”.
+- Product CLI MAY appear in Procedure (`tailscale`, `tailscaled`, `ts-forward`, `TS_DEBUG_MTU`, `accept-dns`, `nodes backfillips`) **after** that field exists on that page.
+- Every overlay-CLI spec MUST include: “This spec does not apply if `<overlay-impl>` is not tailscale-compatible.”
+- Public prose stays “overlay peer / exit node / commercial WireGuard” except in commands and keywords.
 
 ## Bind before apply (MUST)
 
-Every spec has a **Bind** table. Before any live change:
+Every spec has a **Bind** table. Fill **only the rows that page uses**. Before any live change:
 
-1. Read **Topology** (ASCII). Confirm the operator’s path matches the diagram class.
-2. Fill Bind (host class, iface, public vs overlay vs WAN). Humans fill; agents propose the table.
-3. Compute formulas (`mss4 = <wg-mtu> - 40`, `mss6 = <wg-mtu> - 60`). Historical **1160** is a wrong-scope clamp, not the recipe.
+1. Read **Topology** (ASCII), or `N/A — deploy|DNS|API` when there is no packet path. Confirm the operator’s path matches the diagram class.
+2. Fill Bind (host class, iface, public vs overlay vs WAN, or deploy/API rows). Humans fill; agents propose the table.
+3. On **path-MTU** specs only, compute the formula family that step names:
+
+   ```text
+   mss4_wg = <wg-mtu> - 40
+   mss6_wg = <wg-mtu> - 60
+   mss4_overlay_over_wg = min(<overlay-tun-mtu>, <wg-mtu> - <overlay-underlay-overhead>) - 40
+   ```
+
+   Historical **1160 / 1146** is wrong-scope evidence only ([OEN-01](networking/01-overlay-ssh-byte-cliff.md), [OEN-S02](supporting/s02-clamp-mss-to-pmtu-noop.md)). It is not the recipe. LAN bridge stays **1500**.
 4. Emit the Procedure with placeholders **replaced**. That bound runbook is what a human may run.
 5. Stop. MUST NOT run `ip rule`, `nft`, `iptables`, `ip6tables`, `sysctl`, `wg set`, daemon restart, or deploy until the human filled Bind.
 
@@ -91,14 +112,14 @@ Do **not** claim a trap is fixed because ICMP ping succeeded when the spec’s *
 Before any public commit, gist, issue, or Pages publish:
 
 1. Do **not** copy private skill files or ops repos into this tree.
-2. Rewrite from facts. Never include: hostnames, SSH aliases, LAN/overlay/WAN IPs, ULA node addresses, custom SSH/admin ports, commercial VPN **brand names**, server nicknames, GCP project ids or VM names, control-plane URLs, secret-store ids, homelab script paths, feed/Access secrets, timer unit names that identify a lab.
+2. Rewrite from facts. Overlay implementation names and CLI needed to run the procedure are **allowed**. Still forbidden: hostnames, SSH aliases, LAN/overlay/WAN IPs, unique-local (ULA) node addresses, custom SSH/admin ports, commercial exit-VPN **brand names**, server nicknames, Google Cloud project ids or VM names, control-plane URLs, secret-store ids, homelab script paths, feed/Access secrets, timer unit names that identify a lab.
 3. Grep the working tree for those classes. If any hit, rewrite until clean.
 4. Do **not** open public upstream bugs under the author’s account from these notes.
 
 ## How to apply a spec
 
 1. Read YAML frontmatter (`id`, `kind`, `backs` / `backed_by`).
-2. Read Topology, Bind, Formulas, **Agent stop rule**.
+2. Read Topology, Bind, Formulas (path-MTU pages only), **Agent stop rule**.
 3. Run **Procedure** in order. Each step has action, expected output (including scrubbed samples), on-failure next step.
 4. Stop on **MUST NOT**.
 5. Run **Verify**. Do not claim the trap is fixed on ICMP ping alone when the spec says to retest TCP.
@@ -116,7 +137,7 @@ YAML on every spec MUST include `author: Eugene Armstead` and `author_url: https
 
 ## Plain language and terms
 
-Titles MUST be English first. First use of an abbreviation MUST spell it out, then the short form in parentheses. YAML `terms:` MUST list every abbreviation on that page (including **OEN** = Overlay and Edge Notes, and common ones such as SSH, DNS, MTU, NAT). The HTML builder renders **Terms used on this page** and fails the build if a known-style acronym is missing from `terms`.
+Titles MUST be English first. First use of an abbreviation MUST spell it out, then the short form in parentheses. YAML `terms:` MUST list every abbreviation that appears in **that page body** (including **OEN** = Overlay and Edge Notes). The HTML builder fails if a known-style acronym is missing from `terms` **or** if a `terms.abbr` never appears in the page body. Do not copy SSH/MSS onto every page.
 
 Home-page Terms list **only** abbreviations used in the home body/nav — not every catalog title.
 
