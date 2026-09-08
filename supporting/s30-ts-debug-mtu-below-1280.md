@@ -3,7 +3,7 @@ id: "OEN-S30"
 title: "TS_DEBUG_MTU below 1280 disables overlay IPv6"
 kind: "supporting"
 status: "active"
-edition: 2
+edition: 3
 date_published: "2026-09-08"
 author: "Eugene Armstead"
 author_url: "https://www.armsteadent.com/"
@@ -32,34 +32,20 @@ terms:
     expansion: command-line interface
   - abbr: ControlPath
     expansion: OpenSSH multiplexing socket path option
-  - abbr: HTTPS
-    expansion: Hypertext Transfer Protocol Secure
-  - abbr: ICMP
-    expansion: Internet Control Message Protocol
   - abbr: IPv6
     expansion: Internet Protocol version 6
   - abbr: LAN
     expansion: Local Area Network
-  - abbr: MSS
-    expansion: Maximum Segment Size
   - abbr: MTU
     expansion: Maximum Transmission Unit
-  - abbr: nft
-    expansion: nftables (Linux packet filter)
   - abbr: OEN
     expansion: Overlay and Edge Notes
-  - abbr: Pi
-    expansion: single-board computer (Raspberry Pi class)
   - abbr: RFC
     expansion: Request for Comments
   - abbr: SSH
     expansion: Secure Shell
-  - abbr: TCP
-    expansion: Transmission Control Protocol
   - abbr: VPS
     expansion: Virtual Private Server
-  - abbr: WAN
-    expansion: Wide Area Network
 ---
 
 # TS_DEBUG_MTU below 1280 disables overlay IPv6
@@ -83,17 +69,11 @@ Fill this table **before** any live change. Do **not** paste real values back in
 | Placeholder | Operator fills | Class |
 |-------------|----------------|-------|
 | `<overlay-impl>` | Overlay implementation class | `tailscale-compatible` or other — stop and translate CLI |
-| `<cloud-vps>` | Overlay SSH target | Cloud VPS |
-| `<lan-pi>` | Overlay SSH target | LAN Pi |
+| `<cloud-vps>` | Node whose overlay tun is under test | Cloud VPS |
 | `<user>` | SSH user | Guest account |
-| `<wg-iface>` | Commercial WireGuard iface | Router or VPS client |
-| `<wan-iface>` | WAN iface | Router |
+| `<overlay-tun>` | Overlay tun iface | Node under test |
 | `<lan-bridge>` | LAN bridge | Router (MTU 1500) |
 | `<overlay-tun>` | Overlay tun iface | Node under test |
-| `<wg-mtu>` | MTU integer from `ip link` | Measured |
-| `<mss4>` / `<mss6>` | Computed MSS | Formulas |
-| `<vps-public-v4>` / `<vps-public-v6>` | VPS public addresses | WAN; never publish |
-| `<overlay-v4>` / `<overlay-v6>` | Overlay addresses | Overlay; never publish |
 
 ## Formulas
 
@@ -109,17 +89,14 @@ overlay `ip -6` can exist; tun accepts v6.
 
 ## Agent stop rule
 
-> A coding agent MUST emit a **bound runbook** (placeholders replaced from Bind).
-> MUST NOT apply live `ip rule`, nft, iptables, ip6tables, sysctl, `wg set`, daemon restart, or deploy until a **human** filled Bind.
-> MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
-> MUST NOT file an upstream bug from this page.
-> MUST NOT publish real addresses, hostnames, or custom ports.
+> MUST emit the `tailscaled` environ grep after `<overlay-impl>` is `tailscale-compatible` and Bind is filled.
+> MUST NOT set `TS_DEBUG_MTU` below 1280 as a production clamp.
+> MUST NOT shrink the LAN bridge to match a debug MTU.
+> MUST NOT apply netfilter from this page.
 
 ## Procedure
 
 This spec does not apply if `<overlay-impl>` is not tailscale-compatible.
-
-Placeholders only until Bind is filled: `<cloud-vps>`, `<lan-pi>`, `<overlay-peer>`, `<exit-node>`, `<wg-iface>`, `<gcp-nic>`, plus the Bind extras on this page.
 
 ### Copy-paste commands (after Bind)
 
@@ -142,23 +119,23 @@ ssh -o ControlPath=none <user>@<cloud-vps> 'tr "\0" "\n" < /proc/$(pidof tailsca
 
 ## Expected samples
 
+Stdout of the copy-paste block when the debug env is set too low:
+
 ```text
-TS_DEBUG_MTU=1000   # disables overlay v6
+TS_DEBUG_MTU=1000
 ```
+
+Empty stdout means the variable is unset (acceptable if overlay IPv6 remains).
 
 ## Verify
 
 - TS_DEBUG_MTU not below 1280.
 - Overlay v6 not kernel-disabled by that env.
-- ICMP / small ping success was **not** used as the pass criterion when this spec names TCP, SSH, or HTTPS.
-- Bind table was filled by a human before any live `ip` / nft / iptables change.
 
 ## MUST NOT
 
 - MUST NOT ship TS_DEBUG_MTU < 1280 in production.
 - MUST NOT shrink LAN because of it.
-- MUST NOT apply live network or firewall changes until Bind is filled by a human.
-- MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
 - MUST NOT publish hostnames, addresses, ULAs, or custom ports.
 
 ## Page changelog
@@ -169,8 +146,4 @@ TS_DEBUG_MTU=1000   # disables overlay v6
 
 - [OEN-13](../networking/13-overlay-underlay-ula-layers.md)
 - [OEN-S31](s31-prefixes-v6-needs-backfillips.md)
-
-## Prior art (Not novel)
-
-IPv6 minimum MTU 1280 is RFC. This note is the overlay debug env violating it.
 

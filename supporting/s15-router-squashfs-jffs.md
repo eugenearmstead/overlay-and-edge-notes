@@ -129,7 +129,3 @@ df -h
 - [OEN-18](../networking/18-per-node-changelog-contract.md)
 - [OEN-12](../networking/12-consumer-wg-phantom-bridge.md)
 
-## Prior art (Not novel)
-
-squashfs-as-root is normal. This note is Save settings missing JFFS plus logread-vs-syslog.
-

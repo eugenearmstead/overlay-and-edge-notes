@@ -135,7 +135,3 @@ SUnreclaim:   climbing across hours
 
 - [OEN-12](../networking/12-consumer-wg-phantom-bridge.md)
 
-## Prior art (Not novel)
-
-skbuff leaks are discussed in firmware circles. This note is the measured slope plus failed A/Bs without a public thread.
-

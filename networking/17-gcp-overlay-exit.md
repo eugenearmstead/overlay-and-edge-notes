@@ -255,6 +255,3 @@ udp UNCONN ... 0.0.0.0:41641
 - [OEN-S22 Identity-Aware Proxy vs overlay key exchange](../supporting/s22-iap-break-glass-kex.md)
 - [OEN-S23 VPC 41641 while PORT=0](../supporting/s23-vpc-41641-useless-while-port-0.md)
 
-## Prior art (Not novel)
-
-GCP `canIpForward` and “allow UDP 41641” appear in overlay exit tutorials. This spec’s claim is the **failure cluster**: PORT=0 vs VPC, duplicate v6 MASQUERADE, policy default without link-local gateway, Android hiding exits without `::/0`, IAP vs CLI KEX, metadata DNS vs PeerAPI, and leak-test 502 from GCP ranges.

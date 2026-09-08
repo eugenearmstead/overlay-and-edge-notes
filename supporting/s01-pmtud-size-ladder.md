@@ -136,9 +136,10 @@ Measure **three classes of target** from the same client. Do not mix the numbers
 # To probe a 1500-byte IPv6 packet:  ping -6 -M do -s 1452
 
 # Compare max successful IP size to <wg-mtu> and to TCP MSS:
-#   mss4 = <wg-mtu> - 40
-#   mss6 = <wg-mtu> - 60
-# See [OEN-01](../networking/01-overlay-ssh-byte-cliff.md). Historical 1160 is not this formula.
+#   mss4_wg = <wg-mtu> - 40
+#   mss6_wg = <wg-mtu> - 60
+#   mss4_overlay_over_wg = min(<overlay-tun-mtu>, <wg-mtu> - <overlay-underlay-overhead>) - 40
+# Name the family that matches the path under test. See [OEN-01](../networking/01-overlay-ssh-byte-cliff.md).
 ```
 
 ## Method
@@ -261,6 +262,3 @@ Documentation samples use `TEST-NET-3` `203.0.113.10` (RFC 5737). Operators MUST
 - [OEN-04 Exit-node TCPMSS](../networking/04-exit-tcpmss-after-ts-forward.md)
 - [OEN-S02 clamp-mss-to-pmtu no-op](s02-clamp-mss-to-pmtu-noop.md)
 
-## Prior art (Not novel)
-
-Don't-fragment ping ladders are standard path MTU discovery (PMTUD) practice. This note exists so agents **run IPv4 and IPv6 on the right addresses** (public vs overlay vs through-tunnel) and then **retest TCP**, which is the step most runbooks omit.

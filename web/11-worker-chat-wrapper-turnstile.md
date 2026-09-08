@@ -159,7 +159,3 @@ curl -sS -o /dev/null -w '%{http_code}\n' --max-time 15 <live-url>/chatbot.html
 - [OEN-S06 Do not ship HTML-only](../supporting/s06-do-not-ship-html-only.md)
 - [OEN-S09 Playwright three devices](../supporting/s09-playwright-desktop-iphone-pixel.md)
 
-## Prior art (Not novel)
-
-Turnstile and iframe chat are documented. This spec’s claim is wrapper-when-drift plus client sanitize plus FAQ-every-request plus what not to publish.
-

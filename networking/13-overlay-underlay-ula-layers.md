@@ -186,7 +186,3 @@ ssh -o ControlPath=none <user>@<cloud-vps> 'ip -4 addr; ip -6 addr; ip -6 route 
 - [OEN-S30 TS_DEBUG_MTU below 1280](../supporting/s30-ts-debug-mtu-below-1280.md)
 - [OEN-S31 prefixes.v6 needs backfillips](../supporting/s31-prefixes-v6-needs-backfillips.md)
 
-## Prior art (Not novel)
-
-Unique-local vs global is textbook IPv6. This spec’s claim is four layers in an overlay-plus-commercial-tunnel home, plus bind and backfill traps.
-

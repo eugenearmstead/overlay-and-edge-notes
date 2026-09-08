@@ -38,12 +38,6 @@ terms:
     expansion: Hypertext Transfer Protocol Secure
   - abbr: ICMP
     expansion: Internet Control Message Protocol
-  - abbr: IP
-    expansion: Internet Protocol
-  - abbr: IPv4
-    expansion: Internet Protocol version 4
-  - abbr: IPv6
-    expansion: Internet Protocol version 6
   - abbr: KB
     expansion: kilobyte
   - abbr: LAN
@@ -112,16 +106,12 @@ Fill this table **before** any live change. Do **not** paste real values back in
 ## Formulas
 
 ```text
-# Measure <wg-mtu> from: ip link show <wg-iface>
-mss4 = <wg-mtu> - 40    # IPv4 TCP (20-byte IP + 20-byte TCP)
-mss6 = <wg-mtu> - 60    # IPv6 TCP (40-byte IPv6 + 20-byte TCP)
-# IPv4 DF ping: IP size ≈ payload + 28
-# IPv6 DF ping: IP size ≈ payload + 48
-# Historical 1160 / 1146-byte SSH cliff = wrong-scope clamp, not this recipe.
+# LAN↔VPN explicit MSS (this page):
+mss4_wg = <wg-mtu> - 40
+mss6_wg = <wg-mtu> - 60
+# Historical 1160 / 1146-byte SSH cliff = wrong-scope clamp, not this recipe ([OEN-01](../networking/01-overlay-ssh-byte-cliff.md)).
 # LAN bridge MTU MUST stay 1500.
 ```
-
-See [OEN-01](../networking/01-overlay-ssh-byte-cliff.md) and [OEN-S01](../supporting/s01-pmtud-size-ladder.md).
 
 ## Method
 
@@ -197,8 +187,4 @@ TCPMSS  ...  clamp to PMTU  pkts:N
 - [OEN-01](../networking/01-overlay-ssh-byte-cliff.md)
 - [OEN-02](../networking/02-chromium-tls-pmtu.md)
 - [OEN-S01](s01-pmtud-size-ladder.md)
-
-## Prior art (Not novel)
-
-clamp-mss-to-pmtu is the man-page default. This note exists because commercial-VPN ICMP blackholes make it a no-op.
 

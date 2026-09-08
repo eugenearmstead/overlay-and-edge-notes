@@ -140,7 +140,3 @@ ssh -o ControlPath=none <user>@<exit-node> 'ss -u -n | awk "NR==1 || /:53/"'
 
 - [OEN-05](../networking/05-exit-peerapi-dns-stub.md)
 
-## Prior art (Not novel)
-
-Event-loop blocking is textbook. This note is PeerAPI stub + cellular DNS + recv-Q.
-

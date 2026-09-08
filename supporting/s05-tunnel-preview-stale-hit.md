@@ -129,7 +129,3 @@ cf-cache-status: HIT
 - [OEN-S04](s04-purge-cdn-after-deploy.md)
 - [OEN-09](../web/09-git-merge-is-not-a-live-worker.md)
 
-## Prior art (Not novel)
-
-CDN HIT is documented. This note is tunnel preview HIT with origin already new.
-

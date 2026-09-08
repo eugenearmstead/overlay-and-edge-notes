@@ -144,7 +144,3 @@ Fewer pointless GCP MTU changes.
 - [OEN-17](../networking/17-gcp-overlay-exit.md)
 - [OEN-16](../networking/16-commercial-wg-endpoint-rotation.md)
 
-## Prior art (Not novel)
-
-Different underlays are obvious. This note is the false “GCP exit is broken” when only Wi-Fi encapsulates.
-

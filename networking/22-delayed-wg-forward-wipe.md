@@ -159,7 +159,3 @@ ip6tables -C FORWARD -i <lan-bridge> -o <wg-iface> -j ACCEPT || ip6tables -I FOR
 - [OEN-S33 Router cron PATH](../supporting/s33-router-cron-path-set-e.md)
 - [OEN-16 Commercial WireGuard endpoint rotation](16-commercial-wg-endpoint-rotation.md)
 
-## Prior art (Not novel)
-
-Late-start VPN clients are known. This spec’s claim is FORWARD rewrite with **no** restart event minutes after boot.
-

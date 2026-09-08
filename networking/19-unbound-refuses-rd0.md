@@ -172,7 +172,3 @@ ssh -o ControlPath=none <user>@<exit-node> 'dig +time=2 +norecurse @127.0.0.1 ex
 - [OEN-14 Exit app DNS is PeerAPI](14-exit-dns-is-peerapi.md)
 - [OEN-23 Cloud-exit accept-dns](23-cloud-exit-accept-dns.md)
 
-## Prior art (Not novel)
-
-Unbound default recurse policy is documented. This spec’s claim is PeerAPI RD=0 plus dnsmasq-to-loopback as a false “Unbound down.”
-

@@ -131,7 +131,3 @@ ssh -o ControlPath=none <user>@<lan-pi> 'wc -c <small-snapshot>'
 - [OEN-01](../networking/01-overlay-ssh-byte-cliff.md)
 - [OEN-S03](s03-transfer-matrix-controlpath.md)
 
-## Prior art (Not novel)
-
-Chunked uploads are obvious. This note is overlay SSH byte-cliff as the reason.
-

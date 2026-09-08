@@ -166,7 +166,3 @@ example.com.  300  IN  A  ...
 - [OEN-S25 chrony NTS address-family](../supporting/s25-chrony-nts-address-family.md)
 - [OEN-16 Commercial WireGuard endpoint rotation](16-commercial-wg-endpoint-rotation.md)
 
-## Prior art (Not novel)
-
-Split-horizon DNS is old. This spec’s claim is host-must-live vs overlay-may-fail across commercial-tunnel down on the coordinator VPS.
-

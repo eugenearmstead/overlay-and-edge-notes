@@ -30,8 +30,6 @@ description: "A VPC allow for UDP 41641 does nothing while the overlay daemon ha
 terms:
   - abbr: ControlPath
     expansion: OpenSSH multiplexing socket path option
-  - abbr: GCP
-    expansion: Google Cloud Platform
   - abbr: LAN
     expansion: Local Area Network
   - abbr: OEN
@@ -144,8 +142,4 @@ UNCONN ... 0.0.0.0:41641
 
 - [OEN-17](../networking/17-gcp-overlay-exit.md)
 - [OEN-01](../networking/01-overlay-ssh-byte-cliff.md)
-
-## Prior art (Not novel)
-
-Allow UDP 41641 is in every overlay-on-GCP tutorial. This note is PORT=0 making that allow useless.
 

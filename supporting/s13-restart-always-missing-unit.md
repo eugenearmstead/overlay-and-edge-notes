@@ -125,7 +125,3 @@ N failed
 - [OEN-S18](s18-do-not-set-exit-on-agent-workstation.md)
 - [OEN-18](../networking/18-per-node-changelog-contract.md)
 
-## Prior art (Not novel)
-
-systemd Restart=always is documented. This note is missing ExecStart plus 150k restarts plus foreign binds on a 2-core box.
-

@@ -132,7 +132,3 @@ which iptables curl wg
 - [OEN-22](../networking/22-delayed-wg-forward-wipe.md)
 - [OEN-16](../networking/16-commercial-wg-endpoint-rotation.md)
 
-## Prior art (Not novel)
-
-cron PATH is a classic. This note is firmware PATH plus log() returning 1 under set -e.
-

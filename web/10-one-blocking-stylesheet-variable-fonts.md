@@ -164,7 +164,3 @@ CSS/JS/images MUST 200 ([OEN-S06](../supporting/s06-do-not-ship-html-only.md)). 
 - [OEN-S12 Rocket Loader Off](../supporting/s12-rocket-loader-off.md)
 - [OEN-09 Git merge is not a live Worker](09-git-merge-is-not-a-live-worker.md)
 
-## Prior art (Not novel)
-
-CWV and variable fonts are heavily blogged. This spec’s claim is the measured 77→72 extra link plus duplicate variable URLs plus LCP media-split contract.
-

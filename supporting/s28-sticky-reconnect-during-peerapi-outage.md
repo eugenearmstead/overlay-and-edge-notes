@@ -130,7 +130,3 @@ New clients work; stuck phones need a toggle, not a coordinator bounce.
 - [OEN-14](../networking/14-exit-dns-is-peerapi.md)
 - [OEN-05](../networking/05-exit-peerapi-dns-stub.md)
 
-## Prior art (Not novel)
-
-Sticky DNS caches are known. This note is reconnect-during-PeerAPI-outage staying stuck after heal.
-

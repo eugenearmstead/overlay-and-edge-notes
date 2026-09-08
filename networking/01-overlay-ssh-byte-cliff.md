@@ -3,7 +3,7 @@ id: OEN-01
 title: Overlay SSH stalls at a byte cliff
 kind: original
 status: active
-edition: 2
+edition: 3
 date_published: 2026-09-07
 author: Eugene Armstead
 author_url: https://www.armsteadent.com/
@@ -158,19 +158,20 @@ Fill this table **before** any `ip rule`, nft, or iptables change. Do **not** pa
 | `<overlay-v4>` | Overlay IPv4 of `<cloud-vps>` | — | Overlay; **never publish** |
 | `<overlay-v6>` | Overlay IPv6 of `<cloud-vps>` | — | Overlay; **never publish** |
 | `<wg-mtu>` | `ip link show <wg-iface>` MTU | Router | Integer from the box |
-| `<mss4>` | `wg-mtu - 40` | — | IPv4 TCP MSS (see Formulas) |
-| `<mss6>` | `wg-mtu - 60` | — | IPv6 TCP MSS |
+| `<mss4>` | `mss4_wg = <wg-mtu> - 40` | — | IPv4 TCP MSS on LAN↔VPN |
+| `<mss6>` | `mss6_wg = <wg-mtu> - 60` | — | IPv6 TCP MSS on LAN↔VPN |
 
 ## Formulas
 
 Measure `<wg-mtu>` from the live interface. Do not assume 1320. Do not use 1160 as the recipe.
 
 ```text
-# IPv4 TCP MSS = tunnel MTU minus 20-byte IPv4 header minus 20-byte TCP header
-mss4 = <wg-mtu> - 40
+# WireGuard / commercial-tunnel MSS (LAN↔VPN forward)
+mss4_wg = <wg-mtu> - 40
+mss6_wg = <wg-mtu> - 60
 
-# IPv6 TCP MSS = tunnel MTU minus 40-byte IPv6 header minus 20-byte TCP header
-mss6 = <wg-mtu> - 60
+# Overlay tun riding commercial WireGuard (double encapsulation)
+mss4_overlay_over_wg = min(<overlay-tun-mtu>, <wg-mtu> - <overlay-underlay-overhead>) - 40
 
 # Don't-fragment ping payload vs IP packet size ([OEN-S01](../supporting/s01-pmtud-size-ladder.md))
 # IPv4: IP size ≈ payload + 28   (20 IP + 8 ICMP)
@@ -179,8 +180,9 @@ mss6 = <wg-mtu> - 60
 # Historical 1146-byte overlay SSH cliff (evidence of WRONG SCOPE, not the fix):
 #   global or WAN→overlay-return  --set-mss 1160
 #   ≈ 1160 minus TCP/IP overhead in the userspace SSH path
-# LAN↔VPN explicit MSS uses <mss4>/<mss6> (or a slightly smaller explicit value
-# if TCP options eat payload). Example when <wg-mtu> is 1320: mss4=1280, mss6=1260.
+# LAN↔VPN explicit MSS uses mss4_wg / mss6_wg (placeholders <mss4>/<mss6>).
+# Example when <wg-mtu> is 1320: mss4_wg=1280, mss6_wg=1260.
+# LAN bridge MUST stay 1500.
 ```
 
 ## Decision
@@ -287,7 +289,7 @@ Preconditions: overlay SSH login to `<cloud-vps>` and `<lan-pi>` already works f
    - **On failure:** Re-audit after exit-node scripts redeploy; bad clamps come back. Changelog that node ([OEN-18](18-per-node-changelog-contract.md)).
 
 7. **P7 — Keep LAN 1500; explicit `--set-mss` only on LAN↔VPN forward.**
-   - **Action:** Confirm the LAN bridge MTU is 1500. On LAN↔`<wg-iface>` FORWARD (v4 and v6), use explicit TCPMSS. Do **not** use `--clamp-mss-to-pmtu`.
+   - **Action:** Confirm the LAN bridge MTU is 1500. On LAN↔`<wg-iface>` FORWARD (v4 and v6), use explicit TCPMSS from **mss4_wg / mss6_wg**. Do **not** use `--clamp-mss-to-pmtu`.
 
      ```bash
      ip link show <lan-bridge>
@@ -379,6 +381,10 @@ PING <target> (<target>) 1292(1320) bytes of data.
 - [OEN-04 Exit-node TCP maximum-segment-size clamp after ts-forward never runs](04-exit-tcpmss-after-ts-forward.md)
 - [OEN-16 Commercial WireGuard endpoint rotation](16-commercial-wg-endpoint-rotation.md)
 - [OEN-18 Per-node changelog contract](18-per-node-changelog-contract.md)
+
+## Page changelog
+
+- Edition 3 (8 Sep 2026, Mountain Time): Two MSS formula families (`mss4_wg` vs `mss4_overlay_over_wg`); 1160/1146 remains wrong-scope evidence only.
 
 ## Prior art (Not novel)
 

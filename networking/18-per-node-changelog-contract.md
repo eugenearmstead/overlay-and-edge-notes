@@ -187,6 +187,3 @@ Placeholders: `<node>` is a role, not a hostname. `<repo-changelog>` is the cano
 - [OEN-16 Commercial WireGuard endpoint rotation](16-commercial-wg-endpoint-rotation.md)
 - [OEN-17 Google Cloud overlay exit](17-gcp-overlay-exit.md)
 
-## Prior art (Not novel)
-
-Dated changelogs and “docs next to the code” are ordinary. This spec’s claim is the **two-copy contract** with class-specific on-device paths, mandatory hash, timezone labeling, and a ban on fake precision.

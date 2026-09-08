@@ -141,7 +141,3 @@ tmpfs   ...  /srv/ram-origin
 - [OEN-S06](s06-do-not-ship-html-only.md)
 - [OEN-10](../web/10-one-blocking-stylesheet-variable-fonts.md)
 
-## Prior art (Not novel)
-
-tmpfs origins are known. This note is disk-then-RAM plus wrong-tree HTML-only.
-

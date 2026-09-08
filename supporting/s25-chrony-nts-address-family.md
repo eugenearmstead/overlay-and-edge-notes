@@ -137,7 +137,3 @@ ssh -o ControlPath=none <user>@<cloud-vps> 'chronyd --version; chronyc sources |
 
 - [OEN-15](../networking/15-split-host-vs-overlay-resolver.md)
 
-## Prior art (Not novel)
-
-NTS is documented. This note is distro chrony rejecting address-family flags.
-

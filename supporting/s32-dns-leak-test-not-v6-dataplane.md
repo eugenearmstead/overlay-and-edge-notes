@@ -150,7 +150,3 @@ curl -6 --max-time 8 -sS -o /dev/null -w '%{http_code}\n' https://example.com
 - [OEN-06](../networking/06-netfilter-off-v6-return.md)
 - [OEN-14](../networking/14-exit-dns-is-peerapi.md)
 
-## Prior art (Not novel)
-
-DNS vs data plane is textbook. This note is leak-test green specifically.
-

@@ -135,7 +135,3 @@ ssh -o ControlPath=none <user>@<cloud-vps> 'tailscale ip -6 || true'
 
 - [OEN-13](../networking/13-overlay-underlay-ula-layers.md)
 
-## Prior art (Not novel)
-
-Prefix enable is documented. This note is existing nodes needing backfillips --force.
-

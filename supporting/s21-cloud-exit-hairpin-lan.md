@@ -49,8 +49,6 @@ terms:
     expansion: Uniform Resource Locator
   - abbr: VM
     expansion: virtual machine
-  - abbr: VPN
-    expansion: Virtual Private Network
 ---
 
 # Cloud exit hairpins home LAN HTTP while overlay SSH still works
@@ -145,8 +143,4 @@ overlay-ssh-ok
 
 - [OEN-17](../networking/17-gcp-overlay-exit.md)
 - [OEN-S18](s18-do-not-set-exit-on-agent-workstation.md)
-
-## Prior art (Not novel)
-
-VPN hairpin is known. This note is cloud overlay exit vs LAN HTTP with SSH still up.
 

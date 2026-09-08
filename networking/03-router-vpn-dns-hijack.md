@@ -31,8 +31,6 @@ terms:
     expansion: ASUS consumer-router firmware family
   - abbr: Chromium
     expansion: open-source browser engine
-  - abbr: DF
-    expansion: don't-fragment (IP flag)
   - abbr: DHCP
     expansion: Dynamic Host Configuration Protocol
   - abbr: DNAT
@@ -47,10 +45,6 @@ terms:
     expansion: Hypertext Transfer Protocol Secure
   - abbr: ICMP
     expansion: Internet Control Message Protocol
-  - abbr: IP
-    expansion: Internet Protocol
-  - abbr: IPv4
-    expansion: Internet Protocol version 4
   - abbr: IPv6
     expansion: Internet Protocol version 6
   - abbr: LAN
@@ -65,8 +59,6 @@ terms:
     expansion: nftables (Linux packet filter)
   - abbr: OEN
     expansion: Overlay and Edge Notes
-  - abbr: PMTU
-    expansion: path Maximum Transmission Unit
   - abbr: RA
     expansion: Router Advertisement (IPv6)
   - abbr: REFUSED
@@ -120,16 +112,12 @@ Fill this table **before** any live change. Do **not** paste real values back in
 ## Formulas
 
 ```text
-# Measure <wg-mtu> from: ip link show <wg-iface>
-mss4 = <wg-mtu> - 40    # IPv4 TCP (20-byte IP + 20-byte TCP)
-mss6 = <wg-mtu> - 60    # IPv6 TCP (40-byte IPv6 + 20-byte TCP)
-# IPv4 DF ping: IP size ≈ payload + 28
-# IPv6 DF ping: IP size ≈ payload + 48
-# Historical 1160 / 1146-byte SSH cliff = wrong-scope clamp, not this recipe.
+# This trap is DNS, not MSS. Do not compute mss4 on this page.
+# After hijack is ruled out, LAN↔VPN clamp uses mss4_wg ([OEN-02](02-chromium-tls-pmtu.md)):
+#   mss4_wg = <wg-mtu> - 40
+#   mss6_wg = <wg-mtu> - 60
 # LAN bridge MTU MUST stay 1500.
 ```
-
-See [OEN-01](../networking/01-overlay-ssh-byte-cliff.md) and [OEN-S01](../supporting/s01-pmtud-size-ladder.md).
 
 ## Decision
 
@@ -226,8 +214,4 @@ example.com.  0  IN  A  0.0.0.0
 - [OEN-02 Chromium TLS vs curl](02-chromium-tls-pmtu.md)
 - [OEN-S24 LAN DNS returning 0.0.0.0](../supporting/s24-lan-dns-sinkhole-0-0-0-0.md)
 - [OEN-16 Commercial WireGuard endpoint rotation](16-commercial-wg-endpoint-rotation.md)
-
-## Prior art (Not novel)
-
-VPN DNS on routers is a known footgun. This spec’s claim is that Merlin-class DNSVPN2 hijack **mimics** browser PMTU, so MSS-first diagnosis is wrong.
 

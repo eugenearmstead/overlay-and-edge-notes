@@ -220,7 +220,3 @@ udp  UNCONN  0  0  <overlay-v4>:53  0.0.0.0:*
 - [OEN-S29 PeerAPI stub event-loop](../supporting/s29-peerapi-stub-event-loop.md)
 - [OEN-S32 DNS leak-test vs data plane](../supporting/s32-dns-leak-test-not-v6-dataplane.md)
 
-## Prior art (Not novel)
-
-“Use local DNS for exit” is in public overlay docs. They rarely say loopback-only, dynamic PeerAPI port, RD=1, and non-blocking upstream as one contract.
-

@@ -195,7 +195,3 @@ MUST NOT `restart` the WireGuard client from a watchdog ([OEN-22](22-delayed-wg-
 - [OEN-S33 Router cron PATH](../supporting/s33-router-cron-path-set-e.md)
 - [OEN-S14 Broadcom in-kernel WireGuard SUnreclaim](../supporting/s14-broadcom-wg-sunreclaim.md)
 
-## Prior art (Not novel)
-
-Missing FORWARD is a classic NAT router bug. This spec’s claim is phantom guest-bridge allow plus helper wipe as the Merlin-class pattern.
-

@@ -148,7 +148,3 @@ ssh -o ControlPath=none <user>@<exit-node> 'echo openssh-ok'
 - [OEN-17](../networking/17-gcp-overlay-exit.md)
 - [OEN-S23](s23-vpc-41641-useless-while-port-0.md)
 
-## Prior art (Not novel)
-
-IAP and OpenSSH are documented. This note is KEX-fail on some GCE images plus never reset.
-

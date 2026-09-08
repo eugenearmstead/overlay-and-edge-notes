@@ -186,7 +186,3 @@ MUST NOT set exit-node on the agent workstation ([OEN-S18](../supporting/s18-do-
 - [OEN-23 Cloud-exit accept-dns](23-cloud-exit-accept-dns.md)
 - [OEN-S28 Sticky reconnect during PeerAPI outage](../supporting/s28-sticky-reconnect-during-peerapi-outage.md)
 
-## Prior art (Not novel)
-
-Public docs say “local DNS for exit.” They rarely document PeerAPI DoH vs coordinator Unbound as two planes.
-

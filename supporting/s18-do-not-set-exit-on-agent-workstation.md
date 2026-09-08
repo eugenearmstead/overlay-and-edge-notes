@@ -138,7 +138,3 @@ Agent sessions keep internet. Exit tests still happen on a Pi.
 - [OEN-17](../networking/17-gcp-overlay-exit.md)
 - [OEN-S21](s21-cloud-exit-hairpin-lan.md)
 
-## Prior art (Not novel)
-
-Exit nodes are documented. This note is “not on the agent workstation” as a hard MUST NOT.
-

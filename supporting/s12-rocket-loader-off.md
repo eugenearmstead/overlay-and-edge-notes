@@ -123,7 +123,3 @@ Inline GA and smoke selectors match source.
 - [OEN-09](../web/09-git-merge-is-not-a-live-worker.md)
 - [OEN-S04](s04-purge-cdn-after-deploy.md)
 
-## Prior art (Not novel)
-
-Cloudflare documents Rocket Loader. This note is Off as a contract for inline-script sites.
-

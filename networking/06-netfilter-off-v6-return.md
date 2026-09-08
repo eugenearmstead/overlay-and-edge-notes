@@ -214,7 +214,3 @@ MUST NOT split nft MASQUERADE and ip6tables MASQUERADE. MUST NOT add a second `-
 - [OEN-S32 DNS leak-test vs data plane](../supporting/s32-dns-leak-test-not-v6-dataplane.md)
 - [OEN-13 Overlay vs underlay vs unique-local](13-overlay-underlay-ula-layers.md)
 
-## Prior art (Not novel)
-
-Policy routing and table 52 appear in overlay exit docs. This spec’s claim is netfilter-off + nft mark missing the first FIB lookup + missing v6 /48 + split MASQUERADE as one failure cluster.
-

@@ -187,6 +187,3 @@ src/ui.js:42: fetch('http://127.0.0.1:7450/ingest/…'
 - [OEN-S05 Tunnel preview HIT with a stale body](../supporting/s05-tunnel-preview-stale-hit.md)
 - [OEN-S06 Do not ship HTML-only](../supporting/s06-do-not-ship-html-only.md)
 
-## Prior art (Not novel)
-
-Local Network Access prompts and “don’t call localhost from production” are known. This spec’s claim is the **agent-ingest + Worker HTML** failure mode: templates designed for a desktop debug port leaking onto a public HTTPS response.

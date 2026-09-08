@@ -133,7 +133,3 @@ for u in <live-url> <live-url>/<site.css>; do curl -sS -o /dev/null -w '%{http_c
 - [OEN-S08](s08-canonical-disk-tmpfs-origin.md)
 - [OEN-10](../web/10-one-blocking-stylesheet-variable-fonts.md)
 
-## Prior art (Not novel)
-
-Broken asset 404s are obvious in hindsight. This note exists because they present as design bugs.
-

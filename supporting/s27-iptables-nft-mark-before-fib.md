@@ -156,7 +156,3 @@ ip6tables -t mangle -L PREROUTING -n -v
 
 - [OEN-06](../networking/06-netfilter-off-v6-return.md)
 
-## Prior art (Not novel)
-
-Policy routing is documented. This note is iptables-nft mark missing the first FIB lookup.
-

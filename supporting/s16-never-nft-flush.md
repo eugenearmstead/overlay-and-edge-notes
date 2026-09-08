@@ -147,7 +147,3 @@ systemctl is-enabled nftables.service || true
 - [OEN-06](../networking/06-netfilter-off-v6-return.md)
 - [OEN-07](../networking/07-crowdsec-capi-403.md)
 
-## Prior art (Not novel)
-
-nft flush is an obvious footgun. This note is the coexistence with UFW, CrowdSec, and exit tables.
-

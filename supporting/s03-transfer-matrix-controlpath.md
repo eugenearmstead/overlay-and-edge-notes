@@ -17,7 +17,7 @@ keywords:
   - "large scp hang overlay"
   - "OpenSSH vs Tailscale SSH"
   - "transfer size matrix"
-  - "overlay SSH 1146 bytes"
+  - "overlay SSH 3 KB hang"
   - "do not trust mux hang"
   - "ControlMaster stale socket"
   - "path MTU SSH proof"
@@ -29,18 +29,10 @@ description: "Prove overlay SSH size: 1 KB vs about 1 MB with ControlPath=none. 
 terms:
   - abbr: ControlPath
     expansion: OpenSSH multiplexing socket path option
-  - abbr: DF
-    expansion: don't-fragment (IP flag)
   - abbr: HTTPS
     expansion: Hypertext Transfer Protocol Secure
   - abbr: ICMP
     expansion: Internet Control Message Protocol
-  - abbr: IP
-    expansion: Internet Protocol
-  - abbr: IPv4
-    expansion: Internet Protocol version 4
-  - abbr: IPv6
-    expansion: Internet Protocol version 6
   - abbr: KB
     expansion: kilobyte
   - abbr: LAN
@@ -67,6 +59,8 @@ terms:
     expansion: Virtual Private Server
   - abbr: WAN
     expansion: Wide Area Network
+  - abbr: VPN
+    expansion: VPN
 ---
 
 # 1 KB vs 1 MB transfer matrix + ControlPath=none
@@ -106,16 +100,13 @@ Fill this table **before** any live change. Do **not** paste real values back in
 ## Formulas
 
 ```text
-# Measure <wg-mtu> from: ip link show <wg-iface>
-mss4 = <wg-mtu> - 40    # IPv4 TCP (20-byte IP + 20-byte TCP)
-mss6 = <wg-mtu> - 60    # IPv6 TCP (40-byte IPv6 + 20-byte TCP)
-# IPv4 DF ping: IP size ≈ payload + 28
-# IPv6 DF ping: IP size ≈ payload + 48
-# Historical 1160 / 1146-byte SSH cliff = wrong-scope clamp, not this recipe.
+# Size matrix is not an MSS recipe. If you then clamp LAN↔VPN, use:
+mss4_wg = <wg-mtu> - 40
+mss6_wg = <wg-mtu> - 60
 # LAN bridge MTU MUST stay 1500.
 ```
 
-See [OEN-01](../networking/01-overlay-ssh-byte-cliff.md) and [OEN-S01](../supporting/s01-pmtud-size-ladder.md).
+See [OEN-01](../networking/01-overlay-ssh-byte-cliff.md) and [OEN-S01](s01-pmtud-size-ladder.md).
 
 ## Method
 
@@ -190,8 +181,4 @@ ssh -o ControlPath=none <user>@<lan-pi> 'dd if=/dev/zero bs=1024 count=1024 stat
 
 - [OEN-01](../networking/01-overlay-ssh-byte-cliff.md)
 - [OEN-S19](s19-push-small-overlay-snapshots.md)
-
-## Prior art (Not novel)
-
-SSH mux docs are public. This method is the size matrix plus userspace-vs-kernel split.
 

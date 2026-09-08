@@ -44,8 +44,6 @@ terms:
     expansion: Hypertext Transfer Protocol Secure
   - abbr: ICMP
     expansion: Internet Control Message Protocol
-  - abbr: IP
-    expansion: Internet Protocol
   - abbr: IPv4
     expansion: Internet Protocol version 4
   - abbr: IPv6
@@ -138,16 +136,15 @@ Fill this table **before** any live change. Do **not** paste real values back in
 ## Formulas
 
 ```text
-# Measure <wg-mtu> from: ip link show <wg-iface>
-mss4 = <wg-mtu> - 40    # IPv4 TCP (20-byte IP + 20-byte TCP)
-mss6 = <wg-mtu> - 60    # IPv6 TCP (40-byte IPv6 + 20-byte TCP)
-# IPv4 DF ping: IP size ≈ payload + 28
-# IPv6 DF ping: IP size ≈ payload + 48
-# Historical 1160 / 1146-byte SSH cliff = wrong-scope clamp, not this recipe.
+# LAN↔VPN Chromium path uses the WireGuard family (not overlay-over-WireGuard).
+mss4_wg = <wg-mtu> - 40
+mss6_wg = <wg-mtu> - 60
+mss4_overlay_over_wg = min(<overlay-tun-mtu>, <wg-mtu> - <overlay-underlay-overhead>) - 40
+# P-steps on this page that insert TCPMSS use mss4_wg / mss6_wg.
 # LAN bridge MTU MUST stay 1500.
 ```
 
-See [OEN-01](../networking/01-overlay-ssh-byte-cliff.md) and [OEN-S01](../supporting/s01-pmtud-size-ladder.md).
+See [OEN-01](01-overlay-ssh-byte-cliff.md) and [OEN-S01](../supporting/s01-pmtud-size-ladder.md).
 
 ## Decision
 
@@ -257,8 +254,4 @@ ping: local error: message too long, mtu=1320
 - [OEN-03 Router VPN DNS hijack](03-router-vpn-dns-hijack.md)
 - [OEN-S01 Don't-fragment ping size ladder](../supporting/s01-pmtud-size-ladder.md)
 - [OEN-S02 clamp-mss-to-pmtu is a no-op](../supporting/s02-clamp-mss-to-pmtu-noop.md)
-
-## Prior art (Not novel)
-
-Chromium ClientHello size versus curl is partly documented. This spec’s claim is the combo: do not trust curl, do not shrink the LAN, check DNS hijack first, and use explicit `--set-mss`.
 

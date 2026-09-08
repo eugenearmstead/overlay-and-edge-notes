@@ -151,7 +151,3 @@ cf-cache-status: HIT
 - [OEN-S07 Git merge 405 pending](../supporting/s07-git-merge-405-pending.md)
 - [OEN-S12 Rocket Loader Off](../supporting/s12-rocket-loader-off.md)
 
-## Prior art (Not novel)
-
-Cloudflare Git builds and Wrangler are documented. This spec’s claim is the timed fallback plus purge-token gap plus preview HIT-stale as one ops contract.
-

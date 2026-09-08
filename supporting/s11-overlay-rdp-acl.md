@@ -136,7 +136,3 @@ LISTEN 0  ... *:3389
 - [OEN-01](../networking/01-overlay-ssh-byte-cliff.md)
 - [OEN-13](../networking/13-overlay-underlay-ula-layers.md)
 
-## Prior art (Not novel)
-
-RDP and Tailscale ACLs are documented. This note is session-mirror + no-deny ACL holes as overlay access, not SSH-only.
-

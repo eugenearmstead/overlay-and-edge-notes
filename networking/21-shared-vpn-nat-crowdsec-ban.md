@@ -171,7 +171,3 @@ ssh -o ControlPath=none <user>@<cloud-vps> 'echo overlay-ok'
 - [OEN-16 Commercial WireGuard endpoint rotation](16-commercial-wg-endpoint-rotation.md)
 - [OEN-01 Overlay SSH byte cliff](01-overlay-ssh-byte-cliff.md)
 
-## Prior art (Not novel)
-
-CrowdSec bans by source IP are documented. This spec’s claim is shared commercial-VPN NAT as a whole-house outage while overlay UDP still works.
-

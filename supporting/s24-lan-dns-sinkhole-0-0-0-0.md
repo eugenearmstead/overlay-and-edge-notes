@@ -143,7 +143,3 @@ dig +short @<lan-resolver> <name>
 - [OEN-03](../networking/03-router-vpn-dns-hijack.md)
 - [OEN-10](../web/10-one-blocking-stylesheet-variable-fonts.md)
 
-## Prior art (Not novel)
-
-DNS sinkholes are known. This note is LAN 0.0.0.0 vs DoH plus workstation-only hosts.
-

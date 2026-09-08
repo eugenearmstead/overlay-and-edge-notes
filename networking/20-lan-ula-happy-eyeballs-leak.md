@@ -176,7 +176,3 @@ MUST NOT keep changing GCP MTU for this split ([OEN-17](17-gcp-overlay-exit.md))
 - [OEN-S26 Wi-Fi vs cellular underlay](../supporting/s26-wifi-vs-cellular-underlay.md)
 - [OEN-S18 Do not set exit on the agent workstation](../supporting/s18-do-not-set-exit-on-agent-workstation.md)
 
-## Prior art (Not novel)
-
-Happy-Eyeballs v6 preference is documented. This spec’s claim is LAN ULA default versus a selected remote exit as a false “cloud exit is half-broken.”
-

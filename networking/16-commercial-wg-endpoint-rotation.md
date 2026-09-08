@@ -119,6 +119,8 @@ Egress: curl -6 --interface <tunnel-ula>    MUST match that endpoint's site pref
 
 Handshake stale / hop interval / cooldown are operator-tuned. `PersistentKeepalive = 25` is the usual NAT keepalive. Endpoint MUST be an IPv6 **literal**, never FQDN.
 
+No supporting method ID is wired: `backs` / `backed_by` stay empty; the copy-paste on this page is the method.
+
 ## Decision
 
 A commercial WireGuard client that must stay up across endpoint failure MUST implement all of:
@@ -227,6 +229,3 @@ persistent keepalive: every 25 seconds
 - [OEN-S26 Wi-Fi vs cellular underlay](../supporting/s26-wifi-vs-cellular-underlay.md)
 - [OEN-S33 Consumer-router cron PATH](../supporting/s33-router-cron-path-set-e.md)
 
-## Prior art (Not novel)
-
-Handshake-age failover and scheduled hops are documented in generic WireGuard ops posts. This spec’s claim is IPv6-literal endpoints plus WAN-vs-tunnel health split plus site-prefix egress bind plus shuffle bag plus Pi hub watch as one contract.

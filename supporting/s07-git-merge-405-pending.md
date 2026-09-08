@@ -128,7 +128,3 @@ Fewer false “token dead” pages. Real 401 still surfaces fast.
 
 - [OEN-09](../web/09-git-merge-is-not-a-live-worker.md)
 
-## Prior art (Not novel)
-
-GitLab mergeability is documented. This note is 405-as-timing versus 401-as-dead-token.
-

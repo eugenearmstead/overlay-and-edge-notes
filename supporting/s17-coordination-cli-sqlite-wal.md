@@ -137,7 +137,3 @@ ok
 - [OEN-14](../networking/14-exit-dns-is-peerapi.md)
 - [OEN-S19](s19-push-small-overlay-snapshots.md)
 
-## Prior art (Not novel)
-
-SQLite WAL blocking is known. This note is coordination CLI vs /health as the health contract.
-

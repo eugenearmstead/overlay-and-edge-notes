@@ -126,8 +126,8 @@ Diagnose with one dummy enroll POST per address family. Remove A-record hosts pi
 ```bash
 ssh -o ControlPath=none <user>@<cloud-vps> 'systemctl is-active crowdsec; grep -n crowdsec /etc/hosts || true'
 # Dummy enroll POST (no credentials) v4 vs v6 — expect 401 (accepted path) vs 403 (banned family)
-curl -4 -sS -o /dev/null -w '%{http_code}\n' --max-time 15 -X POST https://api.crowdsec.net/v2/watchers
-curl -6 -sS -o /dev/null -w '%{http_code}\n' --max-time 15 -X POST https://api.crowdsec.net/v2/watchers
+curl -4 -sS -o /dev/null -w '%{http_code}\n' --max-time 15 -X POST https://api.crowdsec.net/v3/watchers/enroll
+curl -6 -sS -o /dev/null -w '%{http_code}\n' --max-time 15 -X POST https://api.crowdsec.net/v3/watchers/enroll
 ```
 
 MUST NOT loop `cscli capi status`. Nested probes MUST read a cache ([OEN-S34](../supporting/s34-crowdsec-capi-login-budget.md)).
@@ -183,8 +183,4 @@ MUST NOT loop `cscli capi status`. Nested probes MUST read a cache ([OEN-S34](..
 - [OEN-S34 CrowdSec free-tier CAPI login budget](../supporting/s34-crowdsec-capi-login-budget.md)
 - [OEN-21 Shared VPN NAT house ban](21-shared-vpn-nat-crowdsec-ban.md)
 - [OEN-15 Split host vs overlay resolver](15-split-host-vs-overlay-resolver.md)
-
-## Prior art (Not novel)
-
-Docker healthcheck CAPI bans are documented. This spec’s claim is native systemd + fleet collector + hosts A-pin + 401/403 dummy matrix without more cscli.
 

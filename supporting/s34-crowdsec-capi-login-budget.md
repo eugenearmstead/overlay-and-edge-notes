@@ -3,7 +3,7 @@ id: "OEN-S34"
 title: "CrowdSec free-tier Central API login budget"
 kind: "supporting"
 status: "active"
-edition: 2
+edition: 3
 date_published: "2026-09-08"
 author: "Eugene Armstead"
 author_url: "https://www.armsteadent.com/"
@@ -53,13 +53,17 @@ terms:
     expansion: Linux service manager
   - abbr: VPS
     expansion: Virtual Private Server
+  - abbr: SSH
+    expansion: SSH
+  - abbr: URL
+    expansion: URL
 ---
 
 # CrowdSec free-tier Central API login budget
 
 ## Context
 
-Method behind [OEN-07](../networking/07-crowdsec-capi-403.md). Docker healthchecks are documented; native systemd+collector is the unique stack.
+Method behind [OEN-07](../networking/07-crowdsec-capi-403.md). Docker healthchecks are documented. Native systemd+collector is the unique stack. About **20 Central API logins / 50 minutes / source IP → HTTP 403 for about an hour** is an **observed free-tier** order of magnitude, not a substitute for CrowdSec’s current published limits.
 
 ## Topology
 
@@ -71,11 +75,12 @@ Fill this table **before** any live change. Do **not** paste real values back in
 
 | Placeholder | Operator fills | Class |
 |-------------|----------------|-------|
-| *(none)* | No packet-path Bind for this trap | Use the git host, origin, or API the operator already has |
+| `<cloud-vps>` | Native CrowdSec host | Cloud VPS |
+| `<user>` | SSH user if you inspect the host | Guest account |
 
 ## Method
 
-Cache CAPI status. Nested SLI probes MUST skip live cscli. Dummy enroll POST for 401 vs 403 without more logins.
+Cache CAPI status. Nested SLI probes MUST skip live cscli. For 401 vs 403, reuse the **same** unauthenticated enroll request as [OEN-07](../networking/07-crowdsec-capi-403.md) — a dummy POST is not a different test.
 
 ## Consequences
 
@@ -94,24 +99,27 @@ The VPS IPv4 can cool down. IPv6 may still be 401.
 ### Copy-paste commands (after Bind)
 
 ```bash
-curl -4 -sS -o /dev/null -w '%{http_code}\n' --max-time 15 -X POST https://api.crowdsec.net/v2/watchers
-curl -6 -sS -o /dev/null -w '%{http_code}\n' --max-time 15 -X POST https://api.crowdsec.net/v2/watchers
+# Same unauthenticated enroll POST as OEN-07 (no credentials)
+curl -4 -sS -o /dev/null -w '%{http_code}\n' --max-time 15 -X POST https://api.crowdsec.net/v3/watchers/enroll
+curl -6 -sS -o /dev/null -w '%{http_code}\n' --max-time 15 -X POST https://api.crowdsec.net/v3/watchers/enroll
 ```
 
 1. **P1 — Stop the loop.**
    - **Action:** Disable repeating cscli capi status.
    - **Expected:** No further logins this window.
    - **On failure:** Retries keep the 403.
-2. **P2 — Dummy POST matrix.**
-   - **Action:** Unauthenticated enroll POST v4 vs v6 ([OEN-07](../networking/07-crowdsec-capi-403.md)).
-   - **Expected:** 401 vs 403 per family.
-   - **On failure:** No credentials.
+2. **P2 — Same enroll POST as OEN-07.**
+   - **Action:** Unauthenticated enroll POST v4 vs v6 — copy [OEN-07](../networking/07-crowdsec-capi-403.md), do not invent a second dummy URL.
+   - **Expected:** 401 = that source IP is accepted. 403 = that source IP is banned. That meaning comes from OEN-07, not from a different POST.
+   - **On failure:** Do not put credentials on the dummy POST.
 3. **P3 — Cache.**
    - **Action:** Health reads cache or logs. Far below ~20/50 min.
    - **Expected:** Collector quiet.
    - **On failure:** One cscli after hosts unpin if needed.
 
 ## Expected samples
+
+Stdout of the copy-paste block (one code per family):
 
 ```text
 403
@@ -140,5 +148,5 @@ curl -6 -sS -o /dev/null -w '%{http_code}\n' --max-time 15 -X POST https://api.c
 
 ## Prior art (Not novel)
 
-CrowdSec documents the free-tier login budget. This note is cache-and-dummy-POST as the native-host contract.
+[CrowdSec documentation](https://docs.crowdsec.net/) covers Central API enrollment and health. This note is the native-host cache contract and the observed free-tier login budget.
 

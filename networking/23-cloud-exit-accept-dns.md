@@ -180,7 +180,3 @@ ssh -o ControlPath=none <user>@<exit-node> 'tailscale status --json | head -c 20
 - [OEN-19 Unbound REFUSES RD=0](19-unbound-refuses-rd0.md)
 - [OEN-S18 Do not set exit on the agent workstation](../supporting/s18-do-not-set-exit-on-agent-workstation.md)
 
-## Prior art (Not novel)
-
-accept-dns is a documented overlay flag. This spec’s claim is pretty-print versus PeerAPI RD=0 on GCE-like exit VMs.
-

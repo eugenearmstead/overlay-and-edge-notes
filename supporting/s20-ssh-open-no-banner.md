@@ -140,7 +140,3 @@ ssh -o ControlPath=none -o ConnectTimeout=8 <user>@<router-overlay> 'echo banner
 - [OEN-12](../networking/12-consumer-wg-phantom-bridge.md)
 - [OEN-14](../networking/14-exit-dns-is-peerapi.md)
 
-## Prior art (Not novel)
-
-TCP open vs application banner is textbook. This note is router userspace + PeerAPI dying together.
-

@@ -128,7 +128,3 @@ cf-cache-status: HIT
 - [OEN-09](../web/09-git-merge-is-not-a-live-worker.md)
 - [OEN-S05](s05-tunnel-preview-stale-hit.md)
 
-## Prior art (Not novel)
-
-Cloudflare purge docs exist. This note is the Workers-edit token gap plus ?v= does not replace HTML purge.
-

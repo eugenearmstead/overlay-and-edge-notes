@@ -3,7 +3,7 @@ id: "OEN-04"
 title: "Exit-node TCP maximum-segment-size clamp after ts-forward never runs"
 kind: "original"
 status: "active"
-edition: 2
+edition: 3
 date_published: "2026-09-08"
 author: "Eugene Armstead"
 author_url: "https://www.armsteadent.com/"
@@ -30,8 +30,6 @@ description: "TCPMSS rules in FORWARD after jump ts-forward never see exit SYNs;
 terms:
   - abbr: CLI
     expansion: command-line interface
-  - abbr: DF
-    expansion: don't-fragment (IP flag)
   - abbr: DNS
     expansion: Domain Name System
   - abbr: FORWARD
@@ -44,8 +42,6 @@ terms:
     expansion: Hypertext Transfer Protocol Secure
   - abbr: ICMP
     expansion: Internet Control Message Protocol
-  - abbr: IP
-    expansion: Internet Protocol
   - abbr: IPv4
     expansion: Internet Protocol version 4
   - abbr: IPv6
@@ -76,6 +72,10 @@ terms:
     expansion: virtual machine
   - abbr: WAN
     expansion: Wide Area Network
+  - abbr: MSS
+    expansion: MSS
+  - abbr: WG
+    expansion: WireGuard
 ---
 
 # Exit-node TCP maximum-segment-size clamp after ts-forward never runs
@@ -107,27 +107,30 @@ Fill this table **before** any live change. Do **not** paste real values back in
 | `<overlay-peer>` | Soak client (**not** the agent workstation) | LAN Pi |
 | `<user>` | SSH user | Guest |
 | `<overlay-tun>` | Overlay tun on the exit | Iface |
+| `<overlay-tun-mtu>` | `ip link show <overlay-tun>` MTU | Integer from the box |
+| `<wg-mtu>` | Commercial WireGuard MTU if the underlay is WG | Integer; omit if no WG underlay |
+| `<overlay-underlay-overhead>` | Extra bytes overlay adds on the WG path | Integer the operator measures |
 | `<gcp-nic>` | Public NIC on a Google Cloud guest | Iface; omit on non-GCP exits |
 | `<wan-iface>` | WAN / public NIC | Iface |
-| `<mss4>` / `<mss6>` | Computed from underlay or overlay tun MTU | Formulas |
+| `<mss4>` | `mss4_overlay_over_wg` (or `mss4_wg` if no overlay-over-WG) | Formulas |
+| `<mss6>` | `mss6_wg` analogue: `<wg-mtu> - 60` or overlay-tun family | Formulas |
 
 ## Formulas
 
 ```text
-# Measure <wg-mtu> from: ip link show <wg-iface>
-mss4 = <wg-mtu> - 40    # IPv4 TCP (20-byte IP + 20-byte TCP)
-mss6 = <wg-mtu> - 60    # IPv6 TCP (40-byte IPv6 + 20-byte TCP)
-# IPv4 DF ping: IP size ≈ payload + 28
-# IPv6 DF ping: IP size ≈ payload + 48
-# Historical 1160 / 1146-byte SSH cliff = wrong-scope clamp, not this recipe.
+mss4_wg = <wg-mtu> - 40
+mss6_wg = <wg-mtu> - 60
+mss4_overlay_over_wg = min(<overlay-tun-mtu>, <wg-mtu> - <overlay-underlay-overhead>) - 40
+# P2–P3 on this page use mss4_overlay_over_wg (exit SYN on overlay→WAN).
+# Do not use a global FORWARD clamp; that is the OEN-01 cliff.
 # LAN bridge MTU MUST stay 1500.
 ```
 
-See [OEN-01](../networking/01-overlay-ssh-byte-cliff.md) and [OEN-S01](../supporting/s01-pmtud-size-ladder.md).
+See [OEN-01](01-overlay-ssh-byte-cliff.md) and [OEN-S01](../supporting/s01-pmtud-size-ladder.md).
 
 ## Decision
 
-Operators MUST insert TCPMSS at the **top of `ts-forward`** (v4 and v6), plus a belt-and-suspenders rule **before** the jump. They MUST re-apply after `tailscaled` (or equivalent) settles.
+Operators MUST insert TCPMSS at the **top of `ts-forward`** (v4 and v6) using **explicit `--set-mss`** from **mss4_overlay_over_wg**. A FORWARD copy, if used, MUST be iface-scoped (`-i <overlay-tun> -o <wan-iface>` and reverse), never unscoped `FORWARD 1`. They MUST re-apply after `tailscaled` (or equivalent) settles.
 
 DNS leak-test green is **not** IPv6 data-plane green ([OEN-S32](../supporting/s32-dns-leak-test-not-v6-dataplane.md)).
 
@@ -139,37 +142,38 @@ DNS leak-test green is **not** IPv6 data-plane green ([OEN-S32](../supporting/s3
 
 ## Agent stop rule
 
-> A coding agent MUST emit a **bound runbook** (placeholders replaced from Bind).
-> MUST NOT apply live `ip rule`, nft, iptables, ip6tables, sysctl, `wg set`, daemon restart, or deploy until a **human** filled Bind.
-> MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
-> MUST NOT file an upstream bug from this page.
-> MUST NOT publish real addresses, hostnames, or custom ports.
+> MUST emit bound `iptables`/`ip6tables` (or nft) inserts for **ts-forward** after `<overlay-impl>` is `tailscale-compatible` and Bind is filled.
+> MUST NOT insert unscoped `FORWARD 1` TCPMSS (that is the [OEN-01](01-overlay-ssh-byte-cliff.md) cliff).
+> MUST NOT lead with `--clamp-mss-to-pmtu` ([OEN-S02](../supporting/s02-clamp-mss-to-pmtu-noop.md)).
+> MUST NOT claim ICMP ping as the exit HTTPS fix.
+> MUST NOT file an overlay-product bug from this page.
 
 ## Procedure
 
 This spec does not apply if `<overlay-impl>` is not tailscale-compatible.
 
-Placeholders only until Bind is filled: `<cloud-vps>`, `<lan-pi>`, `<overlay-peer>`, `<exit-node>`, `<wg-iface>`, `<gcp-nic>`, plus the Bind extras on this page.
-
 ### Copy-paste commands (after Bind)
 
-Human-filled Bind. Re-apply after the overlay daemon settles (it rewrites chains).
+Human-filled Bind. Re-apply after the overlay daemon settles (it rewrites chains). P2 uses **mss4_overlay_over_wg**.
 
 ```bash
-mss4=$((<wg-mtu> - 40)); mss6=$((<wg-mtu> - 60))
-# If the clamp is for overlay tun MTU, measure that iface instead.
+# mss4 is mss4_overlay_over_wg from Bind (not an unscoped FORWARD clamp)
+mss4=<mss4>
+mss6=<mss6>
 
 iptables -L ts-forward -n -v --line-numbers
 ip6tables -L ts-forward -n -v --line-numbers
 iptables -L FORWARD -n -v --line-numbers | head
 iptables -S FORWARD | grep -i tcpmss || true
 
-# Insert at TOP of ts-forward (IPv4 + IPv6)
+# Insert at TOP of ts-forward (IPv4 + IPv6) — explicit --set-mss
 iptables -I ts-forward 1 -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --set-mss "$mss4"
 ip6tables -I ts-forward 1 -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --set-mss "$mss6"
-# Belt: before the jump in FORWARD
-iptables -I FORWARD 1 -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --set-mss "$mss4"
-ip6tables -I FORWARD 1 -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --set-mss "$mss6"
+# Optional FORWARD copy: iface-scoped only (never unscoped FORWARD 1)
+iptables -I FORWARD 1 -i <overlay-tun> -o <wan-iface> -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --set-mss "$mss4"
+iptables -I FORWARD 1 -i <wan-iface> -o <overlay-tun> -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --set-mss "$mss4"
+ip6tables -I FORWARD 1 -i <overlay-tun> -o <wan-iface> -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --set-mss "$mss6"
+ip6tables -I FORWARD 1 -i <wan-iface> -o <overlay-tun> -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --set-mss "$mss6"
 
 nft list chain ip filter ts-forward 2>/dev/null || true
 ```
@@ -181,13 +185,13 @@ Then `curl -4` and `curl -6 --max-time 8 https://example.com` from `<overlay-pee
    - **Expected:** FORWARD TCPMSS after the jump stays 0. Exit SYNs are not clamped.
    - **On failure:** If counters already increment in ts-forward, this spec does not apply.
 2. **P2 — Insert TCPMSS at the top of ts-forward.**
-   - **Action:** On `<exit-node>`, insert `TCPMSS --clamp-mss-to-pmtu` **or** explicit `--set-mss` at the **head** of `ts-forward` for v4 and v6. Prefer explicit `--set-mss` when ICMP is dropped ([OEN-S02](../supporting/s02-clamp-mss-to-pmtu-noop.md)).
+   - **Action:** On `<exit-node>`, insert explicit `TCPMSS --set-mss` (mss4_overlay_over_wg / mss6 family) at the **head** of `ts-forward` for v4 and v6. MUST NOT lead with `--clamp-mss-to-pmtu` ([OEN-S02](../supporting/s02-clamp-mss-to-pmtu-noop.md)).
    - **Expected:** A new first rule exists in both families.
    - **On failure:** Do not only append to FORWARD.
-3. **P3 — Belt-and-suspenders before the jump.**
-   - **Action:** Insert a matching TCPMSS rule in FORWARD **immediately before** `jump ts-forward`.
-   - **Expected:** Both the chain-head and the pre-jump rules exist.
-   - **On failure:** Keep them scoped to exit forwarding, not overlay-admin return ([OEN-01](01-overlay-ssh-byte-cliff.md)).
+3. **P3 — Optional iface-scoped FORWARD copy.**
+   - **Action:** If a FORWARD copy is required, insert TCPMSS with `-i <overlay-tun> -o <wan-iface>` and the reverse. MUST NOT use unscoped `-I FORWARD 1` matching every SYN.
+   - **Expected:** FORWARD rules are iface-scoped. Overlay-admin return is not clamped ([OEN-01](01-overlay-ssh-byte-cliff.md)).
+   - **On failure:** Delete any global FORWARD TCPMSS and return to ts-forward-only.
 4. **P4 — Re-apply after the daemon settles; soak from a non-workstation.**
    - **Action:** Restart or wait for the overlay daemon to finish rewriting chains, then re-apply P2–P3. Soak from `<overlay-peer>` (LAN Pi), not the agent workstation ([OEN-S18](../supporting/s18-do-not-set-exit-on-agent-workstation.md)). `curl -4` and `curl -6` to `https://example.com`.
    - **Expected:** HTTP 200 both families. TCPMSS counters in ts-forward increment.
@@ -214,7 +218,8 @@ TCPMSS     all  --  *  *  ...  TCPMSS set 1280   pkts:0
 ## MUST NOT
 
 - MUST NOT file an overlay-product bug until ts-forward counters are evidenced.
-- MUST NOT clamp overlay-admin return in the same global rule.
+- MUST NOT insert unscoped `FORWARD 1` TCPMSS.
+- MUST NOT lead with `--clamp-mss-to-pmtu`.
 - MUST NOT treat DNS leak-test green as IPv6 HTTP green.
 - MUST NOT select this exit on the agent workstation to reproduce.
 - MUST NOT apply live network or firewall changes until Bind is filled by a human.
@@ -223,7 +228,7 @@ TCPMSS     all  --  *  *  ...  TCPMSS set 1280   pkts:0
 
 ## Page changelog
 
-- Edition 2 (8 Sep 2026, Mountain Time): Added overlay-impl Bind and trap-specific terms (review cleanup).
+- Edition 3 (8 Sep 2026, Mountain Time): ts-forward-only clamp; iface-scoped FORWARD copy; two MSS families.
 
 ## Related specs
 
@@ -235,5 +240,5 @@ TCPMSS     all  --  *  *  ...  TCPMSS set 1280   pkts:0
 
 ## Prior art (Not novel)
 
-Tailscale #11002 discusses nft jump/accept before clamp. This spec’s claim is the Pi-exit recipe: top of ts-forward, pre-jump copy, re-apply after rewrite, DNS≠data plane.
+[Tailscale #11002](https://github.com/tailscale/tailscale/issues/11002) discusses nft jump/accept before clamp. This spec’s claim is the exit recipe: top of ts-forward, iface-scoped FORWARD copy only, re-apply after rewrite.
 

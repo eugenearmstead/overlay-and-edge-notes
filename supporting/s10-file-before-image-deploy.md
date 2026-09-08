@@ -124,7 +124,3 @@ hero.png: JPEG image data   # trap: named png, is jpeg
 
 - [OEN-10](../web/10-one-blocking-stylesheet-variable-fonts.md)
 
-## Prior art (Not novel)
-
-file(1) is Unix 101. This note is extension≠format at deploy time.
-

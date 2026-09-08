@@ -127,7 +127,3 @@ cd <worker-root> && npx playwright test --project=desktop --project=iphone --pro
 - [OEN-10](../web/10-one-blocking-stylesheet-variable-fonts.md)
 - [OEN-11](../web/11-worker-chat-wrapper-turnstile.md)
 
-## Prior art (Not novel)
-
-Responsive test matrices are standard. This note is the three Chromium device projects as the gate.
-
