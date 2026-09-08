@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>OEN-19: Local Unbound REFUSES overlay peer-API queries with Recursion Desired off — Overlay and Edge Notes</title>
+    <meta name="description" content="Exit peer-API DNS over HTTPS sends Recursion Desired off. dnsmasq pointed at loopback Unbound returns REFUSED, which looks like Unbound is down.">
+    <link rel="canonical" href="https://eugenearmstead.github.io/overlay-and-edge-notes/networking/19-unbound-refuses-rd0.html">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Source+Sans+3:wght@400;500;600&amp;display=swap">
+    <link rel="stylesheet" href="../assets/spec.css">
+    <link rel="describedby" href="../llms.txt">
+    <meta name="author" content="Eugene Armstead">
+    <meta name="citation_author" content="Eugene Armstead">
+    <meta name="dcterms.creator" content="Eugene Armstead">
+    <link rel="author" href="https://www.armsteadent.com/">
+    <meta property="article:author" content="Eugene Armstead">
+    <meta property="og:see_also" content="https://www.armsteadent.com/">
+    <meta property="og:title" content="OEN-19: Local Unbound REFUSES overlay peer-API queries with Recursion Desired off — Overlay and Edge Notes">
+    <meta property="og:description" content="Exit peer-API DNS over HTTPS sends Recursion Desired off. dnsmasq pointed at loopback Unbound returns REFUSED, which looks like Unbound is down.">
+    <meta property="og:url" content="https://eugenearmstead.github.io/overlay-and-edge-notes/networking/19-unbound-refuses-rd0.html">
+    <meta property="og:type" content="article">
+    <meta property="article:published_time" content="2026-09-08">
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "TechArticle",
+      "@id": "https://eugenearmstead.github.io/overlay-and-edge-notes/networking/19-unbound-refuses-rd0.html#article",
+      "headline": "Local Unbound REFUSES overlay peer-API queries with Recursion Desired off",
+      "description": "Exit peer-API DNS over HTTPS sends Recursion Desired off. dnsmasq pointed at loopback Unbound returns REFUSED, which looks like Unbound is down.",
+      "datePublished": "2026-09-08",
+      "author": {
+        "@type": "Person",
+        "name": "Eugene Armstead",
+        "url": "https://www.armsteadent.com/",
+        "sameAs": [
+          "https://github.com/eugenearmstead"
+        ]
+      },
+      "url": "https://eugenearmstead.github.io/overlay-and-edge-notes/networking/19-unbound-refuses-rd0.html",
+      "identifier": "OEN-19",
+      "license": "https://creativecommons.org/licenses/by/4.0/",
+      "inLanguage": "en"
+    },
+    {
+      "@type": "HowTo",
+      "name": "Local Unbound REFUSES overlay peer-API queries with Recursion Desired off",
+      "description": "Exit peer-API DNS over HTTPS sends Recursion Desired off. dnsmasq pointed at loopback Unbound returns REFUSED, which looks like Unbound is down.",
+      "author": {
+        "@type": "Person",
+        "name": "Eugene Armstead",
+        "url": "https://www.armsteadent.com/",
+        "sameAs": [
+          "https://github.com/eugenearmstead"
+        ]
+      },
+      "step": [
+        {
+          "@type": "HowToStep",
+          "position": 1,
+          "name": "P1 \u2014 Prove RD=0 is REFUSED on loopback.",
+          "text": "Action: On `<exit-node>`: `dig +norecurse @127.0.0.1 example.com` and `dig @127.0.0.1 example.com`. Expected: norecurse / RD=0 \u2192 REFUSED. RD=1 \u2192 answer (if Unbound is up). On failure: If RD=1 is also REFUSED, Unbound really is down \u2014 fix that first."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 2,
+          "name": "P2 \u2014 Compare a remote upstream.",
+          "text": "Action: Point a test dig RD=0 at a remote resolver the box is allowed to use. Many answer or recurse anyway. Expected: Remote may work while loopback Unbound refuses \u2014 this is the trap. On failure: Do not switch PeerAPI to a public resolver as the production fix."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 3,
+          "name": "P3 \u2014 Insert the RD-stub.",
+          "text": "Action: Stub on 127.0.0.1:53 forces RD=1 then queries Unbound on another loopback port. PeerAPI keeps targeting local DNS. Bind loopback only ([OEN-05](05-exit-peerapi-dns-stub.md)). Expected: PeerAPI DoH from `<overlay-peer>` is NOERROR. On failure: Do not bind overlay :53."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 4,
+          "name": "P4 \u2014 Do not pretty-print with accept-dns.",
+          "text": "Action: On cloud exits, leave `accept-dns=false` ([OEN-23](23-cloud-exit-accept-dns.md)). Expected: RD=0 path still works. On failure: Guest dns query metadata is not this path."
+        }
+      ]
+    }
+  ]
+}
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <div class="site-header-inner">
+        <p class="site-title"><a href="../index.html">Overlay and Edge Notes</a></p>
+        <p class="site-tag">Public field notes by Eugene Armstead</p>
+    <nav class="site-nav" aria-label="Site">
+      <a href="../index.html">Home</a>
+      <a href="../DISCLOSURE.html">Disclosure</a>
+      <a href="../changelog.html">Changelog</a>
+      <a href="../editions/2026.html">2026</a>
+      <a href="../AGENTS.md">AGENTS.md</a>
+      <a href="../index.html#networking">Networking</a>
+      <a href="../index.html#web">Web</a>
+      <a href="../index.html#supporting">Supporting</a>
+    </nav>
+      </div>
+    </header>
+    <nav class="breadcrumb" aria-label="Breadcrumb"><ol><li><a href="../index.html">Home</a></li><li><a href="../index.html#networking">Networking</a></li><li>OEN-19</li></ol></nav>
+    <main id="main">
+      <article>
+        <h1>Local Unbound REFUSES overlay peer-API queries with Recursion Desired off</h1>
+        <p class="meta-line"><span>OEN-19</span> · original · edition 1 · 2026-09-08</p>
+        <h2 id="context">Context</h2>
+<p>Exit overlay peer-API (PeerAPI) DNS over HTTPS (DoH) sends Recursion Desired (RD)=0. When dnsmasq on the exit points at <strong>loopback Unbound</strong>, Unbound returns REFUSED. The same dnsmasq often forwards RD=0 to a <em>remote</em> upstream just fine. It looks like “Unbound is down.”</p>
+<p>Public docs say “local DNS for exit.” They rarely document this <strong>local-upstream RD=0 refuse</strong>.</p>
+
+<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>LAN</dt><dd>Local Area Network</dd><dt>WAN</dt><dd>Wide Area Network</dd><dt>TCP</dt><dd>Transmission Control Protocol</dd><dt>MTU</dt><dd>Maximum Transmission Unit</dd><dt>ICMP</dt><dd>Internet Control Message Protocol</dd><dt>HTTPS</dt><dd>Hypertext Transfer Protocol Secure</dd><dt>DNS</dt><dd>Domain Name System</dd><dt>DoH</dt><dd>DNS over HTTPS</dd><dt>GCP</dt><dd>Google Cloud Platform</dd><dt>VM</dt><dd>virtual machine</dd><dt>NIC</dt><dd>network interface card</dd><dt>API</dt><dd>application programming interface</dd><dt>PeerAPI</dt><dd>overlay peer application-programming interface (exit DNS over HTTPS)</dd><dt>RD</dt><dd>Recursion Desired (DNS flag)</dd><dt>nft</dt><dd>nftables (Linux packet filter)</dd><dt>ControlPath</dt><dd>OpenSSH multiplexing socket path option</dd><dt>Pi</dt><dd>single-board computer (Raspberry Pi class)</dd><dt>REFUSES</dt><dd>DNS response code meaning the server will not answer</dd><dt>REFUSED</dt><dd>DNS response code meaning the server will not answer</dd><dt>Unbound</dt><dd>validating recursive DNS resolver</dd><dt>dnsmasq</dt><dd>lightweight DNS forwarder and DHCP server</dd><dt>NOERROR</dt><dd>DNS response code meaning the query succeeded</dd></dl></section>
+<h2 id="topology">Topology</h2>
+<pre><code class="language-text">[PeerAPI DoH]  RD=0  --&gt;  dnsmasq --&gt; loopback Unbound  --&gt;  REFUSED
+Same dnsmasq forwarding RD=0 to a *remote* upstream often works
+Looks like &quot;Unbound is down&quot;
+FIX: RD-stub forces RD=1 before Unbound ([OEN-05](05-exit-peerapi-dns-stub.html))</code></pre>
+<h2 id="bind">Bind</h2>
+<p>Fill this table <strong>before</strong> any live change. Do <strong>not</strong> paste real values back into public notes.</p>
+<table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><code>&lt;exit-node&gt;</code></td><td>Overlay exit node</td><td>Cloud VM or LAN Pi used as exit</td></tr><tr><td><code>&lt;overlay-peer&gt;</code></td><td>Soak client (<strong>not</strong> the agent workstation)</td><td>LAN Pi</td></tr><tr><td><code>&lt;user&gt;</code></td><td>SSH user</td><td>Guest</td></tr><tr><td><code>&lt;overlay-tun&gt;</code></td><td>Overlay tun on the exit</td><td>Iface</td></tr><tr><td><code>&lt;gcp-nic&gt;</code></td><td>Public NIC on a Google Cloud guest</td><td>Iface; omit on non-GCP exits</td></tr><tr><td><code>&lt;wan-iface&gt;</code></td><td>WAN / public NIC</td><td>Iface</td></tr><tr><td><code>&lt;mss4&gt;</code> / <code>&lt;mss6&gt;</code></td><td>Computed from underlay or overlay tun MTU</td><td>Formulas</td></tr></tbody></table>
+<h2 id="formulas">Formulas</h2>
+<p><code>dig +norecurse</code> is RD=0. PeerAPI DoH uses RD=0. Local Unbound MAY refuse that.</p>
+<h2 id="decision">Decision</h2>
+<p>An RD-stub MUST force RD=1 <strong>before</strong> Unbound (<a href="05-exit-peerapi-dns-stub.html">OEN-05</a>). Verify with <code>dig +norecurse @127.0.0.1</code> versus RD=1, then PeerAPI DoH rcode from a non-exit client.</p>
+<h2 id="consequences">Consequences</h2>
+<ul><li>PeerAPI starts answering without replacing Unbound.</li><li>Operators stop restarting Unbound for a flag mismatch.</li><li>Remote-upstream confusion goes away.</li></ul>
+<h2 id="agent-stop-rule">Agent stop rule</h2>
+<blockquote><p>A coding agent MUST emit a <strong>bound runbook</strong> (placeholders replaced from Bind). MUST NOT apply live <code>ip rule</code>, nft, iptables, ip6tables, sysctl, <code>wg set</code>, daemon restart, or deploy until a <strong>human</strong> filled Bind. MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS. MUST NOT file an upstream bug from this page. MUST NOT publish real addresses, hostnames, or custom ports.</p></blockquote>
+<h2 id="procedure">Procedure</h2>
+<p>Placeholders only until Bind is filled: <code>&lt;cloud-vps&gt;</code>, <code>&lt;lan-pi&gt;</code>, <code>&lt;overlay-peer&gt;</code>, <code>&lt;exit-node&gt;</code>, <code>&lt;wg-iface&gt;</code>, <code>&lt;gcp-nic&gt;</code>, plus the Bind extras on this page.</p>
+<h3>Copy-paste commands (after Bind)</h3>
+<pre><code class="language-bash">ssh -o ControlPath=none &lt;user&gt;@&lt;exit-node&gt; &#x27;dig +time=2 +norecurse @127.0.0.1 example.com; dig +time=2 @127.0.0.1 example.com&#x27;</code></pre>
+<ol><li><strong>P1 — Prove RD=0 is REFUSED on loopback.</strong><br>
+- <strong>Action:</strong> On <code>&lt;exit-node&gt;</code>: <code>dig +norecurse @127.0.0.1 example.com</code> and <code>dig @127.0.0.1 example.com</code>.<br>
+- <strong>Expected:</strong> norecurse / RD=0 → REFUSED. RD=1 → answer (if Unbound is up).<br>
+- <strong>On failure:</strong> If RD=1 is also REFUSED, Unbound really is down — fix that first.</li><li><strong>P2 — Compare a remote upstream.</strong><br>
+- <strong>Action:</strong> Point a test dig RD=0 at a remote resolver the box is allowed to use. Many answer or recurse anyway.<br>
+- <strong>Expected:</strong> Remote may work while loopback Unbound refuses — this is the trap.<br>
+- <strong>On failure:</strong> Do not switch PeerAPI to a public resolver as the production fix.</li><li><strong>P3 — Insert the RD-stub.</strong><br>
+- <strong>Action:</strong> Stub on 127.0.0.1:53 forces RD=1 then queries Unbound on another loopback port. PeerAPI keeps targeting local DNS. Bind loopback only (<a href="05-exit-peerapi-dns-stub.html">OEN-05</a>).<br>
+- <strong>Expected:</strong> PeerAPI DoH from <code>&lt;overlay-peer&gt;</code> is NOERROR.<br>
+- <strong>On failure:</strong> Do not bind overlay :53.</li><li><strong>P4 — Do not pretty-print with accept-dns.</strong><br>
+- <strong>Action:</strong> On cloud exits, leave <code>accept-dns=false</code> (<a href="23-cloud-exit-accept-dns.html">OEN-23</a>).<br>
+- <strong>Expected:</strong> RD=0 path still works.<br>
+- <strong>On failure:</strong> Guest dns query metadata is not this path.</li></ol>
+<h2 id="expected-samples">Expected samples</h2>
+<pre><code class="language-text">;; -&gt;&gt;HEADER&lt;&lt;- opcode: QUERY, rcode: REFUSED</code></pre>
+<h2 id="verify">Verify</h2>
+<ul><li>dig +norecurse @127.0.0.1 without stub is REFUSED.</li><li>Through stub / PeerAPI, queries answer.</li><li>Stub is loopback-only.</li><li>Unbound process was up the whole time.</li><li>ICMP / small ping success was <strong>not</strong> used as the pass criterion when this spec names TCP, SSH, or HTTPS.</li><li>Bind table was filled by a human before any live <code>ip</code> / nft / iptables change.</li></ul>
+<h2 id="must-not" class="must-not">MUST NOT</h2>
+<ul><li>MUST NOT restart Unbound as the first “DNS down” fix when RD=0 is REFUSED.</li><li>MUST NOT send PeerAPI at overlay :53.</li><li>MUST NOT set accept-dns=true on the exit VM to hide this.</li><li>MUST NOT publish PeerAPI URLs with real overlay addresses.</li><li>MUST NOT apply live network or firewall changes until Bind is filled by a human.</li><li>MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.</li><li>MUST NOT publish hostnames, addresses, ULAs, or custom ports.</li></ul>
+<h2 id="related-specs">Related specs</h2>
+<ul><li><a href="05-exit-peerapi-dns-stub.html">OEN-05 Exit PeerAPI DNS stub</a></li><li><a href="14-exit-dns-is-peerapi.html">OEN-14 Exit app DNS is PeerAPI</a></li><li><a href="23-cloud-exit-accept-dns.html">OEN-23 Cloud-exit accept-dns</a></li></ul>
+<h2 id="prior-art-not-novel">Prior art (Not novel)</h2>
+<p>Unbound default recurse policy is documented. This spec’s claim is PeerAPI RD=0 plus dnsmasq-to-loopback as a false “Unbound down.”</p>
+      </article>
+    </main>
+    <footer class="site-footer">
+      <div class="site-footer-inner">
+    <p class="byline">Written by <a href="https://www.armsteadent.com/">Eugene Armstead</a> · <a href="https://www.armsteadent.com/">https://www.armsteadent.com/</a> · <a rel="license" href="https://creativecommons.org/licenses/by/4.0/">CC-BY-4.0</a></p>
+    <p class="license-line">Living field notes. Stable IDs. Do not copy private inventory into public text.</p>
+      </div>
+    </footer>
+  </body>
+</html>

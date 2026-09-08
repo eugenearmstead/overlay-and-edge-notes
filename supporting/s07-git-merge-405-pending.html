@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>OEN-S07: Git merge 405 while mergeability is pending — Overlay and Edge Notes</title>
+    <meta name="description" content="HTTP 405 on merge right after opening a merge request is usually mergeability still pending, not a dead token. Contrast with real 401.">
+    <link rel="canonical" href="https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s07-git-merge-405-pending.html">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Source+Sans+3:wght@400;500;600&amp;display=swap">
+    <link rel="stylesheet" href="../assets/spec.css">
+    <link rel="describedby" href="../llms.txt">
+    <meta name="author" content="Eugene Armstead">
+    <meta name="citation_author" content="Eugene Armstead">
+    <meta name="dcterms.creator" content="Eugene Armstead">
+    <link rel="author" href="https://www.armsteadent.com/">
+    <meta property="article:author" content="Eugene Armstead">
+    <meta property="og:see_also" content="https://www.armsteadent.com/">
+    <meta property="og:title" content="OEN-S07: Git merge 405 while mergeability is pending — Overlay and Edge Notes">
+    <meta property="og:description" content="HTTP 405 on merge right after opening a merge request is usually mergeability still pending, not a dead token. Contrast with real 401.">
+    <meta property="og:url" content="https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s07-git-merge-405-pending.html">
+    <meta property="og:type" content="article">
+    <meta property="article:published_time" content="2026-09-08">
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "TechArticle",
+      "@id": "https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s07-git-merge-405-pending.html#article",
+      "headline": "Git merge 405 while mergeability is pending",
+      "description": "HTTP 405 on merge right after opening a merge request is usually mergeability still pending, not a dead token. Contrast with real 401.",
+      "datePublished": "2026-09-08",
+      "author": {
+        "@type": "Person",
+        "name": "Eugene Armstead",
+        "url": "https://www.armsteadent.com/",
+        "sameAs": [
+          "https://github.com/eugenearmstead"
+        ]
+      },
+      "url": "https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s07-git-merge-405-pending.html",
+      "identifier": "OEN-S07",
+      "license": "https://creativecommons.org/licenses/by/4.0/",
+      "inLanguage": "en"
+    },
+    {
+      "@type": "HowTo",
+      "name": "Git merge 405 while mergeability is pending",
+      "description": "HTTP 405 on merge right after opening a merge request is usually mergeability still pending, not a dead token. Contrast with real 401.",
+      "author": {
+        "@type": "Person",
+        "name": "Eugene Armstead",
+        "url": "https://www.armsteadent.com/",
+        "sameAs": [
+          "https://github.com/eugenearmstead"
+        ]
+      },
+      "step": [
+        {
+          "@type": "HowToStep",
+          "position": 1,
+          "name": "P1 \u2014 Classify 405 vs 401.",
+          "text": "Action: Read status. 401 \u2192 stop, tell operator. 405 \u2192 poll merge_status. Expected: 401 never waited out. On failure: Conflicts (cannot_be_merged) are not timing."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 2,
+          "name": "P2 \u2014 Poll mergeability.",
+          "text": "Action: Retry merge up to ~90s while merge_status is checking. Expected: Merges when can_be_merged. On failure: If still 405 after the wait, leave the request URL; do not ask the operator to run git."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 3,
+          "name": "P3 \u2014 Do not use the GitLab token against GitHub.",
+          "text": "Action: GitHub publish uses `gh auth`. GitLab PAT is not a GitHub PAT. Expected: Correct host for the token. On failure: Do not invent a GitHub token."
+        }
+      ]
+    }
+  ]
+}
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <div class="site-header-inner">
+        <p class="site-title"><a href="../index.html">Overlay and Edge Notes</a></p>
+        <p class="site-tag">Public field notes by Eugene Armstead</p>
+    <nav class="site-nav" aria-label="Site">
+      <a href="../index.html">Home</a>
+      <a href="../DISCLOSURE.html">Disclosure</a>
+      <a href="../changelog.html">Changelog</a>
+      <a href="../editions/2026.html">2026</a>
+      <a href="../AGENTS.md">AGENTS.md</a>
+      <a href="../index.html#networking">Networking</a>
+      <a href="../index.html#web">Web</a>
+      <a href="../index.html#supporting">Supporting</a>
+    </nav>
+      </div>
+    </header>
+    <nav class="breadcrumb" aria-label="Breadcrumb"><ol><li><a href="../index.html">Home</a></li><li><a href="../index.html#supporting">Supporting</a></li><li>OEN-S07</li></ol></nav>
+    <main id="main">
+      <article>
+        <h1>Git merge 405 while mergeability is pending</h1>
+        <p class="meta-line"><span>OEN-S07</span> · supporting · edition 1 · 2026-09-08</p>
+        <h2 id="context">Context</h2>
+<p>Git hosting checks mergeability asynchronously. <code>PUT …/merge</code> often 405 until <code>merge_status</code> is <code>can_be_merged</code>. Auth failures are different: 401 / missing token — tell the operator immediately.</p>
+
+<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>TCP</dt><dd>Transmission Control Protocol</dd><dt>ICMP</dt><dd>Internet Control Message Protocol</dd><dt>HTTP</dt><dd>Hypertext Transfer Protocol</dd><dt>HTTPS</dt><dd>Hypertext Transfer Protocol Secure</dd><dt>nft</dt><dd>nftables (Linux packet filter)</dd><dt>URL</dt><dd>Uniform Resource Locator</dd><dt>UI</dt><dd>user interface</dd><dt>GitLab</dt><dd>git hosting and merge-request service</dd><dt>PUT</dt><dd>HTTP method</dd><dt>MR</dt><dd>merge request</dd></dl></section>
+<h2 id="topology">Topology</h2>
+<pre><code class="language-text">[create MR] --&gt; Git host mergeability async
+PUT merge  --&gt;  405 until can_be_merged
+401 is a dead token (tell the operator immediately)</code></pre>
+<h2 id="bind">Bind</h2>
+<p>Fill this table <strong>before</strong> any live change. Do <strong>not</strong> paste real values back into public notes.</p>
+<table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><code>&lt;worker-root&gt;</code></td><td>Worker / UI source tree</td><td>Directory on the workstation</td></tr><tr><td><code>&lt;live-url&gt;</code></td><td>Public HTTPS origin</td><td>URL the browser loads</td></tr><tr><td><code>&lt;preview-url&gt;</code></td><td>Preview origin if used</td><td>URL</td></tr><tr><td><code>&lt;html-path&gt;</code></td><td>Path that becomes a Response body</td><td>File glob</td></tr></tbody></table>
+<h2 id="formulas">Formulas</h2>
+<p>405 while pending is timing. Poll; do not declare the bot cannot merge on a lone 405.</p>
+<h2 id="method">Method</h2>
+<p>Poll until can_be_merged or a real blocker. MUST NOT tell the operator the bot “cannot merge” for a lone 405 until after that wait. MUST report 401 immediately.</p>
+<h2 id="consequences">Consequences</h2>
+<p>Fewer false “token dead” pages. Real 401 still surfaces fast.</p>
+<h2 id="agent-stop-rule">Agent stop rule</h2>
+<blockquote><p>A coding agent MUST emit a <strong>bound runbook</strong> (placeholders replaced from Bind). MUST NOT apply live <code>ip rule</code>, nft, iptables, ip6tables, sysctl, <code>wg set</code>, daemon restart, or deploy until a <strong>human</strong> filled Bind. MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS. MUST NOT file an upstream bug from this page. MUST NOT publish real addresses, hostnames, or custom ports.</p></blockquote>
+<h2 id="procedure">Procedure</h2>
+<p>Placeholders only until Bind is filled: <code>&lt;cloud-vps&gt;</code>, <code>&lt;lan-pi&gt;</code>, <code>&lt;overlay-peer&gt;</code>, <code>&lt;exit-node&gt;</code>, <code>&lt;wg-iface&gt;</code>, <code>&lt;gcp-nic&gt;</code>, plus the Bind extras on this page.</p>
+<h3>Copy-paste commands (after Bind)</h3>
+<pre><code class="language-text"># Agent: poll merge_status until can_be_merged, retry 405. Distinct from HTTP 401.</code></pre>
+<ol><li><strong>P1 — Classify 405 vs 401.</strong><br>
+- <strong>Action:</strong> Read status. 401 → stop, tell operator. 405 → poll merge_status.<br>
+- <strong>Expected:</strong> 401 never waited out.<br>
+- <strong>On failure:</strong> Conflicts (cannot_be_merged) are not timing.</li><li><strong>P2 — Poll mergeability.</strong><br>
+- <strong>Action:</strong> Retry merge up to ~90s while merge_status is checking.<br>
+- <strong>Expected:</strong> Merges when can_be_merged.<br>
+- <strong>On failure:</strong> If still 405 after the wait, leave the request URL; do not ask the operator to run git.</li><li><strong>P3 — Do not use the GitLab token against GitHub.</strong><br>
+- <strong>Action:</strong> GitHub publish uses <code>gh auth</code>. GitLab PAT is not a GitHub PAT.<br>
+- <strong>Expected:</strong> Correct host for the token.<br>
+- <strong>On failure:</strong> Do not invent a GitHub token.</li></ol>
+<h2 id="expected-samples">Expected samples</h2>
+<pre><code class="language-text">405 Method Not Allowed
+# minutes later: merged</code></pre>
+<h2 id="verify">Verify</h2>
+<ul><li>401 reported immediately if it happened.</li><li>405 retried until mergeability or timeout.</li><li>ICMP / small ping success was <strong>not</strong> used as the pass criterion when this spec names TCP, SSH, or HTTPS.</li><li>Bind table was filled by a human before any live <code>ip</code> / nft / iptables change.</li></ul>
+<h2 id="must-not" class="must-not">MUST NOT</h2>
+<ul><li>MUST NOT hide 401 as timing.</li><li>MUST NOT declare cannot-merge on the first 405.</li><li>MUST NOT apply live network or firewall changes until Bind is filled by a human.</li><li>MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.</li><li>MUST NOT publish hostnames, addresses, ULAs, or custom ports.</li></ul>
+<h2 id="related-specs">Related specs</h2>
+<ul><li><a href="../web/09-git-merge-is-not-a-live-worker.html">OEN-09</a></li></ul>
+<h2 id="prior-art-not-novel">Prior art (Not novel)</h2>
+<p>GitLab mergeability is documented. This note is 405-as-timing versus 401-as-dead-token.</p>
+      </article>
+    </main>
+    <footer class="site-footer">
+      <div class="site-footer-inner">
+    <p class="byline">Written by <a href="https://www.armsteadent.com/">Eugene Armstead</a> · <a href="https://www.armsteadent.com/">https://www.armsteadent.com/</a> · <a rel="license" href="https://creativecommons.org/licenses/by/4.0/">CC-BY-4.0</a></p>
+    <p class="license-line">Living field notes. Stable IDs. Do not copy private inventory into public text.</p>
+      </div>
+    </footer>
+  </body>
+</html>

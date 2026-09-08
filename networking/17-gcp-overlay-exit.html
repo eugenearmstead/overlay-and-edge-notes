@@ -68,13 +68,13 @@
           "@type": "HowToStep",
           "position": 2,
           "name": "P2 \u2014 Advertise both default routes and keep accept-dns off on the exit VM.",
-          "text": "Action: On `<exit-node>`, advertise exit plus `0.0.0.0/0,::/0`. Set `accept-dns=false` on this VM (guest DNS pretty-print is not PeerAPI; turning accept-dns on can break Recursion Desired (RD)=0 exit DNS \u2014 forthcoming OEN-23). Expected: Coordinator or `status` shows the node offers exit and both routes. Android does not hide the node. On failure: If `::/0` is missing, phones will not list the exit. Re-advertise; do not debug DNS first."
+          "text": "Action: On `<exit-node>`, advertise exit plus `0.0.0.0/0,::/0`. Set `accept-dns=false` on this VM (guest DNS pretty-print is not PeerAPI; turning accept-dns on can break Recursion Desired (RD)=0 exit DNS \u2014 [OEN-23](23-cloud-exit-accept-dns.md)). Expected: Coordinator or `status` shows the node offers exit and both routes. Android does not hide the node. On failure: If `::/0` is missing, phones will not list the exit. Re-advertise; do not debug DNS first."
         },
         {
           "@type": "HowToStep",
           "position": 3,
           "name": "P3 \u2014 Fix overlay UDP PORT and the cloud firewall together.",
-          "text": "Action: Set daemon `PORT=41641` (never empty, never leave `0` in production). Restart the daemon. Allow UDP 41641 on the guest firewall **and** the VPC rule for `<gcp-nic>`. Expected: `ss` / `netstat` shows UDP 41641. VPC rule is not a decoration on top of PORT=0. On failure: If PORT was 0, the VPC allow did nothing. Set PORT, restart, then re-check. Forthcoming OEN-S23."
+          "text": "Action: Set daemon `PORT=41641` (never empty, never leave `0` in production). Restart the daemon. Allow UDP 41641 on the guest firewall **and** the VPC rule for `<gcp-nic>`."
         },
         {
           "@type": "HowToStep",
@@ -86,7 +86,7 @@
           "@type": "HowToStep",
           "position": 5,
           "name": "P5 \u2014 Soak from a LAN Pi, not from the agent workstation.",
-          "text": "Action: On `<overlay-peer>` (LAN Pi), select `<exit-node>` briefly. `curl -4` and `curl -6` to `https://example.com` with a short timeout. Then clear the exit. Expected: HTTP 200 on both families. Egress addresses belong to the cloud, not the home tunnel. On failure: If v4 works and v6 leaks home, that may be LAN unique-local address (ULA) Happy-Eyeballs (forthcoming OEN-20) or Wi-Fi vs cellular underlay (forthcoming OEN-S26) \u2014 not automatically a GCP NAT bug. If cellular-class clients work and "
+          "text": "Action: On `<overlay-peer>` (LAN Pi), select `<exit-node>` briefly. `curl -4` and `curl -6` to `https://example.com` with a short timeout. Then clear the exit. Expected: HTTP 200 on both families. Egress addresses belong to the cloud, not the home tunnel. On failure: If v4 works and v6 leaks home, that may be LAN unique-local address (ULA) Happy-Eyeballs ([OEN-20](20-lan-ula-happy-eyeballs-leak.md)) or Wi-Fi vs cellular underlay ([OEN-S26](../supporting/s26-wifi-vs-cellular-underlay.md)) \u2014 not a"
         },
         {
           "@type": "HowToStep",
@@ -98,7 +98,7 @@
           "@type": "HowToStep",
           "position": 7,
           "name": "P7 \u2014 Ignore misleading DNS and leak-test canaries.",
-          "text": "Action: If `dns query` on the VM shows `169.254.169.254`, ignore it for exit-client DNS. If a leak-test site returns 502 from GCP, switch the browse gate to `example.com`. Expected: Exit DNS is proven with PeerAPI DoH from a **non-exit** client (forthcoming OEN-05 / OEN-14), not with guest `dig`. On failure: Do not set `accept-dns=true` on the exit VM to make the display pretty."
+          "text": "Action: If `dns query` on the VM shows `169.254.169.254`, ignore it for exit-client DNS. If a leak-test site returns 502 from GCP, switch the browse gate to `example.com`. Expected: Exit DNS is proven with PeerAPI DoH from a **non-exit** client ([OEN-05](05-exit-peerapi-dns-stub.md) / [OEN-14](14-exit-dns-is-peerapi.md)), not with guest `dig`. On failure: Do not set `accept-dns=true` on the exit VM to make the display pretty."
         }
       ]
     }
@@ -115,11 +115,12 @@
     <nav class="site-nav" aria-label="Site">
       <a href="../index.html">Home</a>
       <a href="../DISCLOSURE.html">Disclosure</a>
+      <a href="../changelog.html">Changelog</a>
+      <a href="../editions/2026.html">2026</a>
       <a href="../AGENTS.md">AGENTS.md</a>
       <a href="../index.html#networking">Networking</a>
       <a href="../index.html#web">Web</a>
       <a href="../index.html#supporting">Supporting</a>
-      <a href="../index.html#editions">Editions</a>
     </nav>
       </div>
     </header>
@@ -127,48 +128,73 @@
     <main id="main">
       <article>
         <h1>Google Cloud overlay exit (IP forwarding, listen port, Identity-Aware Proxy)</h1>
-        <p class="meta-line"><span>OEN-17</span> · original · edition 1 · 2026-09-07</p>
+        <p class="meta-line"><span>OEN-17</span> · original · edition 2 · 2026-09-07</p>
         <h2 id="context">Context</h2>
 <p>A cloud virtual machine (VM) on Google Cloud Platform (GCP) is a reasonable <strong>backup</strong> <code>&lt;exit-node&gt;</code>. It is a poor daily primary if the operator’s workstation is the agent host that would lose internet when the exit is wrong.</p>
 <p>Several independent switches have to be true at once. Missing any one looks like “the overlay product is broken”:</p>
 <ul><li>The VM instance MUST have Internet Protocol (IP) forwarding (<code>canIpForward</code> true in the instance application programming interface (API), plus <code>net.ipv4.ip_forward</code> / IPv6 forwarding in the guest).</li><li>The overlay node MUST advertise <code>0.0.0.0/0</code> <strong>and</strong> <code>::/0</code>. Android clients hide the exit if <code>::/0</code> is stripped (<code>ExitNodeOption=false</code>).</li><li>Overlay User Datagram Protocol (UDP) listen <strong>PORT MUST be a fixed well-known 41641</strong> (the overlay product’s usual UDP port). Opening a Virtual Private Cloud (VPC) firewall rule for 41641 while the daemon has <code>PORT=0</code> (ephemeral) is a no-op. An <strong>empty</strong> <code>PORT=</code> can fail daemon start. Ship PORT + daemon restart + guest firewall + VPC rule <strong>together</strong>.</li><li>MUST NOT add a second <code>ip6tables MASQUERADE -o &lt;gcp-nic&gt;</code> on top of the overlay postrouting chain. Duplicate IPv6 masquerade (source network address translation (NAT)) breaks exit-client Hypertext Transfer Protocol Secure (HTTPS) over IPv6. Use the overlay’s own postrouting plus <code>addrtype LOCAL</code> only.</li><li>The policy-routing IPv6 default toward the internet MUST be <code>via fe80::… dev &lt;gcp-nic&gt;</code>, not <code>dev &lt;gcp-nic&gt;</code> alone. Link-local gateway is required on GCP-style networking.</li><li><code>rp_filter=2</code> (loose) on <code>&lt;gcp-nic&gt;</code> so return traffic from the exit path is not dropped as martian.</li><li><strong>Identity-Aware Proxy (IAP)</strong> SSH is <strong>break-glass</strong>. Daily admin is overlay OpenSSH on port 22. The overlay product’s <code>ssh</code> command-line interface (CLI) MAY fail key exchange (KEX) on some guest images — use <strong>plain OpenSSH</strong> to the overlay address.</li><li><code>tailscale dns query</code> (or equivalent) on the VM often shows metadata <code>169.254.169.254</code>. That is <strong>guest resolver pretty-print</strong>, not the exit overlay peer-API (PeerAPI) DNS over HTTPS (DoH) path.</li><li>A popular leak-test website often returns <strong>502</strong> from some GCP ranges. Use <code>example.com</code> / <code>www.google.com</code> as browse gates, not that leak-test as a hard canary.</li></ul>
-<p>This exit is <strong>backup only</strong>. MUST NOT publish a ranked “try exit A then B” ladder in a public spec. MUST NOT select this exit on the <strong>agent workstation</strong> to reproduce (forthcoming OEN-S18).</p>
+<p>This exit is <strong>backup only</strong>. MUST NOT publish a ranked “try exit A then B” ladder in a public spec. MUST NOT select this exit on the <strong>agent workstation</strong> to reproduce (<a href="../supporting/s18-do-not-set-exit-on-agent-workstation.html">OEN-S18</a>).</p>
 
-<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>GCP</dt><dd>Google Cloud Platform</dd><dt>GCE</dt><dd>Google Compute Engine</dd><dt>IP</dt><dd>Internet Protocol</dd><dt>IPv4</dt><dd>Internet Protocol version 4</dd><dt>IPv6</dt><dd>Internet Protocol version 6</dd><dt>IAP</dt><dd>Identity-Aware Proxy</dd><dt>VM</dt><dd>virtual machine</dd><dt>UDP</dt><dd>User Datagram Protocol</dd><dt>VPC</dt><dd>Virtual Private Cloud</dd><dt>NAT</dt><dd>network address translation</dd><dt>NIC</dt><dd>network interface card</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>OpenSSH</dt><dd>OpenBSD Secure Shell</dd><dt>DNS</dt><dd>Domain Name System</dd><dt>DoH</dt><dd>DNS over HTTPS</dd><dt>PeerAPI</dt><dd>overlay peer application-programming interface (exit DNS over HTTPS)</dd><dt>HTTPS</dt><dd>Hypertext Transfer Protocol Secure</dd><dt>HTTP</dt><dd>Hypertext Transfer Protocol</dd><dt>API</dt><dd>application programming interface</dd><dt>CLI</dt><dd>command-line interface</dd><dt>MTU</dt><dd>Maximum Transmission Unit</dd><dt>ULA</dt><dd>unique-local address (IPv6)</dd><dt>LAN</dt><dd>Local Area Network</dd><dt>WAN</dt><dd>Wide Area Network</dd><dt>WG</dt><dd>WireGuard</dd><dt>canIpForward</dt><dd>Google Cloud instance flag that allows IP forwarding</dd><dt>PORT</dt><dd>overlay UDP listen port setting</dd><dt>MASQUERADE</dt><dd>iptables masquerade (source NAT)</dd><dt>KEX</dt><dd>key exchange</dd><dt>RD</dt><dd>Recursion Desired (DNS flag)</dd><dt>Happy-Eyeballs</dt><dd>dual-stack connection racing (RFC 8305)</dd><dt>LOCAL</dt><dd>iptables addrtype match for locally-owned addresses</dd><dt>WireGuard</dt><dd>UDP-based VPN protocol</dd><dt>nft</dt><dd>nftables (Linux packet filter)</dd><dt>Pi</dt><dd>single-board computer (Raspberry Pi class)</dd></dl></section>
+<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>GCP</dt><dd>Google Cloud Platform</dd><dt>GCE</dt><dd>Google Compute Engine</dd><dt>IP</dt><dd>Internet Protocol</dd><dt>IPv4</dt><dd>Internet Protocol version 4</dd><dt>IPv6</dt><dd>Internet Protocol version 6</dd><dt>IAP</dt><dd>Identity-Aware Proxy</dd><dt>VM</dt><dd>virtual machine</dd><dt>UDP</dt><dd>User Datagram Protocol</dd><dt>VPC</dt><dd>Virtual Private Cloud</dd><dt>NAT</dt><dd>network address translation</dd><dt>NIC</dt><dd>network interface card</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>OpenSSH</dt><dd>OpenBSD Secure Shell</dd><dt>DNS</dt><dd>Domain Name System</dd><dt>DoH</dt><dd>DNS over HTTPS</dd><dt>PeerAPI</dt><dd>overlay peer application-programming interface (exit DNS over HTTPS)</dd><dt>HTTPS</dt><dd>Hypertext Transfer Protocol Secure</dd><dt>HTTP</dt><dd>Hypertext Transfer Protocol</dd><dt>API</dt><dd>application programming interface</dd><dt>CLI</dt><dd>command-line interface</dd><dt>MTU</dt><dd>Maximum Transmission Unit</dd><dt>ULA</dt><dd>unique-local address (IPv6)</dd><dt>LAN</dt><dd>Local Area Network</dd><dt>WAN</dt><dd>Wide Area Network</dd><dt>WG</dt><dd>WireGuard</dd><dt>canIpForward</dt><dd>Google Cloud instance flag that allows IP forwarding</dd><dt>PORT</dt><dd>overlay UDP listen port setting</dd><dt>MASQUERADE</dt><dd>iptables masquerade (source NAT)</dd><dt>KEX</dt><dd>key exchange</dd><dt>RD</dt><dd>Recursion Desired (DNS flag)</dd><dt>Happy-Eyeballs</dt><dd>dual-stack connection racing (RFC 8305)</dd><dt>LOCAL</dt><dd>iptables addrtype match for locally-owned addresses</dd><dt>WireGuard</dt><dd>UDP-based VPN protocol</dd><dt>nft</dt><dd>nftables (Linux packet filter)</dd><dt>Pi</dt><dd>single-board computer (Raspberry Pi class)</dd><dt>ControlPath</dt><dd>OpenSSH multiplexing socket path option</dd><dt>UNCONN</dt><dd>ss(8) unconnected socket state</dd><dt>Android</dt><dd>mobile operating system</dd></dl></section>
+<h2 id="topology">Topology</h2>
+<pre><code class="language-text">[&lt;overlay-peer&gt; LAN Pi] --exit selected--&gt; [&lt;exit-node&gt; GCE-like VM]
+    canIpForward + guest ip_forward
+    advertise 0.0.0.0/0 AND ::/0
+    overlay UDP PORT=41641  +  VPC allow UDP 41641  (together)
+    NAT: overlay postrouting only — MUST NOT second MASQUERADE -o &lt;gcp-nic&gt;
+    IPv6 default via fe80::… dev &lt;gcp-nic&gt;
+    rp_filter=2 on &lt;gcp-nic&gt;
+
+Admin: OpenSSH overlay :22 daily; IAP break-glass
+Soak: &lt;overlay-peer&gt;, NEVER the agent workstation</code></pre>
+<h2 id="bind">Bind</h2>
+<table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><code>&lt;exit-node&gt;</code></td><td>Google Cloud overlay exit VM</td><td>Cloud VM</td></tr><tr><td><code>&lt;overlay-peer&gt;</code></td><td>Soak client</td><td>LAN Pi</td></tr><tr><td><code>&lt;gcp-nic&gt;</code></td><td>Guest public NIC</td><td>Iface</td></tr><tr><td><code>&lt;overlay-tun&gt;</code></td><td>Overlay tun</td><td>Iface</td></tr><tr><td><code>&lt;user&gt;</code></td><td>SSH user</td><td>Guest</td></tr><tr><td><code>&lt;overlay-v4&gt;</code></td><td>Overlay IPv4 of the exit</td><td>Never publish</td></tr></tbody></table>
+<h2 id="formulas">Formulas</h2>
+<p><code>mss4 = &lt;wg-mtu&gt; - 40</code>, <code>mss6 = &lt;wg-mtu&gt; - 60</code> apply on the <strong>client underlay</strong>, not as a GCP MTU knob. Do not keep changing GCP MTU for Wi-Fi vs cellular splits (<a href="../supporting/s26-wifi-vs-cellular-underlay.html">OEN-S26</a>).</p>
 <h2 id="decision">Decision</h2>
 <p>Bring a Google Cloud overlay exit up as a <strong>checklist</strong>, not as a single <code>advertise-exit-node</code> flag. Treat Identity-Aware Proxy as recovery. Treat metadata Domain Name System (DNS) and leak-test HTTP 502 as misleading diagnostics. Never hairpin the operator’s workstation through this exit while an agent session needs the internet.</p>
 <h2 id="consequences">Consequences</h2>
 <ul><li>Phones can see the exit (because <code>::/0</code> is present).</li><li>Mesh UDP actually hits the VM (because PORT is fixed and the VPC rule matches).</li><li>Exit-client IPv6 HTTPS works (because NAT is not double-masqueraded).</li><li>Operators still have a door when overlay SSH key exchange fails (IAP), without making IAP the daily path.</li></ul>
+<h2 id="agent-stop-rule">Agent stop rule</h2>
+<blockquote><p>MUST emit a bound checklist (<code>canIpForward</code>, <code>PORT=41641</code>, <code>ss</code>, <code>curl -4/-6</code> from <code>&lt;overlay-peer&gt;</code>).   MUST NOT <code>gcloud compute instances reset</code>.   MUST NOT select this exit on the agent workstation.   MUST NOT add a second IPv6 MASQUERADE on <code>&lt;gcp-nic&gt;</code>.</p></blockquote>
 <h2 id="procedure">Procedure</h2>
 <p>Placeholders: <code>&lt;exit-node&gt;</code> is the GCP VM. <code>&lt;gcp-nic&gt;</code> is the guest network interface (NIC). <code>&lt;overlay-peer&gt;</code> is a <strong>non-workstation</strong> client used for soak (a LAN Pi). Never the agent workstation.</p>
 <ol><li><strong>P1 — Confirm IP forwarding in the instance and the guest.</strong><br>
 - <strong>Action:</strong> From break-glass SSH, <code>gcloud compute instances describe</code> (or equivalent) and check <code>canIpForward</code> is true. In the guest: <code>sysctl net.ipv4.ip_forward</code> (and IPv6 forwarding if you advertise <code>::/0</code>).<br>
 - <strong>Expected:</strong> API <code>canIpForward: true</code>. sysctl is 1.<br>
 - <strong>On failure:</strong> Stop. Set canIpForward on the instance (requires recreate or the documented API update) before debugging NAT.</li><li><strong>P2 — Advertise both default routes and keep accept-dns off on the exit VM.</strong><br>
-- <strong>Action:</strong> On <code>&lt;exit-node&gt;</code>, advertise exit plus <code>0.0.0.0/0,::/0</code>. Set <code>accept-dns=false</code> on this VM (guest DNS pretty-print is not PeerAPI; turning accept-dns on can break Recursion Desired (RD)=0 exit DNS — forthcoming OEN-23).<br>
+- <strong>Action:</strong> On <code>&lt;exit-node&gt;</code>, advertise exit plus <code>0.0.0.0/0,::/0</code>. Set <code>accept-dns=false</code> on this VM (guest DNS pretty-print is not PeerAPI; turning accept-dns on can break Recursion Desired (RD)=0 exit DNS — <a href="23-cloud-exit-accept-dns.html">OEN-23</a>).<br>
 - <strong>Expected:</strong> Coordinator or <code>status</code> shows the node offers exit and both routes. Android does not hide the node.<br>
 - <strong>On failure:</strong> If <code>::/0</code> is missing, phones will not list the exit. Re-advertise; do not debug DNS first.</li><li><strong>P3 — Fix overlay UDP PORT and the cloud firewall together.</strong><br>
-- <strong>Action:</strong> Set daemon <code>PORT=41641</code> (never empty, never leave <code>0</code> in production). Restart the daemon. Allow UDP 41641 on the guest firewall <strong>and</strong> the VPC rule for <code>&lt;gcp-nic&gt;</code>.<br>
-- <strong>Expected:</strong> <code>ss</code> / <code>netstat</code> shows UDP 41641. VPC rule is not a decoration on top of PORT=0.<br>
-- <strong>On failure:</strong> If PORT was 0, the VPC allow did nothing. Set PORT, restart, then re-check. Forthcoming OEN-S23.</li><li><strong>P4 — NAT and policy routing without a second MASQUERADE.</strong><br>
+- <strong>Action:</strong> Set daemon <code>PORT=41641</code> (never empty, never leave <code>0</code> in production). Restart the daemon. Allow UDP 41641 on the guest firewall <strong>and</strong> the VPC rule for <code>&lt;gcp-nic&gt;</code>.</li></ol>
+<pre><code class="language-bash">     ssh -o ControlPath=none &lt;user&gt;@&lt;exit-node&gt; &#x27;ss -ulnp | grep 41641; sysctl net.ipv4.ip_forward net.ipv6.conf.all.forwarding&#x27;
+     </code></pre>
+<p>- <strong>Expected:</strong> <code>ss</code> / <code>netstat</code> shows UDP 41641. VPC rule is not a decoration on top of PORT=0. - <strong>On failure:</strong> If PORT was 0, the VPC allow did nothing. Set PORT, restart, then re-check. <a href="../supporting/s23-vpc-41641-useless-while-port-0.html">OEN-S23</a>.</p>
+<ol><li><strong>P4 — NAT and policy routing without a second MASQUERADE.</strong><br>
 - <strong>Action:</strong> Inspect ip6tables/nft. There MUST NOT be an extra <code>MASQUERADE -o &lt;gcp-nic&gt;</code> beside overlay postrouting. IPv6 default in the exit policy table MUST be <code>via fe80::… dev &lt;gcp-nic&gt;</code>. Set <code>net.ipv4.conf.&lt;gcp-nic&gt;.rp_filter=2</code> (and the IPv6 analogue if used).<br>
 - <strong>Expected:</strong> Exit-client <code>curl -6 https://example.com</code> returns 200. No duplicate masquerade.<br>
 - <strong>On failure:</strong> Remove the extra MASQUERADE. Fix the default route to include the link-local gateway. Do not add more NAT.</li><li><strong>P5 — Soak from a LAN Pi, not from the agent workstation.</strong><br>
 - <strong>Action:</strong> On <code>&lt;overlay-peer&gt;</code> (LAN Pi), select <code>&lt;exit-node&gt;</code> briefly. <code>curl -4</code> and <code>curl -6</code> to <code>https://example.com</code> with a short timeout. Then clear the exit.<br>
 - <strong>Expected:</strong> HTTP 200 on both families. Egress addresses belong to the cloud, not the home tunnel.<br>
-- <strong>On failure:</strong> If v4 works and v6 leaks home, that may be LAN unique-local address (ULA) Happy-Eyeballs (forthcoming OEN-20) or Wi-Fi vs cellular underlay (forthcoming OEN-S26) — not automatically a GCP NAT bug. If cellular-class clients work and Wi-Fi does not, do not keep changing GCP Maximum Transmission Unit (MTU).</li><li><strong>P6 — Admin door: plain OpenSSH on overlay 22; IAP is break-glass.</strong><br>
+- <strong>On failure:</strong> If v4 works and v6 leaks home, that may be LAN unique-local address (ULA) Happy-Eyeballs (<a href="20-lan-ula-happy-eyeballs-leak.html">OEN-20</a>) or Wi-Fi vs cellular underlay (<a href="../supporting/s26-wifi-vs-cellular-underlay.html">OEN-S26</a>) — not automatically a GCP NAT bug. If cellular-class clients work and Wi-Fi does not, do not keep changing GCP Maximum Transmission Unit (MTU).</li><li><strong>P6 — Admin door: plain OpenSSH on overlay 22; IAP is break-glass.</strong><br>
 - <strong>Action:</strong> Prefer <code>ssh user@&lt;exit-node-overlay&gt;</code>. If the overlay <code>ssh</code> CLI fails during key exchange, use plain OpenSSH. Use IAP only when overlay is down.<br>
 - <strong>Expected:</strong> Overlay OpenSSH works for daily ops. IAP is documented, unused in the happy path.<br>
 - <strong>On failure:</strong> Do not <code>gcloud compute instances reset</code> as a debug step. Check PORT/mesh first (<a href="01-overlay-ssh-byte-cliff.html">OEN-01</a> if large output hangs).</li><li><strong>P7 — Ignore misleading DNS and leak-test canaries.</strong><br>
 - <strong>Action:</strong> If <code>dns query</code> on the VM shows <code>169.254.169.254</code>, ignore it for exit-client DNS. If a leak-test site returns 502 from GCP, switch the browse gate to <code>example.com</code>.<br>
-- <strong>Expected:</strong> Exit DNS is proven with PeerAPI DoH from a <strong>non-exit</strong> client (forthcoming OEN-05 / OEN-14), not with guest <code>dig</code>.<br>
+- <strong>Expected:</strong> Exit DNS is proven with PeerAPI DoH from a <strong>non-exit</strong> client (<a href="05-exit-peerapi-dns-stub.html">OEN-05</a> / <a href="14-exit-dns-is-peerapi.html">OEN-14</a>), not with guest <code>dig</code>.<br>
 - <strong>On failure:</strong> Do not set <code>accept-dns=true</code> on the exit VM to make the display pretty.</li></ol>
 <h2 id="verify">Verify</h2>
 <ul><li><code>canIpForward</code> true; guest forwarding on; both default routes advertised.</li><li>Daemon listens UDP 41641; VPC and guest firewall allow it.</li><li>No extra <code>MASQUERADE -o &lt;gcp-nic&gt;</code>.</li><li>Policy IPv6 default uses <code>via fe80::…</code>.</li><li><code>&lt;overlay-peer&gt;</code> soak: <code>example.com</code> 200 over the exit; agent workstation exit remains unset.</li><li>IAP is available and unused in the happy path.</li></ul>
+<h2 id="expected-samples">Expected samples</h2>
+<pre><code class="language-text">canIpForward: true
+udp UNCONN ... 0.0.0.0:41641
+# soak from &lt;overlay-peer&gt;
+200
+200</code></pre>
 <h2 id="must-not" class="must-not">MUST NOT</h2>
 <ul><li>MUST NOT put GCP <strong>project ids</strong>, <strong>zones</strong>, or <strong>VM inventory names</strong> in public text.</li><li>MUST NOT publish a ranked exit ladder.</li><li>MUST NOT select this exit on the agent workstation to reproduce.</li><li>MUST NOT add a second IPv6 MASQUERADE on <code>&lt;gcp-nic&gt;</code>.</li><li>MUST NOT leave <code>PORT</code> empty or <code>0</code> while counting on a VPC UDP 41641 rule.</li><li>MUST NOT treat metadata DNS or a leak-test 502 as proof the exit is down.</li><li>MUST NOT reset the VM as a first debug step.</li></ul>
 <h2 id="related-specs">Related specs</h2>
-<ul><li><a href="01-overlay-ssh-byte-cliff.html">OEN-01 Overlay SSH byte cliff</a> (built)</li><li><a href="16-commercial-wg-endpoint-rotation.html">OEN-16 Commercial WireGuard endpoint rotation</a> (built) — underlay to this VM may still be commercial WireGuard (WG) from home</li><li>OEN-13 overlay vs underlay vs unique-local layers (forthcoming)</li><li>OEN-23 accept-dns on a cloud exit (forthcoming)</li><li>OEN-S18 do not set exit on the agent workstation (forthcoming)</li><li>OEN-S21 cloud exit hairpins home LAN (forthcoming)</li><li>OEN-S22 Identity-Aware Proxy vs overlay key exchange (forthcoming)</li><li>OEN-S23 VPC 41641 while PORT=0 (forthcoming)</li></ul>
+<ul><li><a href="01-overlay-ssh-byte-cliff.html">OEN-01 Overlay SSH byte cliff</a></li><li><a href="16-commercial-wg-endpoint-rotation.html">OEN-16 Commercial WireGuard endpoint rotation</a> — underlay to this VM may still be commercial WireGuard (WG) from home</li><li><a href="13-overlay-underlay-ula-layers.html">OEN-13 Overlay vs underlay vs unique-local layers</a></li><li><a href="23-cloud-exit-accept-dns.html">OEN-23 Cloud-exit accept-dns</a></li><li><a href="../supporting/s18-do-not-set-exit-on-agent-workstation.html">OEN-S18 Do not set exit on the agent workstation</a></li><li><a href="../supporting/s21-cloud-exit-hairpin-lan.html">OEN-S21 Cloud exit hairpins home LAN</a></li><li><a href="../supporting/s22-iap-break-glass-kex.html">OEN-S22 Identity-Aware Proxy vs overlay key exchange</a></li><li><a href="../supporting/s23-vpc-41641-useless-while-port-0.html">OEN-S23 VPC 41641 while PORT=0</a></li></ul>
 <h2 id="prior-art-not-novel">Prior art (Not novel)</h2>
 <p>GCP <code>canIpForward</code> and “allow UDP 41641” appear in overlay exit tutorials. This spec’s claim is the <strong>failure cluster</strong>: PORT=0 vs VPC, duplicate v6 MASQUERADE, policy default without link-local gateway, Android hiding exits without <code>::/0</code>, IAP vs CLI KEX, metadata DNS vs PeerAPI, and leak-test 502 from GCP ranges.</p>
       </article>

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>OEN-S02: clamp-mss-to-pmtu is a no-op when ICMP is dropped — Overlay and Edge Notes</title>
+    <meta name="description" content="iptables --clamp-mss-to-pmtu uses learned path MTU. When ICMP fragmentation-needed is blackholed, the clamp does nothing; use explicit --set-mss.">
+    <link rel="canonical" href="https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s02-clamp-mss-to-pmtu-noop.html">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Source+Sans+3:wght@400;500;600&amp;display=swap">
+    <link rel="stylesheet" href="../assets/spec.css">
+    <link rel="describedby" href="../llms.txt">
+    <meta name="author" content="Eugene Armstead">
+    <meta name="citation_author" content="Eugene Armstead">
+    <meta name="dcterms.creator" content="Eugene Armstead">
+    <link rel="author" href="https://www.armsteadent.com/">
+    <meta property="article:author" content="Eugene Armstead">
+    <meta property="og:see_also" content="https://www.armsteadent.com/">
+    <meta property="og:title" content="OEN-S02: clamp-mss-to-pmtu is a no-op when ICMP is dropped — Overlay and Edge Notes">
+    <meta property="og:description" content="iptables --clamp-mss-to-pmtu uses learned path MTU. When ICMP fragmentation-needed is blackholed, the clamp does nothing; use explicit --set-mss.">
+    <meta property="og:url" content="https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s02-clamp-mss-to-pmtu-noop.html">
+    <meta property="og:type" content="article">
+    <meta property="article:published_time" content="2026-09-08">
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "TechArticle",
+      "@id": "https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s02-clamp-mss-to-pmtu-noop.html#article",
+      "headline": "clamp-mss-to-pmtu is a no-op when ICMP is dropped",
+      "description": "iptables --clamp-mss-to-pmtu uses learned path MTU. When ICMP fragmentation-needed is blackholed, the clamp does nothing; use explicit --set-mss.",
+      "datePublished": "2026-09-08",
+      "author": {
+        "@type": "Person",
+        "name": "Eugene Armstead",
+        "url": "https://www.armsteadent.com/",
+        "sameAs": [
+          "https://github.com/eugenearmstead"
+        ]
+      },
+      "url": "https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s02-clamp-mss-to-pmtu-noop.html",
+      "identifier": "OEN-S02",
+      "license": "https://creativecommons.org/licenses/by/4.0/",
+      "inLanguage": "en"
+    },
+    {
+      "@type": "HowTo",
+      "name": "clamp-mss-to-pmtu is a no-op when ICMP is dropped",
+      "description": "iptables --clamp-mss-to-pmtu uses learned path MTU. When ICMP fragmentation-needed is blackholed, the clamp does nothing; use explicit --set-mss.",
+      "author": {
+        "@type": "Person",
+        "name": "Eugene Armstead",
+        "url": "https://www.armsteadent.com/",
+        "sameAs": [
+          "https://github.com/eugenearmstead"
+        ]
+      },
+      "step": [
+        {
+          "@type": "HowToStep",
+          "position": 1,
+          "name": "P1 \u2014 See clamp-to-pmtu with no learned PMTU.",
+          "text": "Action: List FORWARD TCPMSS. Note `--clamp-mss-to-pmtu`. Don't-fragment ladder ([OEN-S01](s01-pmtud-size-ladder.md)) still cliffs; Chromium still closes. Expected: Rule exists; TCP still too large. On failure: If ICMP frag-needed is visible, clamp-to-pmtu MAY work \u2014 this spec does not apply."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 2,
+          "name": "P2 \u2014 Replace with explicit --set-mss.",
+          "text": "Action: On LAN\u2194`<wg-iface>` v4 and v6, `--set-mss` under tunnel payload. Keep LAN 1500. Expected: Chromium HTTPS and/or overlay SSH 3 KB+ work. On failure: Do not also shrink the LAN MTU."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 3,
+          "name": "P3 \u2014 Confirm ICMP still dropped.",
+          "text": "Action: Large DF ping may still fail; TCP now fits because MSS was forced. Expected: TCP works; ICMP PMTUD remains blackholed. On failure: That split is expected."
+        }
+      ]
+    }
+  ]
+}
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <div class="site-header-inner">
+        <p class="site-title"><a href="../index.html">Overlay and Edge Notes</a></p>
+        <p class="site-tag">Public field notes by Eugene Armstead</p>
+    <nav class="site-nav" aria-label="Site">
+      <a href="../index.html">Home</a>
+      <a href="../DISCLOSURE.html">Disclosure</a>
+      <a href="../changelog.html">Changelog</a>
+      <a href="../editions/2026.html">2026</a>
+      <a href="../AGENTS.md">AGENTS.md</a>
+      <a href="../index.html#networking">Networking</a>
+      <a href="../index.html#web">Web</a>
+      <a href="../index.html#supporting">Supporting</a>
+    </nav>
+      </div>
+    </header>
+    <nav class="breadcrumb" aria-label="Breadcrumb"><ol><li><a href="../index.html">Home</a></li><li><a href="../index.html#supporting">Supporting</a></li><li>OEN-S02</li></ol></nav>
+    <main id="main">
+      <article>
+        <h1>clamp-mss-to-pmtu is a no-op when ICMP is dropped</h1>
+        <p class="meta-line"><span>OEN-S02</span> · supporting · edition 1 · 2026-09-08</p>
+        <h2 id="context">Context</h2>
+<p>The usual recipe <code>TCPMSS --clamp-mss-to-pmtu</code> on Local Area Network (LAN)↔Virtual Private Network (VPN) FORWARD does <strong>nothing useful</strong> when Internet Control Message Protocol (ICMP) path MTU discovery (PMTUD) is blackholed — common on commercial WireGuard. Packet counters may increment while Maximum Segment Size (MSS) never changes. Backs <a href="../networking/01-overlay-ssh-byte-cliff.html">OEN-01</a> and <a href="../networking/02-chromium-tls-pmtu.html">OEN-02</a>.</p>
+
+<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>VPS</dt><dd>Virtual Private Server</dd><dt>LAN</dt><dd>Local Area Network</dd><dt>WAN</dt><dd>Wide Area Network</dd><dt>VPN</dt><dd>Virtual Private Network</dd><dt>KB</dt><dd>kilobyte</dd><dt>TCP</dt><dd>Transmission Control Protocol</dd><dt>MSS</dt><dd>Maximum Segment Size</dd><dt>TCPMSS</dt><dd>iptables/nft target that sets TCP Maximum Segment Size</dd><dt>MTU</dt><dd>Maximum Transmission Unit</dd><dt>ICMP</dt><dd>Internet Control Message Protocol</dd><dt>PMTU</dt><dd>path Maximum Transmission Unit</dd><dt>PMTUD</dt><dd>path MTU discovery</dd><dt>DF</dt><dd>don&#x27;t-fragment (IP flag)</dd><dt>HTTPS</dt><dd>Hypertext Transfer Protocol Secure</dd><dt>IP</dt><dd>Internet Protocol</dd><dt>IPv4</dt><dd>Internet Protocol version 4</dd><dt>IPv6</dt><dd>Internet Protocol version 6</dd><dt>WireGuard</dt><dd>UDP-based VPN protocol</dd><dt>nft</dt><dd>nftables (Linux packet filter)</dd><dt>FORWARD</dt><dd>netfilter/iptables forward chain</dd><dt>Pi</dt><dd>single-board computer (Raspberry Pi class)</dd><dt>Chromium</dt><dd>open-source browser engine</dd><dt>Inter</dt><dd>variable sans-serif font family</dd></dl></section>
+<h2 id="topology">Topology</h2>
+<pre><code class="language-text">LAN&lt;-&gt;VPN FORWARD TCPMSS --clamp-mss-to-pmtu
+ICMP frag-needed blackholed  --&gt;  learned PMTU never updates  --&gt;  clamp is a no-op
+FIX: explicit --set-mss &lt;mss4&gt;/&lt;mss6&gt;</code></pre>
+<h2 id="bind">Bind</h2>
+<p>Fill this table <strong>before</strong> any live change. Do <strong>not</strong> paste real values back into public notes.</p>
+<table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><code>&lt;cloud-vps&gt;</code></td><td>Overlay SSH target</td><td>Cloud VPS</td></tr><tr><td><code>&lt;lan-pi&gt;</code></td><td>Overlay SSH target</td><td>LAN Pi</td></tr><tr><td><code>&lt;user&gt;</code></td><td>SSH user</td><td>Guest account</td></tr><tr><td><code>&lt;wg-iface&gt;</code></td><td>Commercial WireGuard iface</td><td>Router or VPS client</td></tr><tr><td><code>&lt;wan-iface&gt;</code></td><td>WAN iface</td><td>Router</td></tr><tr><td><code>&lt;lan-bridge&gt;</code></td><td>LAN bridge</td><td>Router (MTU 1500)</td></tr><tr><td><code>&lt;overlay-tun&gt;</code></td><td>Overlay tun iface</td><td>Node under test</td></tr><tr><td><code>&lt;wg-mtu&gt;</code></td><td>MTU integer from <code>ip link</code></td><td>Measured</td></tr><tr><td><code>&lt;mss4&gt;</code> / <code>&lt;mss6&gt;</code></td><td>Computed MSS</td><td>Formulas</td></tr><tr><td><code>&lt;vps-public-v4&gt;</code> / <code>&lt;vps-public-v6&gt;</code></td><td>VPS public addresses</td><td>WAN; never publish</td></tr><tr><td><code>&lt;overlay-v4&gt;</code> / <code>&lt;overlay-v6&gt;</code></td><td>Overlay addresses</td><td>Overlay; never publish</td></tr></tbody></table>
+<h2 id="formulas">Formulas</h2>
+<pre><code class="language-text"># Measure &lt;wg-mtu&gt; from: ip link show &lt;wg-iface&gt;
+mss4 = &lt;wg-mtu&gt; - 40    # IPv4 TCP (20-byte IP + 20-byte TCP)
+mss6 = &lt;wg-mtu&gt; - 60    # IPv6 TCP (40-byte IPv6 + 20-byte TCP)
+# IPv4 DF ping: IP size ≈ payload + 28
+# IPv6 DF ping: IP size ≈ payload + 48
+# Historical 1160 / 1146-byte SSH cliff = wrong-scope clamp, not this recipe.
+# LAN bridge MTU MUST stay 1500.</code></pre>
+<p>See <a href="../networking/01-overlay-ssh-byte-cliff.html">OEN-01</a> and <a href="../supporting/s01-pmtud-size-ladder.html">OEN-S01</a>.</p>
+<h2 id="method">Method</h2>
+<p>Use explicit <code>TCPMSS --set-mss</code> with a value under the tunnel payload (example 1200). MUST NOT treat clamp-to-pmtu as the LAN↔VPN fix when ICMP is dropped.</p>
+<h2 id="consequences">Consequences</h2>
+<p>Chromium and overlay Secure Shell (SSH) large output start working without shrinking the LAN bridge to the tunnel Maximum Transmission Unit (MTU).</p>
+<h2 id="agent-stop-rule">Agent stop rule</h2>
+<blockquote><p>A coding agent MUST emit a <strong>bound runbook</strong> (placeholders replaced from Bind). MUST NOT apply live <code>ip rule</code>, nft, iptables, ip6tables, sysctl, <code>wg set</code>, daemon restart, or deploy until a <strong>human</strong> filled Bind. MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS. MUST NOT file an upstream bug from this page. MUST NOT publish real addresses, hostnames, or custom ports.</p></blockquote>
+<h2 id="procedure">Procedure</h2>
+<p>Placeholders only until Bind is filled: <code>&lt;cloud-vps&gt;</code>, <code>&lt;lan-pi&gt;</code>, <code>&lt;overlay-peer&gt;</code>, <code>&lt;exit-node&gt;</code>, <code>&lt;wg-iface&gt;</code>, <code>&lt;gcp-nic&gt;</code>, plus the Bind extras on this page.</p>
+<h3>Copy-paste commands (after Bind)</h3>
+<pre><code class="language-bash">iptables -S FORWARD | grep -i tcpmss
+ip6tables -S FORWARD | grep -i tcpmss
+# Replace clamp-mss-to-pmtu with --set-mss &quot;$mss4&quot; / &quot;$mss6&quot; on &lt;lan-bridge&gt;&lt;-&gt;&lt;wg-iface&gt; only.</code></pre>
+<ol><li><strong>P1 — See clamp-to-pmtu with no learned PMTU.</strong><br>
+- <strong>Action:</strong> List FORWARD TCPMSS. Note <code>--clamp-mss-to-pmtu</code>. Don&#x27;t-fragment ladder (<a href="s01-pmtud-size-ladder.html">OEN-S01</a>) still cliffs; Chromium still closes.<br>
+- <strong>Expected:</strong> Rule exists; TCP still too large.<br>
+- <strong>On failure:</strong> If ICMP frag-needed is visible, clamp-to-pmtu MAY work — this spec does not apply.</li><li><strong>P2 — Replace with explicit --set-mss.</strong><br>
+- <strong>Action:</strong> On LAN↔<code>&lt;wg-iface&gt;</code> v4 and v6, <code>--set-mss</code> under tunnel payload. Keep LAN 1500.<br>
+- <strong>Expected:</strong> Chromium HTTPS and/or overlay SSH 3 KB+ work.<br>
+- <strong>On failure:</strong> Do not also shrink the LAN MTU.</li><li><strong>P3 — Confirm ICMP still dropped.</strong><br>
+- <strong>Action:</strong> Large DF ping may still fail; TCP now fits because MSS was forced.<br>
+- <strong>Expected:</strong> TCP works; ICMP PMTUD remains blackholed.<br>
+- <strong>On failure:</strong> That split is expected.</li></ol>
+<h2 id="expected-samples">Expected samples</h2>
+<pre><code class="language-text"># Counters increment, Chromium still closes — clamp-to-pmtu learned nothing
+TCPMSS  ...  clamp to PMTU  pkts:N</code></pre>
+<h2 id="verify">Verify</h2>
+<ul><li>Explicit --set-mss on LAN↔VPN only.</li><li>LAN MTU 1500.</li><li>Browser or SSH symptom gone.</li><li>ICMP / small ping success was <strong>not</strong> used as the pass criterion when this spec names TCP, SSH, or HTTPS.</li><li>Bind table was filled by a human before any live <code>ip</code> / nft / iptables change.</li></ul>
+<h2 id="must-not" class="must-not">MUST NOT</h2>
+<ul><li>MUST NOT rely on --clamp-mss-to-pmtu when ICMP is dropped.</li><li>MUST NOT shrink the LAN bridge to make the ladder green.</li><li>MUST NOT clamp overlay return.</li><li>MUST NOT apply live network or firewall changes until Bind is filled by a human.</li><li>MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.</li><li>MUST NOT publish hostnames, addresses, ULAs, or custom ports.</li></ul>
+<h2 id="related-specs">Related specs</h2>
+<ul><li><a href="../networking/01-overlay-ssh-byte-cliff.html">OEN-01</a></li><li><a href="../networking/02-chromium-tls-pmtu.html">OEN-02</a></li><li><a href="s01-pmtud-size-ladder.html">OEN-S01</a></li></ul>
+<h2 id="prior-art-not-novel">Prior art (Not novel)</h2>
+<p>clamp-mss-to-pmtu is the man-page default. This note exists because commercial-VPN ICMP blackholes make it a no-op.</p>
+      </article>
+    </main>
+    <footer class="site-footer">
+      <div class="site-footer-inner">
+    <p class="byline">Written by <a href="https://www.armsteadent.com/">Eugene Armstead</a> · <a href="https://www.armsteadent.com/">https://www.armsteadent.com/</a> · <a rel="license" href="https://creativecommons.org/licenses/by/4.0/">CC-BY-4.0</a></p>
+    <p class="license-line">Living field notes. Stable IDs. Do not copy private inventory into public text.</p>
+      </div>
+    </footer>
+  </body>
+</html>

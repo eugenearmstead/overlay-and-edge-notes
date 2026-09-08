@@ -62,43 +62,43 @@
           "@type": "HowToStep",
           "position": 1,
           "name": "P1 \u2014 Disable SSH multiplexing for the audit.",
-          "text": "Action: Add `-o ControlPath=none` to every overlay SSH command in this procedure. Expected: A new TCP session, not a reused mux. On failure: Stop. Heal or ignore mux sockets; they are not the MTU fix. Continue only with `ControlPath=none`."
+          "text": "Action: Add `-o ControlPath=none` to every overlay SSH command."
         },
         {
           "@type": "HowToStep",
           "position": 2,
           "name": "P2 \u2014 Prove small commands work and large commands hang on the cloud VPS.",
-          "text": "Action: Overlay SSH to `<cloud-vps>` and run a tiny command (`hostname` or `echo ok`). Then run a command that prints more than ~2 KB (for example `top -bn1` piped to `wc -c`). Expected: Tiny command returns. Large output stalls or `wc -c` never finishes. On failure: If large output already works, this spec does not apply. If tiny commands fail, this is not a byte cliff (auth, routing, or daemon)."
+          "text": "Action: Tiny then large (do not cancel the large command for 30 seconds):"
         },
         {
           "@type": "HowToStep",
           "position": 3,
           "name": "P3 \u2014 Compare with a LAN Pi on the same client.",
-          "text": "Action: Repeat P2 against `<lan-pi>`. Expected: The Pi accepts 3 KB+ on the same client. On failure: If the Pi also cliffs, look at the **client** path (LAN\u2194VPN MSS, client MTU) before blaming the VPS."
+          "text": "Action: Repeat the large command against `<lan-pi>`."
         },
         {
           "@type": "HowToStep",
           "position": 4,
           "name": "P4 \u2014 Measure don't-fragment size to the VPS public address vs overlay address.",
-          "text": "Action: Run the size ladder in [OEN-S01](../supporting/s01-pmtud-size-ladder.md) toward the VPS **public** address and toward the overlay address of `<cloud-vps>`. Expected: If mesh underlay is double-encapsulated, DF to the public address tops out about 100 bytes under the commercial tunnel MTU. Clear WAN to the same public address is larger. On failure: If public-address DF already reaches near WAN MTU, skip to P6 (MSS scope)."
+          "text": "Action: Run the IPv4 **and** IPv6 ladders in [OEN-S01](../supporting/s01-pmtud-size-ladder.md) toward `<vps-public-v4>` / `<vps-public-v6>` and toward `<overlay-v4>` / `<overlay-v6>`. Expected: If mesh underlay is double-encapsulated, DF to the public address tops out about 100 bytes under `<wg-mtu>`. Clear WAN to the same public address is larger. Sample fail: `ping: local error: message too long, mtu=<wg-mtu>`. Sample success: `1 packets transmitted, 1 received`. On failure: If public-address "
         },
         {
           "@type": "HowToStep",
           "position": 5,
           "name": "P5 \u2014 Install destination policy so VPS public addresses use clear WAN.",
-          "text": "Action: On the consumer router (or the host that selects commercial WireGuard vs WAN), add policy routing so packets **destined to** the cloud VPS public v4 and v6 addresses use the main/WAN table, not `<wg-iface>`. Expected: `ip route get <vps-public>` from a LAN source shows the WAN path, not `<wg-iface>`. General internet `ip route get` of a public resolver MAY still show `<wg-iface>`. On failure: Recheck policy preference order. Do not shrink the LAN bridge MTU."
+          "text": "Action: On the consumer router (or the host that selects commercial WireGuard vs WAN), add policy so packets **destined to** the cloud VPS public addresses use table `main` / WAN, not `<wg-iface>`. **Human MUST have filled Bind.** Preferences `10005` / `10006` are examples; pick unused prefs."
         },
         {
           "@type": "HowToStep",
           "position": 6,
           "name": "P6 \u2014 Strip global / overlay-return MSS; keep exit-path clamp only.",
-          "text": "Action: List FORWARD / mangle TCPMSS rules. Delete any global `--set-mss` and any WAN\u2192overlay return clamp. Keep MSS only on the **exit** forward path (overlay\u2192WAN) if this host is also an `<exit-node>`. Expected: Admin overlay SSH is not subject to an MSS of ~1160 on the return path. On failure: Re-audit after exit-node scripts redeploy; bad clamps come back."
+          "text": "Action: List FORWARD / mangle TCPMSS. Delete any **global** `--set-mss` and any WAN\u2192`<overlay-tun>` return clamp. Keep MSS only on the **exit** forward path (`<overlay-tun>`\u2192WAN) if this host is also an `<exit-node>`."
         },
         {
           "@type": "HowToStep",
           "position": 7,
           "name": "P7 \u2014 Keep LAN 1500; explicit `--set-mss` only on LAN\u2194VPN forward.",
-          "text": "Action: Confirm the LAN bridge MTU is 1500. On LAN\u2194`<wg-iface>` FORWARD (v4 and v6), use `TCPMSS --set-mss` with an explicit value under the tunnel payload, not `--clamp-mss-to-pmtu`. Expected: `ip link` shows LAN 1500 and `<wg-iface>` at the tunnel MTU. TCPMSS rules exist only on that forward pair (plus optional scoped exit path). On failure: If someone set LAN MTU to the VPN MTU, restore 1500. Overlay large SSH will not stay healthy on a shrunken LAN."
+          "text": "Action: Confirm the LAN bridge MTU is 1500. On LAN\u2194`<wg-iface>` FORWARD (v4 and v6), use explicit TCPMSS. Do **not** use `--clamp-mss-to-pmtu`."
         }
       ]
     }
@@ -115,11 +115,12 @@
     <nav class="site-nav" aria-label="Site">
       <a href="../index.html">Home</a>
       <a href="../DISCLOSURE.html">Disclosure</a>
+      <a href="../changelog.html">Changelog</a>
+      <a href="../editions/2026.html">2026</a>
       <a href="../AGENTS.md">AGENTS.md</a>
       <a href="../index.html#networking">Networking</a>
       <a href="../index.html#web">Web</a>
       <a href="../index.html#supporting">Supporting</a>
-      <a href="../index.html#editions">Editions</a>
     </nav>
       </div>
     </header>
@@ -127,52 +128,172 @@
     <main id="main">
       <article>
         <h1>Overlay SSH stalls at a byte cliff</h1>
-        <p class="meta-line"><span>OEN-01</span> · original · edition 1 · 2026-09-07</p>
+        <p class="meta-line"><span>OEN-01</span> · original · edition 2 · 2026-09-07</p>
         <h2 id="context">Context</h2>
 <p>Overlay Secure Shell (SSH) to a <strong>cloud Virtual Private Server (VPS)</strong> can accept a session and run tiny commands, then stall on anything that prints more than about one kilobyte (KB). The same client talking to a <strong>Local Area Network (LAN) Pi</strong> on the same overlay often transfers 3 KB or more without hanging.</p>
-<p>A historically sharp cliff looked like this: about <strong>1146 bytes</strong> of server output succeeded, a few bytes more produced a hang with no further progress. That number is not magic. It matched a <strong>global</strong> <code>TCPMSS --set-mss 1160</code> on the wrong direction (Wide Area Network (WAN) toward the overlay return path). Userspace overlay SSH is less forgiving than kernel OpenSSH on the same host when path Maximum Transmission Unit (MTU) is wrong.</p>
+<p>A historically sharp cliff looked like this: about <strong>1146 bytes</strong> of server output succeeded, a few bytes more produced a hang with no further progress. That number is <strong>not</strong> a recommended Maximum Segment Size (MSS). It matched a <strong>global</strong> <code>TCPMSS --set-mss 1160</code> on the <strong>wrong direction</strong> (Wide Area Network (WAN) toward the overlay return path). Compute MSS from the tunnel Maximum Transmission Unit (MTU) using the formulas below. Userspace overlay SSH is less forgiving than kernel OpenSSH on the same host when path MTU is wrong.</p>
 <p>Three local causes, in the order they were proved:</p>
-<ol><li><strong>Double encapsulation.</strong> The mesh underlay to the cloud VPS public addresses rides the same <strong>commercial WireGuard</strong> that carries general internet traffic. Inner overlay packets already sized for the tunnel MTU do not fit in the outer tunnel. Don&#x27;t-fragment (DF) pings toward the VPS public address stuck roughly <strong>100 bytes under</strong> the commercial tunnel MTU, while a clear-WAN ping to the same public address reached a much larger size.</li><li><strong>Wrong-scope Maximum Segment Size (MSS).</strong> A clamp meant for exit-node forwarding was installed globally, or on WAN→overlay return. Admin overlay SSH then died at the MSS-minus-headers cliff.</li><li><strong>Shrinking the LAN bridge to the Virtual Private Network (VPN) MTU</strong> “to fix browsing.” That hides Chromium Transport Layer Security (TLS) symptoms and <strong>breaks</strong> overlay mesh underlay and large SSH. Keep the LAN bridge at <strong>1500</strong>. Clamp MSS only on LAN↔VPN forward.</li></ol>
+<ol><li><strong>Double encapsulation.</strong> The mesh underlay to the cloud VPS public addresses rides the same <strong>commercial WireGuard</strong> that carries general internet traffic. Inner overlay packets already sized for the tunnel MTU do not fit in the outer tunnel. Don&#x27;t-fragment (DF) pings toward the VPS public address stuck roughly <strong>100 bytes under</strong> the commercial tunnel MTU, while a clear-WAN ping to the same public address reached a much larger size.</li><li><strong>Wrong-scope MSS.</strong> A clamp meant for exit-node forwarding was installed globally, or on WAN→overlay return. Admin overlay SSH then died at the MSS-minus-headers cliff.</li><li><strong>Shrinking the LAN bridge to the Virtual Private Network (VPN) MTU</strong> “to fix browsing.” That hides Chromium Transport Layer Security (TLS) symptoms and <strong>breaks</strong> overlay mesh underlay and large SSH. Keep the LAN bridge at <strong>1500</strong>. Clamp MSS only on LAN↔VPN forward.</li></ol>
 <p>Dead SSH multiplexing sockets are a <strong>symptom</strong>. They are not the path-MTU fix.</p>
 
-<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>OpenSSH</dt><dd>OpenBSD Secure Shell</dd><dt>VPS</dt><dd>Virtual Private Server</dd><dt>LAN</dt><dd>Local Area Network</dd><dt>WAN</dt><dd>Wide Area Network</dd><dt>VPN</dt><dd>Virtual Private Network</dd><dt>KB</dt><dd>kilobyte</dd><dt>TCP</dt><dd>Transmission Control Protocol</dd><dt>MSS</dt><dd>Maximum Segment Size</dd><dt>TCPMSS</dt><dd>iptables/nft target that sets TCP Maximum Segment Size</dd><dt>MTU</dt><dd>Maximum Transmission Unit</dd><dt>ICMP</dt><dd>Internet Control Message Protocol</dd><dt>PMTUD</dt><dd>path MTU discovery</dd><dt>DF</dt><dd>don&#x27;t-fragment (IP flag)</dd><dt>TLS</dt><dd>Transport Layer Security</dd><dt>HTTPS</dt><dd>Hypertext Transfer Protocol Secure</dd><dt>IP</dt><dd>Internet Protocol</dd><dt>IPv4</dt><dd>Internet Protocol version 4</dd><dt>IPv6</dt><dd>Internet Protocol version 6</dd><dt>WG</dt><dd>WireGuard</dd><dt>WireGuard</dt><dd>UDP-based VPN protocol</dd><dt>DNS</dt><dd>Domain Name System</dd><dt>ControlPath</dt><dd>OpenSSH multiplexing socket path option</dd><dt>FORWARD</dt><dd>netfilter/iptables forward chain</dd><dt>WSL2</dt><dd>Windows Subsystem for Linux 2</dd><dt>Pi</dt><dd>single-board computer (Raspberry Pi class)</dd></dl></section>
+<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>OpenSSH</dt><dd>OpenBSD Secure Shell</dd><dt>VPS</dt><dd>Virtual Private Server</dd><dt>LAN</dt><dd>Local Area Network</dd><dt>WAN</dt><dd>Wide Area Network</dd><dt>VPN</dt><dd>Virtual Private Network</dd><dt>KB</dt><dd>kilobyte</dd><dt>TCP</dt><dd>Transmission Control Protocol</dd><dt>MSS</dt><dd>Maximum Segment Size</dd><dt>TCPMSS</dt><dd>iptables/nft target that sets TCP Maximum Segment Size</dd><dt>MTU</dt><dd>Maximum Transmission Unit</dd><dt>ICMP</dt><dd>Internet Control Message Protocol</dd><dt>PMTUD</dt><dd>path MTU discovery</dd><dt>DF</dt><dd>don&#x27;t-fragment (IP flag)</dd><dt>TLS</dt><dd>Transport Layer Security</dd><dt>HTTPS</dt><dd>Hypertext Transfer Protocol Secure</dd><dt>HTTP</dt><dd>Hypertext Transfer Protocol</dd><dt>IP</dt><dd>Internet Protocol</dd><dt>IPv4</dt><dd>Internet Protocol version 4</dd><dt>IPv6</dt><dd>Internet Protocol version 6</dd><dt>WG</dt><dd>WireGuard</dd><dt>WireGuard</dt><dd>UDP-based VPN protocol</dd><dt>DNS</dt><dd>Domain Name System</dd><dt>ControlPath</dt><dd>OpenSSH multiplexing socket path option</dd><dt>FORWARD</dt><dd>netfilter/iptables forward chain</dd><dt>WSL2</dt><dd>Windows Subsystem for Linux 2</dd><dt>Pi</dt><dd>single-board computer (Raspberry Pi class)</dd><dt>UDP</dt><dd>User Datagram Protocol</dd><dt>SYN</dt><dd>TCP synchronize packet</dd><dt>nft</dt><dd>nftables (Linux packet filter)</dd><dt>nftables</dt><dd>Linux packet-filter framework</dd><dt>RST</dt><dd>TCP reset flag</dd><dt>Chromium</dt><dd>open-source browser engine</dd><dt>ICMPv6</dt><dd>Internet Control Message Protocol version 6</dd><dt>MB</dt><dd>megabyte</dd></dl></section>
+<h2 id="topology">Topology</h2>
+<p>Generic nodes only. Operator fills names in <strong>Bind</strong>.</p>
+<pre><code class="language-text">[workstation]
+    |  overlay SSH (userspace), -o ControlPath=none
+    |  underlay: either &lt;wan-iface&gt; (wanted for VPS public)
+    |            or &lt;wg-iface&gt; (double-encap trap)
+    v
+[consumer router]
+    +-- &lt;lan-bridge&gt;   MTU 1500  (MUST stay 1500)
+    +-- &lt;wg-iface&gt;     commercial WireGuard  (measure MTU; often ~1320)
+    +-- &lt;wan-iface&gt;    clear WAN
+    +-- policy: dest &lt;vps-public-v4&gt; / &lt;vps-public-v6&gt;  --&gt;  table main / WAN
+    |
+    |  mesh UDP to VPS public addresses
+    v
+[&lt;cloud-vps&gt;]
+    +-- &lt;overlay-tun&gt;
+    +-- overlay SSH server (userspace)
+
+[&lt;lan-pi&gt;]   same client, same overlay SSH — control path (3 KB+ SHOULD work)</code></pre>
+<h2 id="bind">Bind</h2>
+<p>Fill this table <strong>before</strong> any <code>ip rule</code>, nft, or iptables change. Do <strong>not</strong> paste real values back into public notes.</p>
+<table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Host class</th><th>Address / iface class</th></tr></thead><tbody><tr><td><code>&lt;cloud-vps&gt;</code></td><td>Overlay SSH destination used in <code>ssh</code></td><td>Cloud VPS</td><td>Overlay hostname or overlay address the operator already uses</td></tr><tr><td><code>&lt;lan-pi&gt;</code></td><td>Overlay SSH destination</td><td>Always-on LAN Pi</td><td>Overlay, same overlay as the VPS</td></tr><tr><td><code>&lt;user&gt;</code></td><td>SSH user on the VPS / Pi</td><td>Guest account</td><td>Username only</td></tr><tr><td><code>&lt;wg-iface&gt;</code></td><td><code>ip -o link</code> name of commercial WireGuard</td><td>Consumer router (or VPS client)</td><td>Interface name</td></tr><tr><td><code>&lt;wan-iface&gt;</code></td><td>WAN interface</td><td>Consumer router</td><td>Interface name</td></tr><tr><td><code>&lt;lan-bridge&gt;</code></td><td>LAN bridge</td><td>Consumer router</td><td>Interface name</td></tr><tr><td><code>&lt;overlay-tun&gt;</code></td><td>Overlay tunnel iface on the VPS</td><td>Cloud VPS</td><td>Interface name</td></tr><tr><td><code>&lt;vps-public-v4&gt;</code></td><td>Public IPv4 of the cloud VPS</td><td>—</td><td>WAN unicast; <strong>never publish</strong></td></tr><tr><td><code>&lt;vps-public-v6&gt;</code></td><td>Public IPv6 of the cloud VPS</td><td>—</td><td>WAN unicast; <strong>never publish</strong></td></tr><tr><td><code>&lt;overlay-v4&gt;</code></td><td>Overlay IPv4 of <code>&lt;cloud-vps&gt;</code></td><td>—</td><td>Overlay; <strong>never publish</strong></td></tr><tr><td><code>&lt;overlay-v6&gt;</code></td><td>Overlay IPv6 of <code>&lt;cloud-vps&gt;</code></td><td>—</td><td>Overlay; <strong>never publish</strong></td></tr><tr><td><code>&lt;wg-mtu&gt;</code></td><td><code>ip link show &lt;wg-iface&gt;</code> MTU</td><td>Router</td><td>Integer from the box</td></tr><tr><td><code>&lt;mss4&gt;</code></td><td><code>wg-mtu - 40</code></td><td>—</td><td>IPv4 TCP MSS (see Formulas)</td></tr><tr><td><code>&lt;mss6&gt;</code></td><td><code>wg-mtu - 60</code></td><td>—</td><td>IPv6 TCP MSS</td></tr></tbody></table>
+<h2 id="formulas">Formulas</h2>
+<p>Measure <code>&lt;wg-mtu&gt;</code> from the live interface. Do not assume 1320. Do not use 1160 as the recipe.</p>
+<pre><code class="language-text"># IPv4 TCP MSS = tunnel MTU minus 20-byte IPv4 header minus 20-byte TCP header
+mss4 = &lt;wg-mtu&gt; - 40
+
+# IPv6 TCP MSS = tunnel MTU minus 40-byte IPv6 header minus 20-byte TCP header
+mss6 = &lt;wg-mtu&gt; - 60
+
+# Don&#x27;t-fragment ping payload vs IP packet size ([OEN-S01](../supporting/s01-pmtud-size-ladder.html))
+# IPv4: IP size ≈ payload + 28   (20 IP + 8 ICMP)
+# IPv6: IP size ≈ payload + 48   (40 IPv6 + 8 ICMPv6)
+
+# Historical 1146-byte overlay SSH cliff (evidence of WRONG SCOPE, not the fix):
+#   global or WAN→overlay-return  --set-mss 1160
+#   ≈ 1160 minus TCP/IP overhead in the userspace SSH path
+# LAN↔VPN explicit MSS uses &lt;mss4&gt;/&lt;mss6&gt; (or a slightly smaller explicit value
+# if TCP options eat payload). Example when &lt;wg-mtu&gt; is 1320: mss4=1280, mss6=1260.</code></pre>
 <h2 id="decision">Decision</h2>
 <p>Operators MUST treat this as a <strong>path</strong> problem before an overlay-SSH product bug.</p>
-<ul><li>Destination policy MUST send traffic <strong>to the cloud VPS public addresses</strong> out the <strong>clear WAN</strong>, while general internet MAY stay on commercial WireGuard.</li><li>The LAN bridge MUST stay <strong>1500</strong>. MSS clamping MUST be <strong>only</strong> on LAN↔VPN forward, with an <strong>explicit</strong> <code>--set-mss</code> (not <code>--clamp-mss-to-pmtu</code>, which is a no-op when Internet Control Message Protocol (ICMP) path MTU discovery (PMTUD) is blackholed). See <a href="../supporting/s01-pmtud-size-ladder.html">OEN-S01</a>.</li><li>Operators MUST NOT clamp overlay <strong>return</strong> (WAN→overlay) and MUST NOT install a global FORWARD MSS that hits admin sessions.</li><li>Audits MUST use <code>-o ControlPath=none</code>.</li></ul>
+<ul><li>Destination policy MUST send traffic <strong>to the cloud VPS public addresses</strong> out the <strong>clear WAN</strong>, while general internet MAY stay on commercial WireGuard.</li><li>The LAN bridge MUST stay <strong>1500</strong>. MSS clamping MUST be <strong>only</strong> on LAN↔VPN forward, with an <strong>explicit</strong> <code>--set-mss &lt;mss4&gt;</code> / <code>&lt;mss6&gt;</code> (not <code>--clamp-mss-to-pmtu</code>, which is a no-op when Internet Control Message Protocol (ICMP) path MTU discovery (PMTUD) is blackholed). See <a href="../supporting/s02-clamp-mss-to-pmtu-noop.html">OEN-S02</a>.</li><li>Operators MUST NOT clamp overlay <strong>return</strong> (WAN→overlay) and MUST NOT install a global FORWARD MSS that hits admin sessions.</li><li>Audits MUST use <code>-o ControlPath=none</code>. See <a href="../supporting/s03-transfer-matrix-controlpath.html">OEN-S03</a>.</li></ul>
 <h2 id="consequences">Consequences</h2>
-<ul><li>Overlay SSH large output starts working on the cloud VPS once underlay is clear-WAN and MSS is scoped.</li><li>LAN clients keep a 1500 bridge, so overlay mesh underlay is not poisoned.</li><li>Browser HTTPS over the VPN still needs an explicit LAN↔VPN MSS (a different trap). Do not “fix browsing” by shrinking the LAN.</li><li>Keyed kernel SSH on a custom admin port is <strong>not</strong> the daily workaround. Fix the path.</li></ul>
+<ul><li>Overlay SSH large output starts working on the cloud VPS once underlay is clear-WAN and MSS is scoped.</li><li>LAN clients keep a 1500 bridge, so overlay mesh underlay is not poisoned.</li><li>Browser HTTPS over the VPN still needs an explicit LAN↔VPN MSS (<a href="02-chromium-tls-pmtu.html">OEN-02</a>). Do not “fix browsing” by shrinking the LAN.</li><li>Keyed kernel SSH on a custom admin port is <strong>not</strong> the daily workaround. Fix the path.</li></ul>
+<h2 id="agent-stop-rule">Agent stop rule</h2>
+<blockquote><p>A coding agent MUST emit a <strong>bound runbook</strong> (this Procedure with every placeholder replaced from Bind).   MUST NOT apply <code>ip rule</code>, <code>nft</code>, <code>iptables</code>, <code>ip6tables</code>, or sysctl until a <strong>human</strong> filled Bind and approved the bound commands.   MUST NOT claim the trap is fixed because ICMP ping succeeded. Verify is overlay SSH printing 3 KB+ with <code>ControlPath=none</code>.   MUST NOT file an overlay-SSH upstream bug from this page.</p></blockquote>
 <h2 id="procedure">Procedure</h2>
-<p>Preconditions: you can log in with overlay SSH to <code>&lt;cloud-vps&gt;</code> and to a <code>&lt;lan-pi&gt;</code> from the same client. Placeholders only.</p>
+<p>Preconditions: overlay SSH login to <code>&lt;cloud-vps&gt;</code> and <code>&lt;lan-pi&gt;</code> already works for tiny commands. Placeholders only until Bind is filled.</p>
 <ol><li><strong>P1 — Disable SSH multiplexing for the audit.</strong><br>
-- <strong>Action:</strong> Add <code>-o ControlPath=none</code> to every overlay SSH command in this procedure.<br>
-- <strong>Expected:</strong> A new TCP session, not a reused mux.<br>
-- <strong>On failure:</strong> Stop. Heal or ignore mux sockets; they are not the MTU fix. Continue only with <code>ControlPath=none</code>.</li><li><strong>P2 — Prove small commands work and large commands hang on the cloud VPS.</strong><br>
-- <strong>Action:</strong> Overlay SSH to <code>&lt;cloud-vps&gt;</code> and run a tiny command (<code>hostname</code> or <code>echo ok</code>). Then run a command that prints more than ~2 KB (for example <code>top -bn1</code> piped to <code>wc -c</code>).<br>
-- <strong>Expected:</strong> Tiny command returns. Large output stalls or <code>wc -c</code> never finishes.<br>
-- <strong>On failure:</strong> If large output already works, this spec does not apply. If tiny commands fail, this is not a byte cliff (auth, routing, or daemon).</li><li><strong>P3 — Compare with a LAN Pi on the same client.</strong><br>
-- <strong>Action:</strong> Repeat P2 against <code>&lt;lan-pi&gt;</code>.<br>
-- <strong>Expected:</strong> The Pi accepts 3 KB+ on the same client.<br>
-- <strong>On failure:</strong> If the Pi also cliffs, look at the <strong>client</strong> path (LAN↔VPN MSS, client MTU) before blaming the VPS.</li><li><strong>P4 — Measure don&#x27;t-fragment size to the VPS public address vs overlay address.</strong><br>
-- <strong>Action:</strong> Run the size ladder in <a href="../supporting/s01-pmtud-size-ladder.html">OEN-S01</a> toward the VPS <strong>public</strong> address and toward the overlay address of <code>&lt;cloud-vps&gt;</code>.<br>
-- <strong>Expected:</strong> If mesh underlay is double-encapsulated, DF to the public address tops out about 100 bytes under the commercial tunnel MTU. Clear WAN to the same public address is larger.<br>
+- <strong>Action:</strong> Add <code>-o ControlPath=none</code> to every overlay SSH command.</li></ol>
+<pre><code class="language-bash">     ssh -o ControlPath=none &lt;user&gt;@&lt;cloud-vps&gt; &#x27;echo ok&#x27;
+     ssh -o ControlPath=none &lt;user&gt;@&lt;lan-pi&gt; &#x27;echo ok&#x27;
+     </code></pre>
+<p>- <strong>Expected:</strong> A new Transmission Control Protocol (TCP) session, not a reused mux. Sample: a single line <code>ok</code> then a prompt. - <strong>On failure:</strong> Stop. Heal or ignore mux sockets; they are not the MTU fix. Continue only with <code>ControlPath=none</code>.</p>
+<ol><li><strong>P2 — Prove small commands work and large commands hang on the cloud VPS.</strong><br>
+- <strong>Action:</strong> Tiny then large (do not cancel the large command for 30 seconds):</li></ol>
+<pre><code class="language-bash">     ssh -o ControlPath=none &lt;user&gt;@&lt;cloud-vps&gt; &#x27;echo ok&#x27;
+     ssh -o ControlPath=none &lt;user&gt;@&lt;cloud-vps&gt; &#x27;dd if=/dev/zero bs=1024 count=3 status=none | wc -c&#x27;
+     </code></pre>
+<p>Optional size matrix: <a href="../supporting/s03-transfer-matrix-controlpath.html">OEN-S03</a> (<code>1 KB</code> vs about <code>1 MB</code>). - <strong>Expected:</strong> Tiny returns <code>ok</code>. Large <code>wc -c</code> <strong>never prints</strong> (session hung) if this spec applies. After the fix, <code>wc -c</code> prints <code>3072</code>. - <strong>On failure:</strong> If large output already works, this spec does not apply. If tiny commands fail, this is not a byte cliff (auth, routing, or daemon).</p>
+<ol><li><strong>P3 — Compare with a LAN Pi on the same client.</strong><br>
+- <strong>Action:</strong> Repeat the large command against <code>&lt;lan-pi&gt;</code>.</li></ol>
+<pre><code class="language-bash">     ssh -o ControlPath=none &lt;user&gt;@&lt;lan-pi&gt; &#x27;dd if=/dev/zero bs=1024 count=3 status=none | wc -c&#x27;
+     </code></pre>
+<p>- <strong>Expected:</strong> The Pi prints <code>3072</code> on the same client. - <strong>On failure:</strong> If the Pi also cliffs, look at the <strong>client</strong> path (LAN↔VPN MSS, client MTU) before blaming the VPS.</p>
+<ol><li><strong>P4 — Measure don&#x27;t-fragment size to the VPS public address vs overlay address.</strong><br>
+- <strong>Action:</strong> Run the IPv4 <strong>and</strong> IPv6 ladders in <a href="../supporting/s01-pmtud-size-ladder.html">OEN-S01</a> toward <code>&lt;vps-public-v4&gt;</code> / <code>&lt;vps-public-v6&gt;</code> and toward <code>&lt;overlay-v4&gt;</code> / <code>&lt;overlay-v6&gt;</code>.<br>
+- <strong>Expected:</strong> If mesh underlay is double-encapsulated, DF to the public address tops out about 100 bytes under <code>&lt;wg-mtu&gt;</code>. Clear WAN to the same public address is larger. Sample fail: <code>ping: local error: message too long, mtu=&lt;wg-mtu&gt;</code>. Sample success: <code>1 packets transmitted, 1 received</code>.<br>
 - <strong>On failure:</strong> If public-address DF already reaches near WAN MTU, skip to P6 (MSS scope).</li><li><strong>P5 — Install destination policy so VPS public addresses use clear WAN.</strong><br>
-- <strong>Action:</strong> On the consumer router (or the host that selects commercial WireGuard vs WAN), add policy routing so packets <strong>destined to</strong> the cloud VPS public v4 and v6 addresses use the main/WAN table, not <code>&lt;wg-iface&gt;</code>.<br>
-- <strong>Expected:</strong> <code>ip route get &lt;vps-public&gt;</code> from a LAN source shows the WAN path, not <code>&lt;wg-iface&gt;</code>. General internet <code>ip route get</code> of a public resolver MAY still show <code>&lt;wg-iface&gt;</code>.<br>
-- <strong>On failure:</strong> Recheck policy preference order. Do not shrink the LAN bridge MTU.</li><li><strong>P6 — Strip global / overlay-return MSS; keep exit-path clamp only.</strong><br>
-- <strong>Action:</strong> List FORWARD / mangle TCPMSS rules. Delete any global <code>--set-mss</code> and any WAN→overlay return clamp. Keep MSS only on the <strong>exit</strong> forward path (overlay→WAN) if this host is also an <code>&lt;exit-node&gt;</code>.<br>
-- <strong>Expected:</strong> Admin overlay SSH is not subject to an MSS of ~1160 on the return path.<br>
-- <strong>On failure:</strong> Re-audit after exit-node scripts redeploy; bad clamps come back.</li><li><strong>P7 — Keep LAN 1500; explicit <code>--set-mss</code> only on LAN↔VPN forward.</strong><br>
-- <strong>Action:</strong> Confirm the LAN bridge MTU is 1500. On LAN↔<code>&lt;wg-iface&gt;</code> FORWARD (v4 and v6), use <code>TCPMSS --set-mss</code> with an explicit value under the tunnel payload, not <code>--clamp-mss-to-pmtu</code>.<br>
-- <strong>Expected:</strong> <code>ip link</code> shows LAN 1500 and <code>&lt;wg-iface&gt;</code> at the tunnel MTU. TCPMSS rules exist only on that forward pair (plus optional scoped exit path).<br>
-- <strong>On failure:</strong> If someone set LAN MTU to the VPN MTU, restore 1500. Overlay large SSH will not stay healthy on a shrunken LAN.</li></ol>
+- <strong>Action:</strong> On the consumer router (or the host that selects commercial WireGuard vs WAN), add policy so packets <strong>destined to</strong> the cloud VPS public addresses use table <code>main</code> / WAN, not <code>&lt;wg-iface&gt;</code>. <strong>Human MUST have filled Bind.</strong> Preferences <code>10005</code> / <code>10006</code> are examples; pick unused prefs.</li></ol>
+<pre><code class="language-bash">     # IPv4 + IPv6 destination exceptions (example prefs; list first)
+     ip rule show
+     ip -6 rule show
+     ip rule add pref 10005 to &lt;vps-public-v4&gt; table main
+     ip -6 rule add pref 10006 to &lt;vps-public-v6&gt; table main
+
+     # Confirm from a LAN source (replace &lt;lan-client-v4&gt; from Bind notes)
+     ip route get &lt;vps-public-v4&gt; from &lt;lan-client-v4&gt; iif &lt;lan-bridge&gt;
+     ip -6 route get &lt;vps-public-v6&gt; from &lt;lan-client-v6&gt; iif &lt;lan-bridge&gt;
+     ip route get 1.1.1.1 from &lt;lan-client-v4&gt; iif &lt;lan-bridge&gt;
+     </code></pre>
+<p>- <strong>Expected:</strong> <code>ip route get</code> to the VPS public addresses shows <code>&lt;wan-iface&gt;</code> / table main, <strong>not</strong> <code>&lt;wg-iface&gt;</code>. General internet <code>ip route get 1.1.1.1</code> MAY still show <code>&lt;wg-iface&gt;</code>. - <strong>On failure:</strong> Recheck policy preference order (<code>ip rule</code> lower pref wins). Do not shrink the LAN bridge MTU.</p>
+<ol><li><strong>P6 — Strip global / overlay-return MSS; keep exit-path clamp only.</strong><br>
+- <strong>Action:</strong> List FORWARD / mangle TCPMSS. Delete any <strong>global</strong> <code>--set-mss</code> and any WAN→<code>&lt;overlay-tun&gt;</code> return clamp. Keep MSS only on the <strong>exit</strong> forward path (<code>&lt;overlay-tun&gt;</code>→WAN) if this host is also an <code>&lt;exit-node&gt;</code>.</li></ol>
+<pre><code class="language-bash">     # iptables
+     iptables -L FORWARD -n -v --line-numbers
+     iptables -t mangle -L FORWARD -n -v --line-numbers
+     ip6tables -L FORWARD -n -v --line-numbers
+     iptables -S FORWARD | grep -i tcpmss || true
+     ip6tables -S FORWARD | grep -i tcpmss || true
+
+     # nft (if the host uses nftables)
+     nft list ruleset | grep -i -A2 mss || true
+     </code></pre>
+<p>Delete by line number only after identifying a <strong>global</strong> or WAN→overlay-return rule. Sample of a <strong>bad</strong> rule (wrong scope): <code>TCPMSS set 1160</code> matching WAN ingress toward <code>&lt;overlay-tun&gt;</code>. - <strong>Expected:</strong> Admin overlay SSH is not subject to an MSS of ~1160 on the return path. - <strong>On failure:</strong> Re-audit after exit-node scripts redeploy; bad clamps come back. Changelog that node (<a href="18-per-node-changelog-contract.html">OEN-18</a>).</p>
+<ol><li><strong>P7 — Keep LAN 1500; explicit <code>--set-mss</code> only on LAN↔VPN forward.</strong><br>
+- <strong>Action:</strong> Confirm the LAN bridge MTU is 1500. On LAN↔<code>&lt;wg-iface&gt;</code> FORWARD (v4 and v6), use explicit TCPMSS. Do <strong>not</strong> use <code>--clamp-mss-to-pmtu</code>.</li></ol>
+<pre><code class="language-bash">     ip link show &lt;lan-bridge&gt;
+     ip link show &lt;wg-iface&gt;
+     # expect: &lt;lan-bridge&gt; mtu 1500 ; &lt;wg-iface&gt; mtu &lt;wg-mtu&gt;
+
+     mss4=$((&lt;wg-mtu&gt; - 40))
+     mss6=$((&lt;wg-mtu&gt; - 60))
+
+     # iptables (idempotent insert)
+     iptables -C FORWARD -i &lt;lan-bridge&gt; -o &lt;wg-iface&gt; -p tcp --tcp-flags SYN,RST SYN \
+       -j TCPMSS --set-mss &quot;$mss4&quot; \
+       || iptables -I FORWARD -i &lt;lan-bridge&gt; -o &lt;wg-iface&gt; -p tcp --tcp-flags SYN,RST SYN \
+       -j TCPMSS --set-mss &quot;$mss4&quot;
+     iptables -C FORWARD -i &lt;wg-iface&gt; -o &lt;lan-bridge&gt; -p tcp --tcp-flags SYN,RST SYN \
+       -j TCPMSS --set-mss &quot;$mss4&quot; \
+       || iptables -I FORWARD -i &lt;wg-iface&gt; -o &lt;lan-bridge&gt; -p tcp --tcp-flags SYN,RST SYN \
+       -j TCPMSS --set-mss &quot;$mss4&quot;
+     ip6tables -C FORWARD -i &lt;lan-bridge&gt; -o &lt;wg-iface&gt; -p tcp --tcp-flags SYN,RST SYN \
+       -j TCPMSS --set-mss &quot;$mss6&quot; \
+       || ip6tables -I FORWARD -i &lt;lan-bridge&gt; -o &lt;wg-iface&gt; -p tcp --tcp-flags SYN,RST SYN \
+       -j TCPMSS --set-mss &quot;$mss6&quot;
+     ip6tables -C FORWARD -i &lt;wg-iface&gt; -o &lt;lan-bridge&gt; -p tcp --tcp-flags SYN,RST SYN \
+       -j TCPMSS --set-mss &quot;$mss6&quot; \
+       || ip6tables -I FORWARD -i &lt;wg-iface&gt; -o &lt;lan-bridge&gt; -p tcp --tcp-flags SYN,RST SYN \
+       -j TCPMSS --set-mss &quot;$mss6&quot;
+
+     # nft equivalent (adjust table/chain to the host; do not nft flush — [OEN-S16](../supporting/s16-never-nft-flush.html))
+     nft add rule inet filter forward iifname &quot;&lt;lan-bridge&gt;&quot; oifname &quot;&lt;wg-iface&gt;&quot; \
+       tcp flags syn / syn,rst tcp option maxseg size set $mss4
+     nft add rule inet filter forward iifname &quot;&lt;lan-bridge&gt;&quot; oifname &quot;&lt;wg-iface&gt;&quot; \
+       ip6 nexthdr tcp tcp flags syn / syn,rst tcp option maxseg size set $mss6
+     </code></pre>
+<p>If nft <code>inet</code> cannot mix v4/v6 maxseg in one rule on this kernel, use separate <code>ip filter</code> / <code>ip6 filter</code> tables with the same match. - <strong>Expected:</strong> <code>ip link</code> shows LAN 1500 and <code>&lt;wg-iface&gt;</code> at <code>&lt;wg-mtu&gt;</code>. TCPMSS exists only on that forward pair (plus optional scoped exit path). Overlay SSH P2 now prints <code>3072</code>. - <strong>On failure:</strong> If someone set LAN MTU to the VPN MTU, restore 1500. Overlay large SSH will not stay healthy on a shrunken LAN.</p>
+<h2 id="expected-samples">Expected samples</h2>
+<p>Scrubbed. Replace sizes with what Bind measured.</p>
+<pre><code class="language-text"># P2 tiny (good)
+ok
+
+# P2 large BEFORE path fix (hang): wc -c never prints; SSH session stuck until killed
+# P2 large AFTER path fix
+3072
+
+# P4 DF fail (IPv4, payload too big for path)
+ping: local error: message too long, mtu=1320
+
+# P4 DF success
+PING &lt;target&gt; (&lt;target&gt;) 1292(1320) bytes of data.
+1300 bytes from &lt;target&gt;: icmp_seq=1 ttl=54 time=18.2 ms
+
+# P5 wanted: VPS public uses WAN, not WireGuard
+&lt;vps-public-v4&gt; from &lt;lan-client-v4&gt; iif &lt;lan-bridge&gt; dev &lt;wan-iface&gt; src &lt;lan-nat-v4&gt; uid 0
+1.1.1.1 from &lt;lan-client-v4&gt; iif &lt;lan-bridge&gt; dev &lt;wg-iface&gt; src &lt;tunnel-v4&gt; uid 0</code></pre>
 <h2 id="verify">Verify</h2>
-<ul><li>Overlay SSH to <code>&lt;cloud-vps&gt;</code> with <code>ControlPath=none</code> prints 3 KB+ (<code>top -bn1 | wc -c</code> finishes).</li><li>The same check still passes on <code>&lt;lan-pi&gt;</code>.</li><li>DF ping to the VPS public address is no longer stuck ~100 bytes under the tunnel MTU.</li><li>LAN bridge MTU is 1500.</li><li>No TCPMSS rule matches WAN→overlay return.</li></ul>
+<ul><li>Overlay SSH to <code>&lt;cloud-vps&gt;</code> with <code>ControlPath=none</code> prints 3 KB+ (<code>dd … count=3 | wc -c</code> finishes with <code>3072</code>).</li><li>The same check still passes on <code>&lt;lan-pi&gt;</code>.</li><li>DF ping to the VPS public address is no longer stuck ~100 bytes under <code>&lt;wg-mtu&gt;</code> (<a href="../supporting/s01-pmtud-size-ladder.html">OEN-S01</a>).</li><li>LAN bridge MTU is 1500.</li><li>No TCPMSS rule matches WAN→overlay return.</li><li>ICMP success was <strong>not</strong> used as the pass criterion.</li></ul>
 <h2 id="must-not" class="must-not">MUST NOT</h2>
-<ul><li>MUST NOT file an overlay-SSH upstream bug until P4–P7 are evidenced.</li><li>MUST NOT treat a custom kernel SSH admin port, or a cloud break-glass SSH product, as the daily fix.</li><li>MUST NOT shrink the LAN bridge to the commercial WireGuard MTU to “fix browsing.”</li><li>MUST NOT use <code>--clamp-mss-to-pmtu</code> as the LAN↔VPN fix when ICMP is dropped.</li><li>MUST NOT clamp overlay return or install a global FORWARD MSS.</li><li>MUST NOT publish hostnames, public IPs, overlay addresses, or custom SSH ports in a repro.</li></ul>
+<ul><li>MUST NOT file an overlay-SSH upstream bug until P4–P7 are evidenced.</li><li>MUST NOT treat a custom kernel SSH admin port, or a cloud break-glass SSH product, as the daily fix.</li><li>MUST NOT shrink the LAN bridge to the commercial WireGuard MTU to “fix browsing.”</li><li>MUST NOT use <code>--clamp-mss-to-pmtu</code> as the LAN↔VPN fix when ICMP is dropped (<a href="../supporting/s02-clamp-mss-to-pmtu-noop.html">OEN-S02</a>).</li><li>MUST NOT clamp overlay return or install a global FORWARD MSS.</li><li>MUST NOT apply P5–P7 until Bind is filled by a human.</li><li>MUST NOT claim a fix on ICMP ping alone.</li><li>MUST NOT publish hostnames, public IPs, overlay addresses, or custom SSH ports in a repro.</li></ul>
 <h2 id="related-specs">Related specs</h2>
-<ul><li><a href="../supporting/s01-pmtud-size-ladder.html">OEN-S01 Don&#x27;t-fragment ping size ladder (path MTU discovery)</a> (built)</li><li>OEN-02 Chromium TLS vs curl (forthcoming)</li><li>OEN-S02 clamp-mss-to-pmtu no-op (forthcoming)</li><li>OEN-S03 transfer matrix + <code>ControlPath=none</code> (forthcoming)</li></ul>
+<ul><li><a href="../supporting/s01-pmtud-size-ladder.html">OEN-S01 Don&#x27;t-fragment ping size ladder (path MTU discovery)</a></li><li><a href="02-chromium-tls-pmtu.html">OEN-02 Chromium TLS fails while curl returns 200</a></li><li><a href="../supporting/s02-clamp-mss-to-pmtu-noop.html">OEN-S02 clamp-mss-to-pmtu is a no-op when ICMP is dropped</a></li><li><a href="../supporting/s03-transfer-matrix-controlpath.html">OEN-S03 1 KB vs 1 MB transfer matrix + ControlPath=none</a></li><li><a href="04-exit-tcpmss-after-ts-forward.html">OEN-04 Exit-node TCP maximum-segment-size clamp after ts-forward never runs</a></li><li><a href="16-commercial-wg-endpoint-rotation.html">OEN-16 Commercial WireGuard endpoint rotation</a></li><li><a href="18-per-node-changelog-contract.html">OEN-18 Per-node changelog contract</a></li></ul>
 <h2 id="prior-art-not-novel">Prior art (Not novel)</h2>
-<p>Generic WireGuard MTU notes and WSL2 <code>eth0</code> 1280 vs overlay 1280 are already public. This spec’s claim is the <strong>combo</strong>: double encapsulation of mesh underlay through the same commercial tunnel as general internet, plus “do not shrink the LAN,” plus explicit <code>--set-mss</code> vs clamp-to-pmtu, plus userspace overlay SSH vs kernel SSH as one playbook.</p>
+<p>Generic WireGuard MTU notes and WSL2 <code>eth0</code> 1280 vs overlay 1280 are already public. This spec’s claim is the <strong>combo</strong>: double encapsulation of mesh underlay through the same commercial tunnel as general internet, plus “do not shrink the LAN,” plus explicit <code>--set-mss</code> vs clamp-to-pmtu, plus userspace overlay SSH vs kernel SSH as one playbook, with bindable commands a remote agent can execute after a human fills Bind.</p>
       </article>
     </main>
     <footer class="site-footer">

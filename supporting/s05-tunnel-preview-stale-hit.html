@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>OEN-S05: Tunnel preview HIT with a stale body — Overlay and Edge Notes</title>
+    <meta name="description" content="Origin can already be new while a Cloudflare Tunnel preview still serves HIT with a stale body until the preview URL is purged.">
+    <link rel="canonical" href="https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s05-tunnel-preview-stale-hit.html">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Source+Sans+3:wght@400;500;600&amp;display=swap">
+    <link rel="stylesheet" href="../assets/spec.css">
+    <link rel="describedby" href="../llms.txt">
+    <meta name="author" content="Eugene Armstead">
+    <meta name="citation_author" content="Eugene Armstead">
+    <meta name="dcterms.creator" content="Eugene Armstead">
+    <link rel="author" href="https://www.armsteadent.com/">
+    <meta property="article:author" content="Eugene Armstead">
+    <meta property="og:see_also" content="https://www.armsteadent.com/">
+    <meta property="og:title" content="OEN-S05: Tunnel preview HIT with a stale body — Overlay and Edge Notes">
+    <meta property="og:description" content="Origin can already be new while a Cloudflare Tunnel preview still serves HIT with a stale body until the preview URL is purged.">
+    <meta property="og:url" content="https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s05-tunnel-preview-stale-hit.html">
+    <meta property="og:type" content="article">
+    <meta property="article:published_time" content="2026-09-08">
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "TechArticle",
+      "@id": "https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s05-tunnel-preview-stale-hit.html#article",
+      "headline": "Tunnel preview HIT with a stale body",
+      "description": "Origin can already be new while a Cloudflare Tunnel preview still serves HIT with a stale body until the preview URL is purged.",
+      "datePublished": "2026-09-08",
+      "author": {
+        "@type": "Person",
+        "name": "Eugene Armstead",
+        "url": "https://www.armsteadent.com/",
+        "sameAs": [
+          "https://github.com/eugenearmstead"
+        ]
+      },
+      "url": "https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s05-tunnel-preview-stale-hit.html",
+      "identifier": "OEN-S05",
+      "license": "https://creativecommons.org/licenses/by/4.0/",
+      "inLanguage": "en"
+    },
+    {
+      "@type": "HowTo",
+      "name": "Tunnel preview HIT with a stale body",
+      "description": "Origin can already be new while a Cloudflare Tunnel preview still serves HIT with a stale body until the preview URL is purged.",
+      "author": {
+        "@type": "Person",
+        "name": "Eugene Armstead",
+        "url": "https://www.armsteadent.com/",
+        "sameAs": [
+          "https://github.com/eugenearmstead"
+        ]
+      },
+      "step": [
+        {
+          "@type": "HowToStep",
+          "position": 1,
+          "name": "P1 \u2014 Compare origin vs preview.",
+          "text": "Action: curl origin unique string vs preview URL headers and body. Expected: Origin new; preview HIT stale. On failure: If origin is also old, this is not a preview cache issue."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 2,
+          "name": "P2 \u2014 Purge preview URL.",
+          "text": "Action: Purge that exact URL. Prefer no-store on HTML. Expected: Preview body matches origin. On failure: Workers-edit token may lack purge ([OEN-S04](s04-purge-cdn-after-deploy.md))."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 3,
+          "name": "P3 \u2014 Do not ship ingest while iterating.",
+          "text": "Action: Keep [OEN-08](../web/08-worker-html-localhost-debug.md) grep clean. Expected: No 127.0.0.1 ingest. On failure: Debug locally in files, not page JS."
+        }
+      ]
+    }
+  ]
+}
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <div class="site-header-inner">
+        <p class="site-title"><a href="../index.html">Overlay and Edge Notes</a></p>
+        <p class="site-tag">Public field notes by Eugene Armstead</p>
+    <nav class="site-nav" aria-label="Site">
+      <a href="../index.html">Home</a>
+      <a href="../DISCLOSURE.html">Disclosure</a>
+      <a href="../changelog.html">Changelog</a>
+      <a href="../editions/2026.html">2026</a>
+      <a href="../AGENTS.md">AGENTS.md</a>
+      <a href="../index.html#networking">Networking</a>
+      <a href="../index.html#web">Web</a>
+      <a href="../index.html#supporting">Supporting</a>
+    </nav>
+      </div>
+    </header>
+    <nav class="breadcrumb" aria-label="Breadcrumb"><ol><li><a href="../index.html">Home</a></li><li><a href="../index.html#supporting">Supporting</a></li><li>OEN-S05</li></ol></nav>
+    <main id="main">
+      <article>
+        <h1>Tunnel preview HIT with a stale body</h1>
+        <p class="meta-line"><span>OEN-S05</span> · supporting · edition 1 · 2026-09-08</p>
+        <h2 id="context">Context</h2>
+<p>Preview <code>cf-cache-status: HIT</code> with a stale body after origin is new. Prefer origin <code>CDN-Cache-Control: no-store</code> on HTML.</p>
+
+<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>TCP</dt><dd>Transmission Control Protocol</dd><dt>ICMP</dt><dd>Internet Control Message Protocol</dd><dt>HTTPS</dt><dd>Hypertext Transfer Protocol Secure</dd><dt>HTML</dt><dd>HyperText Markup Language</dd><dt>CSS</dt><dd>Cascading Style Sheets</dd><dt>JS</dt><dd>JavaScript</dd><dt>nft</dt><dd>nftables (Linux packet filter)</dd><dt>CDN</dt><dd>content delivery network</dd><dt>URL</dt><dd>Uniform Resource Locator</dd><dt>UI</dt><dd>user interface</dd><dt>HIT</dt><dd>cache HIT (content still served from cache)</dd><dt>Wrangler</dt><dd>Cloudflare Workers command-line tool</dd><dt>Cloudflare</dt><dd>content delivery and Workers platform</dd></dl></section>
+<h2 id="topology">Topology</h2>
+<pre><code class="language-text">[tunnel preview hostname]  cf-cache-status HIT + stale body
+[origin] already new
+Prefer CDN-Cache-Control: no-store on HTML</code></pre>
+<h2 id="bind">Bind</h2>
+<p>Fill this table <strong>before</strong> any live change. Do <strong>not</strong> paste real values back into public notes.</p>
+<table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><code>&lt;worker-root&gt;</code></td><td>Worker / UI source tree</td><td>Directory on the workstation</td></tr><tr><td><code>&lt;live-url&gt;</code></td><td>Public HTTPS origin</td><td>URL the browser loads</td></tr><tr><td><code>&lt;preview-url&gt;</code></td><td>Preview origin if used</td><td>URL</td></tr><tr><td><code>&lt;html-path&gt;</code></td><td>Path that becomes a Response body</td><td>File glob</td></tr></tbody></table>
+<h2 id="formulas">Formulas</h2>
+<pre><code class="language-text"># Predeploy MUST fail the ship on client-executed matches:
+#   127.0.0.1:7450   localhost:7450   /ingest/   X-Debug-Session-Id
+# Merge ≠ live Worker. Wait ~10 minutes, then Wrangler if the Git build never started.
+# Cache: Workers-edit tokens often lack Cache Purge. ?v= does not replace zone purge for HTML.</code></pre>
+<h2 id="method">Method</h2>
+<p>Purge the preview URL. Do not debug templates until view-source on preview matches origin.</p>
+<h2 id="consequences">Consequences</h2>
+<p>False “deploy failed” reports drop.</p>
+<h2 id="agent-stop-rule">Agent stop rule</h2>
+<blockquote><p>A coding agent MUST emit a <strong>bound runbook</strong> (placeholders replaced from Bind). MUST NOT apply live <code>ip rule</code>, nft, iptables, ip6tables, sysctl, <code>wg set</code>, daemon restart, or deploy until a <strong>human</strong> filled Bind. MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS. MUST NOT file an upstream bug from this page. MUST NOT publish real addresses, hostnames, or custom ports.</p></blockquote>
+<h2 id="procedure">Procedure</h2>
+<p>Placeholders only until Bind is filled: <code>&lt;cloud-vps&gt;</code>, <code>&lt;lan-pi&gt;</code>, <code>&lt;overlay-peer&gt;</code>, <code>&lt;exit-node&gt;</code>, <code>&lt;wg-iface&gt;</code>, <code>&lt;gcp-nic&gt;</code>, plus the Bind extras on this page.</p>
+<h3>Copy-paste commands (after Bind)</h3>
+<pre><code class="language-bash">curl -sS -D- -o /tmp/preview.body --max-time 15 &lt;preview-url&gt; | tr -d &#x27;\r&#x27; | grep -iE &#x27;cf-cache-status|cdn-cache-control&#x27;
+# Compare body hash to origin file; mismatch + HIT = this spec.</code></pre>
+<ol><li><strong>P1 — Compare origin vs preview.</strong><br>
+- <strong>Action:</strong> curl origin unique string vs preview URL headers and body.<br>
+- <strong>Expected:</strong> Origin new; preview HIT stale.<br>
+- <strong>On failure:</strong> If origin is also old, this is not a preview cache issue.</li><li><strong>P2 — Purge preview URL.</strong><br>
+- <strong>Action:</strong> Purge that exact URL. Prefer no-store on HTML.<br>
+- <strong>Expected:</strong> Preview body matches origin.<br>
+- <strong>On failure:</strong> Workers-edit token may lack purge (<a href="s04-purge-cdn-after-deploy.html">OEN-S04</a>).</li><li><strong>P3 — Do not ship ingest while iterating.</strong><br>
+- <strong>Action:</strong> Keep <a href="../web/08-worker-html-localhost-debug.html">OEN-08</a> grep clean.<br>
+- <strong>Expected:</strong> No 127.0.0.1 ingest.<br>
+- <strong>On failure:</strong> Debug locally in files, not page JS.</li></ol>
+<h2 id="expected-samples">Expected samples</h2>
+<pre><code class="language-text">cf-cache-status: HIT
+# body still previous deploy</code></pre>
+<h2 id="verify">Verify</h2>
+<ul><li>Preview view-source matches origin.</li><li>cf-cache-status is not HIT-stale.</li><li>ICMP / small ping success was <strong>not</strong> used as the pass criterion when this spec names TCP, SSH, or HTTPS.</li><li>Bind table was filled by a human before any live <code>ip</code> / nft / iptables change.</li></ul>
+<h2 id="must-not" class="must-not">MUST NOT</h2>
+<ul><li>MUST NOT debug CSS for a stale HIT body.</li><li>MUST NOT skip preview purge.</li><li>MUST NOT apply live network or firewall changes until Bind is filled by a human.</li><li>MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.</li><li>MUST NOT publish hostnames, addresses, ULAs, or custom ports.</li></ul>
+<h2 id="related-specs">Related specs</h2>
+<ul><li><a href="s04-purge-cdn-after-deploy.html">OEN-S04</a></li><li><a href="../web/09-git-merge-is-not-a-live-worker.html">OEN-09</a></li></ul>
+<h2 id="prior-art-not-novel">Prior art (Not novel)</h2>
+<p>CDN HIT is documented. This note is tunnel preview HIT with origin already new.</p>
+      </article>
+    </main>
+    <footer class="site-footer">
+      <div class="site-footer-inner">
+    <p class="byline">Written by <a href="https://www.armsteadent.com/">Eugene Armstead</a> · <a href="https://www.armsteadent.com/">https://www.armsteadent.com/</a> · <a rel="license" href="https://creativecommons.org/licenses/by/4.0/">CC-BY-4.0</a></p>
+    <p class="license-line">Living field notes. Stable IDs. Do not copy private inventory into public text.</p>
+      </div>
+    </footer>
+  </body>
+</html>

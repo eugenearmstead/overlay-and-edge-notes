@@ -3,7 +3,7 @@ id: OEN-08
 title: Do not ship localhost debug beacons in Worker HTML
 kind: original
 status: active
-edition: 1
+edition: 2
 date_published: 2026-09-07
 author: Eugene Armstead
 author_url: https://www.armsteadent.com/
@@ -47,6 +47,10 @@ terms:
     expansion: cache HIT (content still served from cache)
   - abbr: CSS
     expansion: Cascading Style Sheets
+  - abbr: Chromium
+    expansion: open-source browser engine
+  - abbr: Cloudflare
+    expansion: content delivery and Workers platform
 ---
 
 # Do not ship localhost debug beacons in Worker HTML
@@ -67,6 +71,31 @@ A Worker `fetch('http://127.0.0.1:…')` on the **edge** is also useless: the is
 
 Local Network Access (LNA) itself is documented. The unique warning is **shipping agent ingest into Worker-rendered HTML**.
 
+## Topology
+
+```text
+[author PC]  Cursor debug ingest 127.0.0.1:7450     (local only — OK)
+[Cloudflare Worker] --Response HTML/JS--> [visitor browser]
+    fetch('http://127.0.0.1:7450/ingest/…')     TRAP: public https page
+    Worker fetch('http://127.0.0.1')            also useless: edge cannot reach the PC
+```
+
+## Bind
+
+| Placeholder | Operator fills | Class |
+|-------------|----------------|-------|
+| `<worker-root>` | Worker / UI source tree | Directory |
+| `<live-url>` | Public HTTPS origin | URL |
+| `<html-path>` | Files that become a Response body | Glob |
+
+## Parameters
+
+```text
+Fail the ship on client-executed matches:
+  127.0.0.1:7450   localhost:7450   /ingest/   X-Debug-Session-Id
+Log from office NDJSON files or server console.log — not page JS.
+```
+
 ## Decision
 
 Anything that becomes a Hypertext Transfer Protocol (HTTP) **Response body** (HTML templates, inline `<script>`, bundled browser JS) MUST NOT contain:
@@ -84,6 +113,12 @@ Log from office scripts that write newline-delimited JSON (NDJSON) to a local fi
 - Public pages stop triggering local-network permission prompts.
 - Debug still exists, just not in the browser.
 - If a prompt already fired, remove beacons, redeploy, and tell the operator to **Block** once if the old page is cached, then hard-refresh.
+
+## Agent stop rule
+
+> MUST emit the grep command with `<worker-root>` filled.  
+> MUST NOT `wrangler deploy` until Bind is filled and grep is clean.  
+> MUST NOT claim a CDN HIT means the beacons are gone — view-source the live HTML ([OEN-S04](../supporting/s04-purge-cdn-after-deploy.md), [OEN-S05](../supporting/s05-tunnel-preview-stale-hit.md)).
 
 ## Procedure
 
@@ -110,7 +145,7 @@ Placeholders: a Worker or static origin that emits HTML. No private site interna
    - **On failure:** Remove it. Use `console.log` on the isolate or an origin you actually control.
 
 4. **P4 — After a bad ship, clean cache.**
-   - **Action:** Remove beacons, redeploy, purge the HTML URL if a content delivery network (CDN) caches it (forthcoming OEN-S04). Ask the operator to Block the prompt if it still appears, then hard-refresh.
+   - **Action:** Remove beacons, redeploy, purge the HTML URL if a content delivery network (CDN) caches it ([OEN-S04](../supporting/s04-purge-cdn-after-deploy.md)). Ask the operator to Block the prompt if it still appears, then hard-refresh.
    - **Expected:** View-source on the live HTML has zero `7450` / `X-Debug-Session-Id`.
    - **On failure:** Search generated strings, not only source files (templates may interpolate).
 
@@ -120,6 +155,16 @@ Placeholders: a Worker or static origin that emits HTML. No private site interna
 - Live view-source has no loopback ingest URL.
 - No Worker code fetches loopback.
 - A browser on a fresh profile does not show a local-network permission prompt on that page.
+
+## Expected samples
+
+```text
+# Clean predeploy
+# (no output from rg)
+
+# Hit (blocker)
+src/ui.js:42: fetch('http://127.0.0.1:7450/ingest/…'
+```
 
 ## MUST NOT
 
@@ -131,10 +176,10 @@ Placeholders: a Worker or static origin that emits HTML. No private site interna
 
 ## Related specs
 
-- OEN-09 Git merge is not a live Worker (forthcoming)
-- OEN-S04 purge the CDN after deploy (forthcoming)
-- OEN-S05 tunnel preview HIT with a stale body (forthcoming)
-- OEN-S06 do not ship HTML-only (forthcoming)
+- [OEN-09 Git merge is not a live Worker](09-git-merge-is-not-a-live-worker.md)
+- [OEN-S04 Purge the CDN after deploy](../supporting/s04-purge-cdn-after-deploy.md)
+- [OEN-S05 Tunnel preview HIT with a stale body](../supporting/s05-tunnel-preview-stale-hit.md)
+- [OEN-S06 Do not ship HTML-only](../supporting/s06-do-not-ship-html-only.md)
 
 ## Prior art (Not novel)
 

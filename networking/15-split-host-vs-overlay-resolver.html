@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>OEN-15: Split host vs overlay resolver views on the coordinator VPS — Overlay and Edge Notes</title>
+    <meta name="description" content="The coordinator host resolver on loopback MUST keep working when the commercial tunnel is down. The overlay nameserver view MAY fail in that state if it forwards through the tunnel.">
+    <link rel="canonical" href="https://eugenearmstead.github.io/overlay-and-edge-notes/networking/15-split-host-vs-overlay-resolver.html">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Source+Sans+3:wght@400;500;600&amp;display=swap">
+    <link rel="stylesheet" href="../assets/spec.css">
+    <link rel="describedby" href="../llms.txt">
+    <meta name="author" content="Eugene Armstead">
+    <meta name="citation_author" content="Eugene Armstead">
+    <meta name="dcterms.creator" content="Eugene Armstead">
+    <link rel="author" href="https://www.armsteadent.com/">
+    <meta property="article:author" content="Eugene Armstead">
+    <meta property="og:see_also" content="https://www.armsteadent.com/">
+    <meta property="og:title" content="OEN-15: Split host vs overlay resolver views on the coordinator VPS — Overlay and Edge Notes">
+    <meta property="og:description" content="The coordinator host resolver on loopback MUST keep working when the commercial tunnel is down. The overlay nameserver view MAY fail in that state if it forwards through the tunnel.">
+    <meta property="og:url" content="https://eugenearmstead.github.io/overlay-and-edge-notes/networking/15-split-host-vs-overlay-resolver.html">
+    <meta property="og:type" content="article">
+    <meta property="article:published_time" content="2026-09-08">
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "TechArticle",
+      "@id": "https://eugenearmstead.github.io/overlay-and-edge-notes/networking/15-split-host-vs-overlay-resolver.html#article",
+      "headline": "Split host vs overlay resolver views on the coordinator VPS",
+      "description": "The coordinator host resolver on loopback MUST keep working when the commercial tunnel is down. The overlay nameserver view MAY fail in that state if it forwards through the tunnel.",
+      "datePublished": "2026-09-08",
+      "author": {
+        "@type": "Person",
+        "name": "Eugene Armstead",
+        "url": "https://www.armsteadent.com/",
+        "sameAs": [
+          "https://github.com/eugenearmstead"
+        ]
+      },
+      "url": "https://eugenearmstead.github.io/overlay-and-edge-notes/networking/15-split-host-vs-overlay-resolver.html",
+      "identifier": "OEN-15",
+      "license": "https://creativecommons.org/licenses/by/4.0/",
+      "inLanguage": "en"
+    },
+    {
+      "@type": "HowTo",
+      "name": "Split host vs overlay resolver views on the coordinator VPS",
+      "description": "The coordinator host resolver on loopback MUST keep working when the commercial tunnel is down. The overlay nameserver view MAY fail in that state if it forwards through the tunnel.",
+      "author": {
+        "@type": "Person",
+        "name": "Eugene Armstead",
+        "url": "https://www.armsteadent.com/",
+        "sameAs": [
+          "https://github.com/eugenearmstead"
+        ]
+      },
+      "step": [
+        {
+          "@type": "HowToStep",
+          "position": 1,
+          "name": "P1 \u2014 Record both views while the tunnel is up.",
+          "text": "Action: On `<cloud-vps>`: `dig @127.0.0.1 example.com` and `dig @<overlay-ns> example.com` with short timeouts. Expected: Both succeed while `<wg-iface>` is up. On failure: If host view already fails, fix host Unbound/dnsmasq before touching the tunnel."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 2,
+          "name": "P2 \u2014 Stop the tunnel; retest.",
+          "text": "Action: Stop `<wg-iface>` (or the WireGuard unit). Repeat both digs. Do not edit resolv.conf. Expected: Host dig still works. Overlay-ns dig times out or SERVFAIL if it forwarded through the tunnel. On failure: If host dig dies, the host view was secretly tunnel-dependent \u2014 that is the bug to fix."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 3,
+          "name": "P3 \u2014 Start the tunnel; retest.",
+          "text": "Action: Bring `<wg-iface>` up. Overlay-ns dig works again. Host dig still works. Expected: Split restored. On failure: If overlay view stays dead, the forwarder did not recover \u2014 check Unbound, not resolv.conf."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 4,
+          "name": "P4 \u2014 Confirm no hand-edited resolv.conf.",
+          "text": "Action: `lsattr` / package scripts / wg-quick PostUp. resolv.conf SHOULD be managed, not a frozen manual file. Expected: No operator comment \u201cI set nameserver 1.1.1.1 to fix it.\u201d On failure: Revert manual edits; restore the scripted split."
+        }
+      ]
+    }
+  ]
+}
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <div class="site-header-inner">
+        <p class="site-title"><a href="../index.html">Overlay and Edge Notes</a></p>
+        <p class="site-tag">Public field notes by Eugene Armstead</p>
+    <nav class="site-nav" aria-label="Site">
+      <a href="../index.html">Home</a>
+      <a href="../DISCLOSURE.html">Disclosure</a>
+      <a href="../changelog.html">Changelog</a>
+      <a href="../editions/2026.html">2026</a>
+      <a href="../AGENTS.md">AGENTS.md</a>
+      <a href="../index.html#networking">Networking</a>
+      <a href="../index.html#web">Web</a>
+      <a href="../index.html#supporting">Supporting</a>
+    </nav>
+      </div>
+    </header>
+    <nav class="breadcrumb" aria-label="Breadcrumb"><ol><li><a href="../index.html">Home</a></li><li><a href="../index.html#networking">Networking</a></li><li>OEN-15</li></ol></nav>
+    <main id="main">
+      <article>
+        <h1>Split host vs overlay resolver views on the coordinator VPS</h1>
+        <p class="meta-line"><span>OEN-15</span> · original · edition 1 · 2026-09-08</p>
+        <h2 id="context">Context</h2>
+<p>On the coordination Virtual Private Server (VPS), two resolver views exist. The <strong>host</strong> view (<code>127.0.0.1</code>) must keep resolving if the commercial WireGuard tunnel drops — or the box cannot update, enroll, or reach CrowdSec. The <strong>overlay</strong> nameserver view MAY fail in that state if it forwards through the tunnel. That is expected.</p>
+<p>Operators who hand-edit <code>resolv.conf</code> fight the tunnel up/down scripts and lose the split. Network Time Security (NTS) on this host may need a newer chrony than the distro (<a href="../supporting/s25-chrony-nts-address-family.html">OEN-S25</a>).</p>
+
+<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>VPS</dt><dd>Virtual Private Server</dd><dt>LAN</dt><dd>Local Area Network</dd><dt>WAN</dt><dd>Wide Area Network</dd><dt>TCP</dt><dd>Transmission Control Protocol</dd><dt>MSS</dt><dd>Maximum Segment Size</dd><dt>MTU</dt><dd>Maximum Transmission Unit</dd><dt>ICMP</dt><dd>Internet Control Message Protocol</dd><dt>HTTPS</dt><dd>Hypertext Transfer Protocol Secure</dd><dt>WireGuard</dt><dd>UDP-based VPN protocol</dd><dt>DNS</dt><dd>Domain Name System</dd><dt>CAPI</dt><dd>CrowdSec Central API</dd><dt>PeerAPI</dt><dd>overlay peer application-programming interface (exit DNS over HTTPS)</dd><dt>nft</dt><dd>nftables (Linux packet filter)</dd><dt>ControlPath</dt><dd>OpenSSH multiplexing socket path option</dd><dt>NTS</dt><dd>Network Time Security</dd><dt>Pi</dt><dd>single-board computer (Raspberry Pi class)</dd><dt>Unbound</dt><dd>validating recursive DNS resolver</dd><dt>dnsmasq</dt><dd>lightweight DNS forwarder and DHCP server</dd><dt>chrony</dt><dd>NTP/NTS time daemon</dd><dt>CrowdSec</dt><dd>open-source IDS/IPS with a Central API</dd><dt>SERVFAIL</dt><dd>DNS response code meaning the server failed</dd><dt>NS</dt><dd>DNS nameserver (or overlay nameserver view)</dd></dl></section>
+<h2 id="topology">Topology</h2>
+<pre><code class="language-text">[&lt;cloud-vps&gt;]
+    host view  127.0.0.1 Unbound/dnsmasq   MUST work with commercial tunnel DOWN
+    overlay NS view                       MAY fail while tunnel is down (expected)
+Tunnel up/down scripts flip resolv preference. Do not hand-edit resolv.conf.</code></pre>
+<h2 id="bind">Bind</h2>
+<p>Fill this table <strong>before</strong> any live change. Do <strong>not</strong> paste real values back into public notes.</p>
+<table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><code>&lt;cloud-vps&gt;</code></td><td>Overlay SSH target</td><td>Cloud VPS</td></tr><tr><td><code>&lt;lan-pi&gt;</code></td><td>Overlay SSH target</td><td>LAN Pi</td></tr><tr><td><code>&lt;user&gt;</code></td><td>SSH user</td><td>Guest account</td></tr><tr><td><code>&lt;wg-iface&gt;</code></td><td>Commercial WireGuard iface</td><td>Router or VPS client</td></tr><tr><td><code>&lt;wan-iface&gt;</code></td><td>WAN iface</td><td>Router</td></tr><tr><td><code>&lt;lan-bridge&gt;</code></td><td>LAN bridge</td><td>Router (MTU 1500)</td></tr><tr><td><code>&lt;overlay-tun&gt;</code></td><td>Overlay tun iface</td><td>Node under test</td></tr><tr><td><code>&lt;wg-mtu&gt;</code></td><td>MTU integer from <code>ip link</code></td><td>Measured</td></tr><tr><td><code>&lt;mss4&gt;</code> / <code>&lt;mss6&gt;</code></td><td>Computed MSS</td><td>Formulas</td></tr><tr><td><code>&lt;vps-public-v4&gt;</code> / <code>&lt;vps-public-v6&gt;</code></td><td>VPS public addresses</td><td>WAN; never publish</td></tr><tr><td><code>&lt;overlay-v4&gt;</code> / <code>&lt;overlay-v6&gt;</code></td><td>Overlay addresses</td><td>Overlay; never publish</td></tr></tbody></table>
+<h2 id="formulas">Formulas</h2>
+<p>NTS/chrony is host stack, not PeerAPI (<a href="../supporting/s25-chrony-nts-address-family.html">OEN-S25</a>).</p>
+<h2 id="decision">Decision</h2>
+<p>Host <code>dig @127.0.0.1</code> MUST succeed after a tunnel stop. Overlay-view dig MAY time out until the tunnel returns. MUST NOT hand-edit <code>resolv.conf</code> on the VPS. Tunnel up/down scripts flip preference.</p>
+<h2 id="consequences">Consequences</h2>
+<ul><li>The VPS remains administrable when the tunnel is down.</li><li>Overlay clients see the intended failure if they depend on tunnel-forwarded DNS.</li><li>No more “fix DNS” by freezing resolv.conf.</li></ul>
+<h2 id="agent-stop-rule">Agent stop rule</h2>
+<blockquote><p>A coding agent MUST emit a <strong>bound runbook</strong> (placeholders replaced from Bind). MUST NOT apply live <code>ip rule</code>, nft, iptables, ip6tables, sysctl, <code>wg set</code>, daemon restart, or deploy until a <strong>human</strong> filled Bind. MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS. MUST NOT file an upstream bug from this page. MUST NOT publish real addresses, hostnames, or custom ports.</p></blockquote>
+<h2 id="procedure">Procedure</h2>
+<p>Placeholders only until Bind is filled: <code>&lt;cloud-vps&gt;</code>, <code>&lt;lan-pi&gt;</code>, <code>&lt;overlay-peer&gt;</code>, <code>&lt;exit-node&gt;</code>, <code>&lt;wg-iface&gt;</code>, <code>&lt;gcp-nic&gt;</code>, plus the Bind extras on this page.</p>
+<h3>Copy-paste commands (after Bind)</h3>
+<pre><code class="language-bash">ssh -o ControlPath=none &lt;user&gt;@&lt;cloud-vps&gt; &#x27;dig +time=2 @127.0.0.1 example.com; ip link show &lt;wg-iface&gt;&#x27;
+# After a controlled tunnel stop (human-approved): host dig still works; overlay NS MAY time out.
+# Start tunnel; overlay NS works again.</code></pre>
+<ol><li><strong>P1 — Record both views while the tunnel is up.</strong><br>
+- <strong>Action:</strong> On <code>&lt;cloud-vps&gt;</code>: <code>dig @127.0.0.1 example.com</code> and <code>dig @&lt;overlay-ns&gt; example.com</code> with short timeouts.<br>
+- <strong>Expected:</strong> Both succeed while <code>&lt;wg-iface&gt;</code> is up.<br>
+- <strong>On failure:</strong> If host view already fails, fix host Unbound/dnsmasq before touching the tunnel.</li><li><strong>P2 — Stop the tunnel; retest.</strong><br>
+- <strong>Action:</strong> Stop <code>&lt;wg-iface&gt;</code> (or the WireGuard unit). Repeat both digs. Do not edit resolv.conf.<br>
+- <strong>Expected:</strong> Host dig still works. Overlay-ns dig times out or SERVFAIL if it forwarded through the tunnel.<br>
+- <strong>On failure:</strong> If host dig dies, the host view was secretly tunnel-dependent — that is the bug to fix.</li><li><strong>P3 — Start the tunnel; retest.</strong><br>
+- <strong>Action:</strong> Bring <code>&lt;wg-iface&gt;</code> up. Overlay-ns dig works again. Host dig still works.<br>
+- <strong>Expected:</strong> Split restored.<br>
+- <strong>On failure:</strong> If overlay view stays dead, the forwarder did not recover — check Unbound, not resolv.conf.</li><li><strong>P4 — Confirm no hand-edited resolv.conf.</strong><br>
+- <strong>Action:</strong> <code>lsattr</code> / package scripts / wg-quick PostUp. resolv.conf SHOULD be managed, not a frozen manual file.<br>
+- <strong>Expected:</strong> No operator comment “I set nameserver 1.1.1.1 to fix it.”<br>
+- <strong>On failure:</strong> Revert manual edits; restore the scripted split.</li></ol>
+<h2 id="expected-samples">Expected samples</h2>
+<pre><code class="language-text"># Host view still answers with tunnel down
+example.com.  300  IN  A  ...</code></pre>
+<h2 id="verify">Verify</h2>
+<ul><li>Tunnel down: host dig works; overlay-ns MAY fail.</li><li>Tunnel up: both work.</li><li>resolv.conf is not a hand-frozen file.</li><li>chrony NTS still steps if that is in scope (<a href="../supporting/s25-chrony-nts-address-family.html">OEN-S25</a>).</li><li>ICMP / small ping success was <strong>not</strong> used as the pass criterion when this spec names TCP, SSH, or HTTPS.</li><li>Bind table was filled by a human before any live <code>ip</code> / nft / iptables change.</li></ul>
+<h2 id="must-not" class="must-not">MUST NOT</h2>
+<ul><li>MUST NOT hand-edit resolv.conf on the coordinator VPS as a DNS fix.</li><li>MUST NOT require overlay-ns to work while the commercial tunnel is down.</li><li>MUST NOT publish the overlay nameserver address.</li><li>MUST NOT restart coordination serve to “refresh DNS” (<a href="14-exit-dns-is-peerapi.html">OEN-14</a>).</li><li>MUST NOT apply live network or firewall changes until Bind is filled by a human.</li><li>MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.</li><li>MUST NOT publish hostnames, addresses, ULAs, or custom ports.</li></ul>
+<h2 id="related-specs">Related specs</h2>
+<ul><li><a href="14-exit-dns-is-peerapi.html">OEN-14 Exit DNS is PeerAPI</a></li><li><a href="07-crowdsec-capi-403.html">OEN-07 CrowdSec CAPI 403</a></li><li><a href="../supporting/s25-chrony-nts-address-family.html">OEN-S25 chrony NTS address-family</a></li><li><a href="16-commercial-wg-endpoint-rotation.html">OEN-16 Commercial WireGuard endpoint rotation</a></li></ul>
+<h2 id="prior-art-not-novel">Prior art (Not novel)</h2>
+<p>Split-horizon DNS is old. This spec’s claim is host-must-live vs overlay-may-fail across commercial-tunnel down on the coordinator VPS.</p>
+      </article>
+    </main>
+    <footer class="site-footer">
+      <div class="site-footer-inner">
+    <p class="byline">Written by <a href="https://www.armsteadent.com/">Eugene Armstead</a> · <a href="https://www.armsteadent.com/">https://www.armsteadent.com/</a> · <a rel="license" href="https://creativecommons.org/licenses/by/4.0/">CC-BY-4.0</a></p>
+    <p class="license-line">Living field notes. Stable IDs. Do not copy private inventory into public text.</p>
+      </div>
+    </footer>
+  </body>
+</html>

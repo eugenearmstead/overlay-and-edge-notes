@@ -1,0 +1,158 @@
+---
+id: OEN-S05
+title: "Tunnel preview HIT with a stale body"
+kind: supporting
+status: active
+edition: 1
+date_published: 2026-09-08
+author: Eugene Armstead
+author_url: https://www.armsteadent.com/
+canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s05-tunnel-preview-stale-hit.html
+keywords:
+  - cloudflare-tunnel
+  - cache
+  - preview
+backs:
+  - OEN-08
+  - OEN-09
+backed_by: []
+description: "Origin can already be new while a Cloudflare Tunnel preview still serves HIT with a stale body until the preview URL is purged."
+terms:
+  - abbr: OEN
+    expansion: Overlay and Edge Notes
+  - abbr: SSH
+    expansion: Secure Shell
+  - abbr: TCP
+    expansion: Transmission Control Protocol
+  - abbr: ICMP
+    expansion: Internet Control Message Protocol
+  - abbr: HTTPS
+    expansion: Hypertext Transfer Protocol Secure
+  - abbr: HTML
+    expansion: HyperText Markup Language
+  - abbr: CSS
+    expansion: Cascading Style Sheets
+  - abbr: JS
+    expansion: JavaScript
+  - abbr: nft
+    expansion: nftables (Linux packet filter)
+  - abbr: CDN
+    expansion: content delivery network
+  - abbr: URL
+    expansion: Uniform Resource Locator
+  - abbr: UI
+    expansion: user interface
+  - abbr: HIT
+    expansion: cache HIT (content still served from cache)
+  - abbr: Wrangler
+    expansion: Cloudflare Workers command-line tool
+  - abbr: Cloudflare
+    expansion: content delivery and Workers platform
+---
+
+# Tunnel preview HIT with a stale body
+
+## Context
+
+Preview `cf-cache-status: HIT` with a stale body after origin is new. Prefer origin `CDN-Cache-Control: no-store` on HTML.
+
+## Topology
+
+```text
+[tunnel preview hostname]  cf-cache-status HIT + stale body
+[origin] already new
+Prefer CDN-Cache-Control: no-store on HTML
+```
+
+## Bind
+
+Fill this table **before** any live change. Do **not** paste real values back into public notes.
+
+| Placeholder | Operator fills | Class |
+|-------------|----------------|-------|
+| `<worker-root>` | Worker / UI source tree | Directory on the workstation |
+| `<live-url>` | Public HTTPS origin | URL the browser loads |
+| `<preview-url>` | Preview origin if used | URL |
+| `<html-path>` | Path that becomes a Response body | File glob |
+
+
+## Formulas
+
+```text
+# Predeploy MUST fail the ship on client-executed matches:
+#   127.0.0.1:7450   localhost:7450   /ingest/   X-Debug-Session-Id
+# Merge ≠ live Worker. Wait ~10 minutes, then Wrangler if the Git build never started.
+# Cache: Workers-edit tokens often lack Cache Purge. ?v= does not replace zone purge for HTML.
+```
+
+## Method
+
+Purge the preview URL. Do not debug templates until view-source on preview matches origin.
+
+## Consequences
+
+False “deploy failed” reports drop.
+
+## Agent stop rule
+
+> A coding agent MUST emit a **bound runbook** (placeholders replaced from Bind).
+> MUST NOT apply live `ip rule`, nft, iptables, ip6tables, sysctl, `wg set`, daemon restart, or deploy until a **human** filled Bind.
+> MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
+> MUST NOT file an upstream bug from this page.
+> MUST NOT publish real addresses, hostnames, or custom ports.
+
+## Procedure
+
+Placeholders only until Bind is filled: `<cloud-vps>`, `<lan-pi>`, `<overlay-peer>`, `<exit-node>`, `<wg-iface>`, `<gcp-nic>`, plus the Bind extras on this page.
+
+### Copy-paste commands (after Bind)
+
+```bash
+curl -sS -D- -o /tmp/preview.body --max-time 15 <preview-url> | tr -d '\r' | grep -iE 'cf-cache-status|cdn-cache-control'
+# Compare body hash to origin file; mismatch + HIT = this spec.
+```
+
+1. **P1 — Compare origin vs preview.**
+   - **Action:** curl origin unique string vs preview URL headers and body.
+   - **Expected:** Origin new; preview HIT stale.
+   - **On failure:** If origin is also old, this is not a preview cache issue.
+2. **P2 — Purge preview URL.**
+   - **Action:** Purge that exact URL. Prefer no-store on HTML.
+   - **Expected:** Preview body matches origin.
+   - **On failure:** Workers-edit token may lack purge ([OEN-S04](s04-purge-cdn-after-deploy.md)).
+3. **P3 — Do not ship ingest while iterating.**
+   - **Action:** Keep [OEN-08](../web/08-worker-html-localhost-debug.md) grep clean.
+   - **Expected:** No 127.0.0.1 ingest.
+   - **On failure:** Debug locally in files, not page JS.
+
+## Expected samples
+
+```text
+cf-cache-status: HIT
+# body still previous deploy
+```
+
+## Verify
+
+- Preview view-source matches origin.
+- cf-cache-status is not HIT-stale.
+- ICMP / small ping success was **not** used as the pass criterion when this spec names TCP, SSH, or HTTPS.
+- Bind table was filled by a human before any live `ip` / nft / iptables change.
+
+## MUST NOT
+
+- MUST NOT debug CSS for a stale HIT body.
+- MUST NOT skip preview purge.
+- MUST NOT apply live network or firewall changes until Bind is filled by a human.
+- MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
+- MUST NOT publish hostnames, addresses, ULAs, or custom ports.
+
+## Related specs
+
+- [OEN-S04](s04-purge-cdn-after-deploy.md)
+- [OEN-09](../web/09-git-merge-is-not-a-live-worker.md)
+
+## Prior art (Not novel)
+
+CDN HIT is documented. This note is tunnel preview HIT with origin already new.
+

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>OEN-S33: Consumer-router cron PATH omits curl; watchdog log() + set -e exits — Overlay and Edge Notes</title>
+    <meta name="description" content="Consumer-router cron PATH may omit /usr/sbin and curl. A log() that returns 1 with set -e exits the watchdog every tick — silent skip, stale status.">
+    <link rel="canonical" href="https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s33-router-cron-path-set-e.html">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Source+Sans+3:wght@400;500;600&amp;display=swap">
+    <link rel="stylesheet" href="../assets/spec.css">
+    <link rel="describedby" href="../llms.txt">
+    <meta name="author" content="Eugene Armstead">
+    <meta name="citation_author" content="Eugene Armstead">
+    <meta name="dcterms.creator" content="Eugene Armstead">
+    <link rel="author" href="https://www.armsteadent.com/">
+    <meta property="article:author" content="Eugene Armstead">
+    <meta property="og:see_also" content="https://www.armsteadent.com/">
+    <meta property="og:title" content="OEN-S33: Consumer-router cron PATH omits curl; watchdog log() + set -e exits — Overlay and Edge Notes">
+    <meta property="og:description" content="Consumer-router cron PATH may omit /usr/sbin and curl. A log() that returns 1 with set -e exits the watchdog every tick — silent skip, stale status.">
+    <meta property="og:url" content="https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s33-router-cron-path-set-e.html">
+    <meta property="og:type" content="article">
+    <meta property="article:published_time" content="2026-09-08">
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "TechArticle",
+      "@id": "https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s33-router-cron-path-set-e.html#article",
+      "headline": "Consumer-router cron PATH omits curl; watchdog log() + set -e exits",
+      "description": "Consumer-router cron PATH may omit /usr/sbin and curl. A log() that returns 1 with set -e exits the watchdog every tick \u2014 silent skip, stale status.",
+      "datePublished": "2026-09-08",
+      "author": {
+        "@type": "Person",
+        "name": "Eugene Armstead",
+        "url": "https://www.armsteadent.com/",
+        "sameAs": [
+          "https://github.com/eugenearmstead"
+        ]
+      },
+      "url": "https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s33-router-cron-path-set-e.html",
+      "identifier": "OEN-S33",
+      "license": "https://creativecommons.org/licenses/by/4.0/",
+      "inLanguage": "en"
+    },
+    {
+      "@type": "HowTo",
+      "name": "Consumer-router cron PATH omits curl; watchdog log() + set -e exits",
+      "description": "Consumer-router cron PATH may omit /usr/sbin and curl. A log() that returns 1 with set -e exits the watchdog every tick \u2014 silent skip, stale status.",
+      "author": {
+        "@type": "Person",
+        "name": "Eugene Armstead",
+        "url": "https://www.armsteadent.com/",
+        "sameAs": [
+          "https://github.com/eugenearmstead"
+        ]
+      },
+      "step": [
+        {
+          "@type": "HowToStep",
+          "position": 1,
+          "name": "P1 \u2014 PATH.",
+          "text": "Action: Cron PATH on this firmware may omit `/usr/sbin`. `which iptables curl wg`. Set PATH at the top of the script. Expected: iptables found. On failure: Silent \u201ccommand not found\u201d was the skip."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 2,
+          "name": "P2 \u2014 log() and set -e.",
+          "text": "Action: If `log` returns 1, `set -e` exits every tick. Expected: log returns 0. Watchdog completes. On failure: Do not remove set -e; fix log."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 3,
+          "name": "P3 \u2014 No WG restart.",
+          "text": "Action: Re-apply rules / `wg set` only ([OEN-22](../networking/22-delayed-wg-forward-wipe.md)). Expected: Tunnel not bounced every tick. On failure: Restart wipes FORWARD."
+        }
+      ]
+    }
+  ]
+}
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <div class="site-header-inner">
+        <p class="site-title"><a href="../index.html">Overlay and Edge Notes</a></p>
+        <p class="site-tag">Public field notes by Eugene Armstead</p>
+    <nav class="site-nav" aria-label="Site">
+      <a href="../index.html">Home</a>
+      <a href="../DISCLOSURE.html">Disclosure</a>
+      <a href="../changelog.html">Changelog</a>
+      <a href="../editions/2026.html">2026</a>
+      <a href="../AGENTS.md">AGENTS.md</a>
+      <a href="../index.html#networking">Networking</a>
+      <a href="../index.html#web">Web</a>
+      <a href="../index.html#supporting">Supporting</a>
+    </nav>
+      </div>
+    </header>
+    <nav class="breadcrumb" aria-label="Breadcrumb"><ol><li><a href="../index.html">Home</a></li><li><a href="../index.html#supporting">Supporting</a></li><li>OEN-S33</li></ol></nav>
+    <main id="main">
+      <article>
+        <h1>Consumer-router cron PATH omits curl; watchdog log() + set -e exits</h1>
+        <p class="meta-line"><span>OEN-S33</span> · supporting · edition 1 · 2026-09-08</p>
+        <h2 id="context">Context</h2>
+<p>Watchdogs for FORWARD re-apply and WG rotation silently never run.</p>
+
+<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>LAN</dt><dd>Local Area Network</dd><dt>WAN</dt><dd>Wide Area Network</dd><dt>TCP</dt><dd>Transmission Control Protocol</dd><dt>MTU</dt><dd>Maximum Transmission Unit</dd><dt>ICMP</dt><dd>Internet Control Message Protocol</dd><dt>HTTPS</dt><dd>Hypertext Transfer Protocol Secure</dd><dt>WG</dt><dd>WireGuard</dd><dt>WireGuard</dt><dd>UDP-based VPN protocol</dd><dt>DNS</dt><dd>Domain Name System</dd><dt>nft</dt><dd>nftables (Linux packet filter)</dd><dt>FORWARD</dt><dd>netfilter/iptables forward chain</dd><dt>PATH</dt><dd>Unix executable search path</dd></dl></section>
+<h2 id="topology">Topology</h2>
+<pre><code class="language-text">consumer-router cron PATH omits /usr/sbin and curl
+log() returns 1 + set -e  --&gt;  watchdog exits every tick
+MUST NOT restart WG from the watchdog</code></pre>
+<h2 id="bind">Bind</h2>
+<p>Fill this table <strong>before</strong> any live change. Do <strong>not</strong> paste real values back into public notes.</p>
+<table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><code>&lt;wg-iface&gt;</code></td><td>Consumer-router WireGuard client iface</td><td>Iface</td></tr><tr><td><code>&lt;lan-bridge&gt;</code></td><td>LAN bridge</td><td>Iface; MTU 1500</td></tr><tr><td><code>&lt;wan-iface&gt;</code></td><td>WAN iface</td><td>Iface</td></tr><tr><td><code>&lt;lan-resolver&gt;</code></td><td>Intended LAN DNS</td><td>Address; never publish</td></tr></tbody></table>
+<h2 id="formulas">Formulas</h2>
+<p>Set PATH at top of script. log() MUST return 0.</p>
+<h2 id="method">Method</h2>
+<p>Set PATH in the cron/script. log() MUST return 0. MUST NOT restart WG from the watchdog.</p>
+<h2 id="consequences">Consequences</h2>
+<p>Delayed FORWARD re-apply actually runs. Rotator hub watch ticks.</p>
+<h2 id="agent-stop-rule">Agent stop rule</h2>
+<blockquote><p>A coding agent MUST emit a <strong>bound runbook</strong> (placeholders replaced from Bind). MUST NOT apply live <code>ip rule</code>, nft, iptables, ip6tables, sysctl, <code>wg set</code>, daemon restart, or deploy until a <strong>human</strong> filled Bind. MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS. MUST NOT file an upstream bug from this page. MUST NOT publish real addresses, hostnames, or custom ports.</p></blockquote>
+<h2 id="procedure">Procedure</h2>
+<p>Placeholders only until Bind is filled: <code>&lt;cloud-vps&gt;</code>, <code>&lt;lan-pi&gt;</code>, <code>&lt;overlay-peer&gt;</code>, <code>&lt;exit-node&gt;</code>, <code>&lt;wg-iface&gt;</code>, <code>&lt;gcp-nic&gt;</code>, plus the Bind extras on this page.</p>
+<h3>Copy-paste commands (after Bind)</h3>
+<pre><code class="language-bash"># After Bind, on the router:
+echo &quot;$PATH&quot;
+which iptables curl wg</code></pre>
+<ol><li><strong>P1 — PATH.</strong><br>
+- <strong>Action:</strong> Cron PATH on this firmware may omit <code>/usr/sbin</code>. <code>which iptables curl wg</code>. Set PATH at the top of the script.<br>
+- <strong>Expected:</strong> iptables found.<br>
+- <strong>On failure:</strong> Silent “command not found” was the skip.</li><li><strong>P2 — log() and set -e.</strong><br>
+- <strong>Action:</strong> If <code>log</code> returns 1, <code>set -e</code> exits every tick.<br>
+- <strong>Expected:</strong> log returns 0. Watchdog completes.<br>
+- <strong>On failure:</strong> Do not remove set -e; fix log.</li><li><strong>P3 — No WG restart.</strong><br>
+- <strong>Action:</strong> Re-apply rules / <code>wg set</code> only (<a href="../networking/22-delayed-wg-forward-wipe.html">OEN-22</a>).<br>
+- <strong>Expected:</strong> Tunnel not bounced every tick.<br>
+- <strong>On failure:</strong> Restart wipes FORWARD.</li></ol>
+<h2 id="expected-samples">Expected samples</h2>
+<pre><code class="language-text"># silent skip: iptables: not found</code></pre>
+<h2 id="verify">Verify</h2>
+<ul><li>Watchdog log shows completed ticks.</li><li>PATH includes iptables.</li><li>No WG restart.</li><li>ICMP / small ping success was <strong>not</strong> used as the pass criterion when this spec names TCP, SSH, or HTTPS.</li><li>Bind table was filled by a human before any live <code>ip</code> / nft / iptables change.</li></ul>
+<h2 id="must-not" class="must-not">MUST NOT</h2>
+<ul><li>MUST NOT restart WireGuard from the watchdog.</li><li>MUST NOT publish the script path as inventory.</li><li>MUST NOT apply live network or firewall changes until Bind is filled by a human.</li><li>MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.</li><li>MUST NOT publish hostnames, addresses, ULAs, or custom ports.</li></ul>
+<h2 id="related-specs">Related specs</h2>
+<ul><li><a href="../networking/22-delayed-wg-forward-wipe.html">OEN-22</a></li><li><a href="../networking/16-commercial-wg-endpoint-rotation.html">OEN-16</a></li></ul>
+<h2 id="prior-art-not-novel">Prior art (Not novel)</h2>
+<p>cron PATH is a classic. This note is firmware PATH plus log() returning 1 under set -e.</p>
+      </article>
+    </main>
+    <footer class="site-footer">
+      <div class="site-footer-inner">
+    <p class="byline">Written by <a href="https://www.armsteadent.com/">Eugene Armstead</a> · <a href="https://www.armsteadent.com/">https://www.armsteadent.com/</a> · <a rel="license" href="https://creativecommons.org/licenses/by/4.0/">CC-BY-4.0</a></p>
+    <p class="license-line">Living field notes. Stable IDs. Do not copy private inventory into public text.</p>
+      </div>
+    </footer>
+  </body>
+</html>

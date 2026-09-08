@@ -3,7 +3,7 @@ id: OEN-18
 title: Per-node changelog contract (repo + hashed on-device copy)
 kind: original
 status: active
-edition: 1
+edition: 2
 date_published: 2026-09-07
 author: Eugene Armstead
 author_url: https://www.armsteadent.com/
@@ -32,8 +32,10 @@ terms:
     expansion: Local Area Network
   - abbr: Pi
     expansion: single-board computer (Raspberry Pi class)
-  - abbr: GCP
-    expansion: Google Cloud Platform
+  - abbr: ControlPath
+    expansion: OpenSSH multiplexing socket path option
+  - abbr: TZ
+    expansion: timezone abbreviation in a changelog heading
   - abbr: WG
     expansion: WireGuard
   - abbr: WireGuard
@@ -42,6 +44,8 @@ terms:
     expansion: Uniform Resource Locator
   - abbr: IP
     expansion: Internet Protocol
+  - abbr: ControlPath
+    expansion: OpenSSH multiplexing socket path option
 ---
 
 # Per-node changelog contract (repo + hashed on-device copy)
@@ -66,6 +70,31 @@ Two copies:
 
 Agents MUST NOT claim an on-device path exists without `ls` and a **hash match** against the repo file. Workstations in particular often **lack** a sudo tree such as `/usr/local/share/<project>` when passwordless sudo is off. Canonical remains the repo file.
 
+## Topology
+
+```text
+[private ops repo]  <repo-changelog>     CANONICAL
+        |
+        |  same session as the change
+        v
+[on-device copy]    <on-device-changelog>   class path by node type
+        |
+        +-- ls + sha256sum MUST match
+```
+
+## Bind
+
+| Placeholder | Operator fills | Class |
+|-------------|----------------|-------|
+| `<repo-changelog>` | Canonical Markdown in the private ops repo | Path class |
+| `<on-device-changelog>` | On-device copy | Path class from the table |
+| `<node>` | Role (cloud VPS, LAN Pi, router, workstation) | Role, not hostname |
+| `<user>` | Account used to copy | Guest or workstation user |
+
+## Parameters
+
+Each entry MUST include Date + labeled timezone, Change, Paths, Verify. No secrets. Agents MUST NOT invent fake precision.
+
 ## Decision
 
 Same session as the change:
@@ -89,6 +118,12 @@ No secrets, tokens, or passwords. Agents MUST NOT invent fake precision: if the 
 - On-device copies cannot silently diverge if the hash check is required.
 - Public discussion of the **pattern** does not require publishing anyone’s hostnames or real paths.
 
+## Agent stop rule
+
+> MUST emit the class path table with `<repo-changelog>` filled.  
+> MUST NOT claim an on-device path exists without `ls` + `sha256sum`.  
+> MUST NOT copy secrets into the log.
+
 ## Procedure
 
 Placeholders: `<node>` is a role, not a hostname. `<repo-changelog>` is the canonical Markdown file. `<on-device-changelog>` is the class path from the table.
@@ -109,7 +144,13 @@ Placeholders: `<node>` is a role, not a hostname. `<repo-changelog>` is the cano
    - **On failure:** Do not claim “synced.” Leave the repo entry noting the copy failed.
 
 4. **P4 — Hash both sides.**
-   - **Action:** `sha256sum <repo-changelog> <on-device-changelog>` (or `sha256` on the remote).
+   - **Action:**
+
+     ```bash
+     sha256sum <repo-changelog>
+     ssh -o ControlPath=none <user>@<node> 'sha256sum <on-device-changelog>'
+     ```
+
    - **Expected:** Digests match.
    - **On failure:** Recopy. Never report success on a mismatched hash.
 
@@ -125,6 +166,14 @@ Placeholders: `<node>` is a role, not a hostname. `<repo-changelog>` is the cano
 - `sha256sum` matches when a copy was made.
 - No secrets in the text.
 
+## Expected samples
+
+```text
+<hash>  docs/changelogs/<role>/CHANGELOG.md
+<hash>  /opt/<project>/docs/CHANGELOG.md
+# hashes equal
+```
+
 ## MUST NOT
 
 - MUST NOT claim a path exists without `ls` + hash vs repo.
@@ -135,9 +184,9 @@ Placeholders: `<node>` is a role, not a hostname. `<repo-changelog>` is the cano
 
 ## Related specs
 
-- [OEN-01 Overlay SSH byte cliff](01-overlay-ssh-byte-cliff.md) (built) — MSS and underlay changes belong in the node log
-- [OEN-16 Commercial WireGuard endpoint rotation](16-commercial-wg-endpoint-rotation.md) (built)
-- [OEN-17 Google Cloud overlay exit](17-gcp-overlay-exit.md) (built)
+- [OEN-01 Overlay SSH byte cliff](01-overlay-ssh-byte-cliff.md) — MSS and underlay changes belong in the node log
+- [OEN-16 Commercial WireGuard endpoint rotation](16-commercial-wg-endpoint-rotation.md)
+- [OEN-17 Google Cloud overlay exit](17-gcp-overlay-exit.md)
 
 ## Prior art (Not novel)
 

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>OEN-02: Chromium TLS fails while curl returns 200 — Overlay and Edge Notes</title>
+    <meta name="description" content="Chromium HTTPS can close during handshake while curl still returns 200 because the browser ClientHello is larger than curl and path MTU discovery is blackholed.">
+    <link rel="canonical" href="https://eugenearmstead.github.io/overlay-and-edge-notes/networking/02-chromium-tls-pmtu.html">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Source+Sans+3:wght@400;500;600&amp;display=swap">
+    <link rel="stylesheet" href="../assets/spec.css">
+    <link rel="describedby" href="../llms.txt">
+    <meta name="author" content="Eugene Armstead">
+    <meta name="citation_author" content="Eugene Armstead">
+    <meta name="dcterms.creator" content="Eugene Armstead">
+    <link rel="author" href="https://www.armsteadent.com/">
+    <meta property="article:author" content="Eugene Armstead">
+    <meta property="og:see_also" content="https://www.armsteadent.com/">
+    <meta property="og:title" content="OEN-02: Chromium TLS fails while curl returns 200 — Overlay and Edge Notes">
+    <meta property="og:description" content="Chromium HTTPS can close during handshake while curl still returns 200 because the browser ClientHello is larger than curl and path MTU discovery is blackholed.">
+    <meta property="og:url" content="https://eugenearmstead.github.io/overlay-and-edge-notes/networking/02-chromium-tls-pmtu.html">
+    <meta property="og:type" content="article">
+    <meta property="article:published_time" content="2026-09-08">
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "TechArticle",
+      "@id": "https://eugenearmstead.github.io/overlay-and-edge-notes/networking/02-chromium-tls-pmtu.html#article",
+      "headline": "Chromium TLS fails while curl returns 200",
+      "description": "Chromium HTTPS can close during handshake while curl still returns 200 because the browser ClientHello is larger than curl and path MTU discovery is blackholed.",
+      "datePublished": "2026-09-08",
+      "author": {
+        "@type": "Person",
+        "name": "Eugene Armstead",
+        "url": "https://www.armsteadent.com/",
+        "sameAs": [
+          "https://github.com/eugenearmstead"
+        ]
+      },
+      "url": "https://eugenearmstead.github.io/overlay-and-edge-notes/networking/02-chromium-tls-pmtu.html",
+      "identifier": "OEN-02",
+      "license": "https://creativecommons.org/licenses/by/4.0/",
+      "inLanguage": "en"
+    },
+    {
+      "@type": "HowTo",
+      "name": "Chromium TLS fails while curl returns 200",
+      "description": "Chromium HTTPS can close during handshake while curl still returns 200 because the browser ClientHello is larger than curl and path MTU discovery is blackholed.",
+      "author": {
+        "@type": "Person",
+        "name": "Eugene Armstead",
+        "url": "https://www.armsteadent.com/",
+        "sameAs": [
+          "https://github.com/eugenearmstead"
+        ]
+      },
+      "step": [
+        {
+          "@type": "HowToStep",
+          "position": 1,
+          "name": "P1 \u2014 Rule out overlay exit and DNS hijack.",
+          "text": "Action: Confirm no exit node is selected for general web. Resolve the failing name with LAN DNS and with DNS over HTTPS. If LAN DNS hangs or returns sinkhole answers, stop and follow [OEN-03](03-router-vpn-dns-hijack.md) / [OEN-S24](../supporting/s24-lan-dns-sinkhole-0-0-0-0.md). Expected: LAN DNS answers real addresses. Overlay is not the web path. On failure: Do not clamp MSS until DNS is honest."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 2,
+          "name": "P2 \u2014 Compare interface MTUs.",
+          "text": "Action: `ip link show` on the client (and the router if you have it). Record LAN/bridge vs `<wg-iface>`. Expected: LAN often 1500; commercial WireGuard often ~1320. On failure: If LAN was already set to the tunnel MTU, restore 1500 before continuing."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 3,
+          "name": "P3 \u2014 Don't-fragment ladder through the VPN path.",
+          "text": "Action: Run [OEN-S01](../supporting/s01-pmtud-size-ladder.md) toward a public HTTPS target **while traffic uses** `<wg-iface>`. Expected: A clear max payload under the tunnel MTU, with small ping succeeding. On failure: If even mid-size DF fails, check routing; if DF already reaches ~1500, skip to P5."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 4,
+          "name": "P4 \u2014 Same URL: curl vs Chromium.",
+          "text": "Action: `curl -4 -sS -o /dev/null -w '%{http_code}\\n' --connect-timeout 8 https://<target>` then open the same URL in Chromium/Brave. Expected: curl 200; browser handshake closed or `ERR_CONNECTION_CLOSED`. On failure: If both fail, this is not the curl-vs-browser split (auth, DNS, or blocking)."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 5,
+          "name": "P5 \u2014 Explicit MSS on LAN\u2194VPN only.",
+          "text": "Action: On LAN\u2194`<wg-iface>` FORWARD (IPv4 and IPv6), install `TCPMSS --set-mss` with an explicit value under the tunnel payload. Do **not** use `--clamp-mss-to-pmtu`. Do **not** change LAN MTU. Expected: Chromium handshake completes. `ip link` still shows LAN 1500. On failure: Re-check after firmware/VPN scripts redeploy; clamps get wiped."
+        }
+      ]
+    }
+  ]
+}
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <div class="site-header-inner">
+        <p class="site-title"><a href="../index.html">Overlay and Edge Notes</a></p>
+        <p class="site-tag">Public field notes by Eugene Armstead</p>
+    <nav class="site-nav" aria-label="Site">
+      <a href="../index.html">Home</a>
+      <a href="../DISCLOSURE.html">Disclosure</a>
+      <a href="../changelog.html">Changelog</a>
+      <a href="../editions/2026.html">2026</a>
+      <a href="../AGENTS.md">AGENTS.md</a>
+      <a href="../index.html#networking">Networking</a>
+      <a href="../index.html#web">Web</a>
+      <a href="../index.html#supporting">Supporting</a>
+    </nav>
+      </div>
+    </header>
+    <nav class="breadcrumb" aria-label="Breadcrumb"><ol><li><a href="../index.html">Home</a></li><li><a href="../index.html#networking">Networking</a></li><li>OEN-02</li></ol></nav>
+    <main id="main">
+      <article>
+        <h1>Chromium TLS fails while curl returns 200</h1>
+        <p class="meta-line"><span>OEN-02</span> · original · edition 1 · 2026-09-08</p>
+        <h2 id="context">Context</h2>
+<p>A Local Area Network (LAN) client can load a site with <code>curl</code> (Hypertext Transfer Protocol Secure (HTTPS) 200) while Brave or Chrome reports <code>ERR_CONNECTION_CLOSED</code> or a Transport Layer Security (TLS) handshake that never finishes. Internet Control Message Protocol (ICMP) ping and Domain Name System (DNS) may still look healthy.</p>
+<p>Chromium post-quantum ClientHello messages (often about 1.5–1.9 kilobytes) are much larger than a typical curl/OpenSSL hello (about 0.5 KB). When the path Maximum Transmission Unit (MTU) is the commercial WireGuard tunnel (~1320) and ICMP path MTU discovery (PMTUD) is blackholed, those large Transmission Control Protocol (TCP) segments die while small curl still works.</p>
+<p>This is <strong>not</strong> proof of a Chromium or overlay-product bug. Overlay with <strong>no exit node selected</strong> does not carry general web traffic. A <strong>second</strong> trap looks identical in the browser: consumer-router Virtual Private Network (VPN) DNS hijack (<a href="03-router-vpn-dns-hijack.html">OEN-03</a>). Check DNS hijack <strong>before</strong> Maximum Segment Size (MSS).</p>
+
+<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>VPS</dt><dd>Virtual Private Server</dd><dt>LAN</dt><dd>Local Area Network</dd><dt>WAN</dt><dd>Wide Area Network</dd><dt>VPN</dt><dd>Virtual Private Network</dd><dt>KB</dt><dd>kilobyte</dd><dt>TCP</dt><dd>Transmission Control Protocol</dd><dt>UDP</dt><dd>User Datagram Protocol</dd><dt>MSS</dt><dd>Maximum Segment Size</dd><dt>TCPMSS</dt><dd>iptables/nft target that sets TCP Maximum Segment Size</dd><dt>MTU</dt><dd>Maximum Transmission Unit</dd><dt>ICMP</dt><dd>Internet Control Message Protocol</dd><dt>PMTU</dt><dd>path Maximum Transmission Unit</dd><dt>PMTUD</dt><dd>path MTU discovery</dd><dt>DF</dt><dd>don&#x27;t-fragment (IP flag)</dd><dt>TLS</dt><dd>Transport Layer Security</dd><dt>HTTPS</dt><dd>Hypertext Transfer Protocol Secure</dd><dt>IP</dt><dd>Internet Protocol</dd><dt>IPv4</dt><dd>Internet Protocol version 4</dd><dt>IPv6</dt><dd>Internet Protocol version 6</dd><dt>WireGuard</dt><dd>UDP-based VPN protocol</dd><dt>DNS</dt><dd>Domain Name System</dd><dt>nft</dt><dd>nftables (Linux packet filter)</dd><dt>FORWARD</dt><dd>netfilter/iptables forward chain</dd><dt>ClientHello</dt><dd>TLS handshake message sent by the client</dd><dt>URL</dt><dd>Uniform Resource Locator</dd><dt>Pi</dt><dd>single-board computer (Raspberry Pi class)</dd><dt>QUIC</dt><dd>Quick UDP Internet Connections</dd><dt>SYN</dt><dd>TCP synchronize packet</dd><dt>Chromium</dt><dd>open-source browser engine</dd><dt>Inter</dt><dd>variable sans-serif font family</dd><dt>RST</dt><dd>TCP reset flag</dd></dl></section>
+<h2 id="topology">Topology</h2>
+<pre><code class="language-text">[LAN client]  MTU 1500 (MUST stay)
+    --&gt;  &lt;lan-bridge&gt; 1500
+    --&gt;  &lt;wg-iface&gt;  &lt;wg-mtu&gt;  commercial WireGuard
+    --&gt;  internet HTTPS  (ICMP PMTUD often blackholed)
+
+Overlay with **no exit selected** is NOT the general-web path.
+A second trap that looks identical in the browser: DNS hijack ([OEN-03](03-router-vpn-dns-hijack.html)).</code></pre>
+<h2 id="bind">Bind</h2>
+<p>Fill this table <strong>before</strong> any live change. Do <strong>not</strong> paste real values back into public notes.</p>
+<table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><code>&lt;cloud-vps&gt;</code></td><td>Overlay SSH target</td><td>Cloud VPS</td></tr><tr><td><code>&lt;lan-pi&gt;</code></td><td>Overlay SSH target</td><td>LAN Pi</td></tr><tr><td><code>&lt;user&gt;</code></td><td>SSH user</td><td>Guest account</td></tr><tr><td><code>&lt;wg-iface&gt;</code></td><td>Commercial WireGuard iface</td><td>Router or VPS client</td></tr><tr><td><code>&lt;wan-iface&gt;</code></td><td>WAN iface</td><td>Router</td></tr><tr><td><code>&lt;lan-bridge&gt;</code></td><td>LAN bridge</td><td>Router (MTU 1500)</td></tr><tr><td><code>&lt;overlay-tun&gt;</code></td><td>Overlay tun iface</td><td>Node under test</td></tr><tr><td><code>&lt;wg-mtu&gt;</code></td><td>MTU integer from <code>ip link</code></td><td>Measured</td></tr><tr><td><code>&lt;mss4&gt;</code> / <code>&lt;mss6&gt;</code></td><td>Computed MSS</td><td>Formulas</td></tr><tr><td><code>&lt;vps-public-v4&gt;</code> / <code>&lt;vps-public-v6&gt;</code></td><td>VPS public addresses</td><td>WAN; never publish</td></tr><tr><td><code>&lt;overlay-v4&gt;</code> / <code>&lt;overlay-v6&gt;</code></td><td>Overlay addresses</td><td>Overlay; never publish</td></tr></tbody></table>
+<h2 id="formulas">Formulas</h2>
+<pre><code class="language-text"># Measure &lt;wg-mtu&gt; from: ip link show &lt;wg-iface&gt;
+mss4 = &lt;wg-mtu&gt; - 40    # IPv4 TCP (20-byte IP + 20-byte TCP)
+mss6 = &lt;wg-mtu&gt; - 60    # IPv6 TCP (40-byte IPv6 + 20-byte TCP)
+# IPv4 DF ping: IP size ≈ payload + 28
+# IPv6 DF ping: IP size ≈ payload + 48
+# Historical 1160 / 1146-byte SSH cliff = wrong-scope clamp, not this recipe.
+# LAN bridge MTU MUST stay 1500.</code></pre>
+<p>See <a href="../networking/01-overlay-ssh-byte-cliff.html">OEN-01</a> and <a href="../supporting/s01-pmtud-size-ladder.html">OEN-S01</a>.</p>
+<h2 id="decision">Decision</h2>
+<p>Operators MUST NOT treat working curl as “not MTU.” After DNS hijack is ruled out, curl-200 plus Chromium-fail MUST be treated as a path-MTU / MSS problem.</p>
+<ul><li>The LAN bridge MUST stay <strong>1500</strong>. MSS clamping MUST be <strong>only</strong> on LAN↔VPN forward with an <strong>explicit</strong> <code>--set-mss</code> (not <code>--clamp-mss-to-pmtu</code>). See <a href="../supporting/s02-clamp-mss-to-pmtu-noop.html">OEN-S02</a>.</li><li>Operators MUST NOT shrink the LAN bridge to the tunnel MTU “to fix browsing.” That hides Chromium symptoms and <strong>breaks</strong> overlay mesh underlay (<a href="01-overlay-ssh-byte-cliff.html">OEN-01</a>).</li><li>QUIC is a separate User Datagram Protocol (UDP) issue. Diagnose TCP size first.</li></ul>
+<h2 id="consequences">Consequences</h2>
+<ul><li>Chromium HTTPS starts completing once LAN↔VPN MSS is explicit and LAN stays 1500.</li><li>Overlay large Secure Shell (SSH) stays healthy because the LAN was not shrunk.</li><li>If Chromium still times out with overlay <strong>off</strong>, the next spec is DNS hijack, not another MSS pass.</li></ul>
+<h2 id="agent-stop-rule">Agent stop rule</h2>
+<blockquote><p>A coding agent MUST emit a <strong>bound runbook</strong> (placeholders replaced from Bind). MUST NOT apply live <code>ip rule</code>, nft, iptables, ip6tables, sysctl, <code>wg set</code>, daemon restart, or deploy until a <strong>human</strong> filled Bind. MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS. MUST NOT file an upstream bug from this page. MUST NOT publish real addresses, hostnames, or custom ports.</p></blockquote>
+<h2 id="procedure">Procedure</h2>
+<p>Placeholders only until Bind is filled: <code>&lt;cloud-vps&gt;</code>, <code>&lt;lan-pi&gt;</code>, <code>&lt;overlay-peer&gt;</code>, <code>&lt;exit-node&gt;</code>, <code>&lt;wg-iface&gt;</code>, <code>&lt;gcp-nic&gt;</code>, plus the Bind extras on this page.</p>
+<h3>Copy-paste commands (after Bind)</h3>
+<p>Copy-paste after Bind (IPv4 and IPv6). Do not clamp until DNS is honest (<a href="03-router-vpn-dns-hijack.html">OEN-03</a>).</p>
+<pre><code class="language-bash">ip link show &lt;lan-bridge&gt;
+ip link show &lt;wg-iface&gt;
+# DF ladders: [OEN-S01](../supporting/s01-pmtud-size-ladder.html)
+ping -c1 -W2 -M do -s 1472 &lt;https-v4&gt;
+ping -6 -c1 -W2 -M do -s 1452 &lt;https-v6&gt;
+curl -4 -sS -o /dev/null -w &#x27;%{http_code}\n&#x27; --connect-timeout 8 https://&lt;https-host&gt;
+# Then open the same URL in Chromium. curl 200 is NOT a PMTU pass.
+
+mss4=$((&lt;wg-mtu&gt; - 40)); mss6=$((&lt;wg-mtu&gt; - 60))
+iptables -C FORWARD -i &lt;lan-bridge&gt; -o &lt;wg-iface&gt; -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --set-mss &quot;$mss4&quot; \
+  || iptables -I FORWARD -i &lt;lan-bridge&gt; -o &lt;wg-iface&gt; -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --set-mss &quot;$mss4&quot;
+ip6tables -C FORWARD -i &lt;lan-bridge&gt; -o &lt;wg-iface&gt; -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --set-mss &quot;$mss6&quot; \
+  || ip6tables -I FORWARD -i &lt;lan-bridge&gt; -o &lt;wg-iface&gt; -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --set-mss &quot;$mss6&quot;
+nft list ruleset | grep -i mss || true</code></pre>
+<ol><li><strong>P1 — Rule out overlay exit and DNS hijack.</strong><br>
+- <strong>Action:</strong> Confirm no exit node is selected for general web. Resolve the failing name with LAN DNS and with DNS over HTTPS. If LAN DNS hangs or returns sinkhole answers, stop and follow <a href="03-router-vpn-dns-hijack.html">OEN-03</a> / <a href="../supporting/s24-lan-dns-sinkhole-0-0-0-0.html">OEN-S24</a>.<br>
+- <strong>Expected:</strong> LAN DNS answers real addresses. Overlay is not the web path.<br>
+- <strong>On failure:</strong> Do not clamp MSS until DNS is honest.</li><li><strong>P2 — Compare interface MTUs.</strong><br>
+- <strong>Action:</strong> <code>ip link show</code> on the client (and the router if you have it). Record LAN/bridge vs <code>&lt;wg-iface&gt;</code>.<br>
+- <strong>Expected:</strong> LAN often 1500; commercial WireGuard often ~1320.<br>
+- <strong>On failure:</strong> If LAN was already set to the tunnel MTU, restore 1500 before continuing.</li><li><strong>P3 — Don&#x27;t-fragment ladder through the VPN path.</strong><br>
+- <strong>Action:</strong> Run <a href="../supporting/s01-pmtud-size-ladder.html">OEN-S01</a> toward a public HTTPS target <strong>while traffic uses</strong> <code>&lt;wg-iface&gt;</code>.<br>
+- <strong>Expected:</strong> A clear max payload under the tunnel MTU, with small ping succeeding.<br>
+- <strong>On failure:</strong> If even mid-size DF fails, check routing; if DF already reaches ~1500, skip to P5.</li><li><strong>P4 — Same URL: curl vs Chromium.</strong><br>
+- <strong>Action:</strong> <code>curl -4 -sS -o /dev/null -w &#x27;%{http_code}\n&#x27; --connect-timeout 8 https://&lt;target&gt;</code> then open the same URL in Chromium/Brave.<br>
+- <strong>Expected:</strong> curl 200; browser handshake closed or <code>ERR_CONNECTION_CLOSED</code>.<br>
+- <strong>On failure:</strong> If both fail, this is not the curl-vs-browser split (auth, DNS, or blocking).</li><li><strong>P5 — Explicit MSS on LAN↔VPN only.</strong><br>
+- <strong>Action:</strong> On LAN↔<code>&lt;wg-iface&gt;</code> FORWARD (IPv4 and IPv6), install <code>TCPMSS --set-mss</code> with an explicit value under the tunnel payload. Do <strong>not</strong> use <code>--clamp-mss-to-pmtu</code>. Do <strong>not</strong> change LAN MTU.<br>
+- <strong>Expected:</strong> Chromium handshake completes. <code>ip link</code> still shows LAN 1500.<br>
+- <strong>On failure:</strong> Re-check after firmware/VPN scripts redeploy; clamps get wiped.</li></ol>
+<h2 id="expected-samples">Expected samples</h2>
+<pre><code class="language-text"># curl 200 while Chromium ERR_CONNECTION_CLOSED — this spec, after DNS is honest
+200
+
+# DF fail
+ping: local error: message too long, mtu=1320</code></pre>
+<h2 id="verify">Verify</h2>
+<ul><li>curl and Chromium both complete HTTPS to the same URL.</li><li>LAN bridge MTU is 1500.</li><li>TCPMSS exists only on LAN↔VPN forward (plus any scoped exit path).</li><li>Overlay SSH 3 KB+ still works (<a href="01-overlay-ssh-byte-cliff.html">OEN-01</a>).</li><li>ICMP / small ping success was <strong>not</strong> used as the pass criterion when this spec names TCP, SSH, or HTTPS.</li><li>Bind table was filled by a human before any live <code>ip</code> / nft / iptables change.</li></ul>
+<h2 id="must-not" class="must-not">MUST NOT</h2>
+<ul><li>MUST NOT file a Chromium or overlay-product bug until P1–P5 are evidenced.</li><li>MUST NOT shrink the LAN bridge to the commercial WireGuard MTU.</li><li>MUST NOT treat working curl/ping/DNS as proof “not MTU.”</li><li>MUST NOT skip the DNS-hijack check.</li><li>MUST NOT publish hostnames or addresses from the ladder.</li><li>MUST NOT apply live network or firewall changes until Bind is filled by a human.</li><li>MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.</li><li>MUST NOT publish hostnames, addresses, ULAs, or custom ports.</li></ul>
+<h2 id="related-specs">Related specs</h2>
+<ul><li><a href="01-overlay-ssh-byte-cliff.html">OEN-01 Overlay SSH byte cliff</a></li><li><a href="03-router-vpn-dns-hijack.html">OEN-03 Router VPN DNS hijack</a></li><li><a href="../supporting/s01-pmtud-size-ladder.html">OEN-S01 Don&#x27;t-fragment ping size ladder</a></li><li><a href="../supporting/s02-clamp-mss-to-pmtu-noop.html">OEN-S02 clamp-mss-to-pmtu is a no-op</a></li></ul>
+<h2 id="prior-art-not-novel">Prior art (Not novel)</h2>
+<p>Chromium ClientHello size versus curl is partly documented. This spec’s claim is the combo: do not trust curl, do not shrink the LAN, check DNS hijack first, and use explicit <code>--set-mss</code>.</p>
+      </article>
+    </main>
+    <footer class="site-footer">
+      <div class="site-footer-inner">
+    <p class="byline">Written by <a href="https://www.armsteadent.com/">Eugene Armstead</a> · <a href="https://www.armsteadent.com/">https://www.armsteadent.com/</a> · <a rel="license" href="https://creativecommons.org/licenses/by/4.0/">CC-BY-4.0</a></p>
+    <p class="license-line">Living field notes. Stable IDs. Do not copy private inventory into public text.</p>
+      </div>
+    </footer>
+  </body>
+</html>

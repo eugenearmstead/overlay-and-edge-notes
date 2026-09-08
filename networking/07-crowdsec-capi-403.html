@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>OEN-07: CrowdSec Central API HTTP 403 from native health probes — Overlay and Edge Notes</title>
+    <meta name="description" content="Native systemd health and fleet collectors that loop cscli capi status can 403 a Virtual Private Server IPv4 the same way Docker healthchecks do. Dummy enroll POST distinguishes banned IPv4 from a dead install.">
+    <link rel="canonical" href="https://eugenearmstead.github.io/overlay-and-edge-notes/networking/07-crowdsec-capi-403.html">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Source+Sans+3:wght@400;500;600&amp;display=swap">
+    <link rel="stylesheet" href="../assets/spec.css">
+    <link rel="describedby" href="../llms.txt">
+    <meta name="author" content="Eugene Armstead">
+    <meta name="citation_author" content="Eugene Armstead">
+    <meta name="dcterms.creator" content="Eugene Armstead">
+    <link rel="author" href="https://www.armsteadent.com/">
+    <meta property="article:author" content="Eugene Armstead">
+    <meta property="og:see_also" content="https://www.armsteadent.com/">
+    <meta property="og:title" content="OEN-07: CrowdSec Central API HTTP 403 from native health probes — Overlay and Edge Notes">
+    <meta property="og:description" content="Native systemd health and fleet collectors that loop cscli capi status can 403 a Virtual Private Server IPv4 the same way Docker healthchecks do. Dummy enroll POST distinguishes banned IPv4 from a dead install.">
+    <meta property="og:url" content="https://eugenearmstead.github.io/overlay-and-edge-notes/networking/07-crowdsec-capi-403.html">
+    <meta property="og:type" content="article">
+    <meta property="article:published_time" content="2026-09-08">
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "TechArticle",
+      "@id": "https://eugenearmstead.github.io/overlay-and-edge-notes/networking/07-crowdsec-capi-403.html#article",
+      "headline": "CrowdSec Central API HTTP 403 from native health probes",
+      "description": "Native systemd health and fleet collectors that loop cscli capi status can 403 a Virtual Private Server IPv4 the same way Docker healthchecks do. Dummy enroll POST distinguishes banned IPv4 from a dead install.",
+      "datePublished": "2026-09-08",
+      "author": {
+        "@type": "Person",
+        "name": "Eugene Armstead",
+        "url": "https://www.armsteadent.com/",
+        "sameAs": [
+          "https://github.com/eugenearmstead"
+        ]
+      },
+      "url": "https://eugenearmstead.github.io/overlay-and-edge-notes/networking/07-crowdsec-capi-403.html",
+      "identifier": "OEN-07",
+      "license": "https://creativecommons.org/licenses/by/4.0/",
+      "inLanguage": "en"
+    },
+    {
+      "@type": "HowTo",
+      "name": "CrowdSec Central API HTTP 403 from native health probes",
+      "description": "Native systemd health and fleet collectors that loop cscli capi status can 403 a Virtual Private Server IPv4 the same way Docker healthchecks do. Dummy enroll POST distinguishes banned IPv4 from a dead install.",
+      "author": {
+        "@type": "Person",
+        "name": "Eugene Armstead",
+        "url": "https://www.armsteadent.com/",
+        "sameAs": [
+          "https://github.com/eugenearmstead"
+        ]
+      },
+      "step": [
+        {
+          "@type": "HowToStep",
+          "position": 1,
+          "name": "P1 \u2014 Stop looping cscli.",
+          "text": "Action: Disable or rate-limit systemd health and fleet collector units that run `cscli capi status`. Do not run it \u201cto check again.\u201d Expected: No further CAPI logins this hour. On failure: If you already looped, wait the free-tier window (~1 h) before P3."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 2,
+          "name": "P2 \u2014 Dummy enroll POST per family.",
+          "text": "Action: From `<cloud-vps>`, `curl -4` and `curl -6` POST `https://api.crowdsec.net/v3/watchers/enroll` with empty JSON, no credentials. If `/etc/hosts` has an A pin, resolve AAAA via a public resolver and `curl --resolve` for v6. Expected: 401 = that source IP is accepted. 403 = that source IP is banned. Compare a second cloud host if you have one. On failure: Do not put credentials on the dummy POST."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 3,
+          "name": "P3 \u2014 Remove A-record pins.",
+          "text": "Action: If `/etc/hosts` pins `api.crowdsec.net` to IPv4, delete it. Confirm `getent` no longer returns `::ffff:` mapped v4 for the name. Expected: Go/cscli can use IPv6. One `cscli capi status` after the pin is gone. On failure: Do not restore the pin \u201cto force IPv4.\u201d"
+        },
+        {
+          "@type": "HowToStep",
+          "position": 4,
+          "name": "P4 \u2014 Cache status; skip nested probes.",
+          "text": "Action: Health MUST read a cached CAPI result or log lines, not nested `cscli` every scrape. Expected: Collector interval is far below ~20 / 50 min per IP. On failure: If 403 remains on both families on two hosts, wait; do not probe harder."
+        }
+      ]
+    }
+  ]
+}
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <div class="site-header-inner">
+        <p class="site-title"><a href="../index.html">Overlay and Edge Notes</a></p>
+        <p class="site-tag">Public field notes by Eugene Armstead</p>
+    <nav class="site-nav" aria-label="Site">
+      <a href="../index.html">Home</a>
+      <a href="../DISCLOSURE.html">Disclosure</a>
+      <a href="../changelog.html">Changelog</a>
+      <a href="../editions/2026.html">2026</a>
+      <a href="../AGENTS.md">AGENTS.md</a>
+      <a href="../index.html#networking">Networking</a>
+      <a href="../index.html#web">Web</a>
+      <a href="../index.html#supporting">Supporting</a>
+    </nav>
+      </div>
+    </header>
+    <nav class="breadcrumb" aria-label="Breadcrumb"><ol><li><a href="../index.html">Home</a></li><li><a href="../index.html#networking">Networking</a></li><li>OEN-07</li></ol></nav>
+    <main id="main">
+      <article>
+        <h1>CrowdSec Central API HTTP 403 from native health probes</h1>
+        <p class="meta-line"><span>OEN-07</span> · original · edition 1 · 2026-09-08</p>
+        <h2 id="context">Context</h2>
+<p>CrowdSec Central API (CAPI) HTTP <strong>403 Forbidden</strong> on a <strong>native</strong> (non-Docker) Virtual Private Server (VPS) looks like “CrowdSec is broken.” Docker <code>healthcheck: cscli capi status</code> is already documented (~20 logins / 50 minutes → about one hour ban). The unique add-on is <strong>stacked systemd health plus a fleet collector</strong> calling the same CLI every fifteen minutes (plus retries).</p>
+<p>A leftover <code>/etc/hosts</code> <strong>A-record pin</strong> for <code>api.crowdsec.net</code> forces Go onto <strong>banned IPv4</strong> while IPv6 still returns <strong>401</strong> on a dummy enroll (IP accepted, auth expected to fail). Dummy unauthenticated enroll POST is a 401-versus-403 matrix <strong>without</strong> more <code>cscli</code>.</p>
+<p>CAPI egress on this class of host is the <strong>public NIC</strong>, not the commercial tunnel. MUST NOT publish real public IPs. Generic: “VPS IPv4 banned, IPv6 still accepted.” Distinct from <a href="21-shared-vpn-nat-crowdsec-ban.html">OEN-21</a> (shared VPN NAT house ban).</p>
+
+<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>VPS</dt><dd>Virtual Private Server</dd><dt>VPN</dt><dd>Virtual Private Network</dd><dt>TCP</dt><dd>Transmission Control Protocol</dd><dt>ICMP</dt><dd>Internet Control Message Protocol</dd><dt>HTTP</dt><dd>Hypertext Transfer Protocol</dd><dt>HTTPS</dt><dd>Hypertext Transfer Protocol Secure</dd><dt>IP</dt><dd>Internet Protocol</dd><dt>IPv4</dt><dd>Internet Protocol version 4</dd><dt>IPv6</dt><dd>Internet Protocol version 6</dd><dt>NAT</dt><dd>network address translation</dd><dt>NIC</dt><dd>network interface card</dd><dt>API</dt><dd>application programming interface</dd><dt>CLI</dt><dd>command-line interface</dd><dt>CAPI</dt><dd>CrowdSec Central API</dd><dt>nft</dt><dd>nftables (Linux packet filter)</dd><dt>ControlPath</dt><dd>OpenSSH multiplexing socket path option</dd><dt>JSON</dt><dd>JavaScript Object Notation</dd><dt>UI</dt><dd>user interface</dd><dt>systemd</dt><dd>Linux service manager</dd><dt>CrowdSec</dt><dd>open-source IDS/IPS with a Central API</dd><dt>POST</dt><dd>HTTP method</dd><dt>AAAA</dt><dd>DNS IPv6 address record</dd></dl></section>
+<h2 id="topology">Topology</h2>
+<pre><code class="language-text">[native systemd host] --HTTPS--&gt; CrowdSec Central API
+    stacked health + collector calling `cscli capi status`  --&gt;  login budget  --&gt; HTTP 403
+    leftover /etc/hosts A-record pin  --&gt;  Go uses banned IPv4 while IPv6 still 401</code></pre>
+<h2 id="bind">Bind</h2>
+<p>Fill this table <strong>before</strong> any live change. Do <strong>not</strong> paste real values back into public notes.</p>
+<table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><code>&lt;cloud-vps&gt;</code></td><td>Native CrowdSec host</td><td>Cloud VPS</td></tr><tr><td><code>&lt;user&gt;</code></td><td>SSH user</td><td>Guest</td></tr></tbody></table>
+<h2 id="formulas">Formulas</h2>
+<p>Free-tier order of magnitude: about <strong>20 CAPI logins / 50 minutes / source IP</strong> then ~1 hour of HTTP 403. Cache status; dummy unauthenticated enroll POST for 401 vs 403 <strong>without</strong> more <code>cscli</code>.</p>
+<h2 id="decision">Decision</h2>
+<p>Operators MUST cache <code>cscli capi status</code> and MUST NOT loop it (<a href="../supporting/s34-crowdsec-capi-login-budget.html">OEN-S34</a>).</p>
+<p>Diagnose with one dummy enroll POST per address family. Remove A-record hosts pins. Prefer CAPI log lines and the Console UI over extra CLI logins.</p>
+<h2 id="consequences">Consequences</h2>
+<ul><li>IPv6 CAPI keeps working while IPv4 cools down.</li><li>Health probes stop re-banning the VPS.</li><li>Console “enrolled” is not confused with a fleet dashboard 403.</li></ul>
+<h2 id="agent-stop-rule">Agent stop rule</h2>
+<blockquote><p>A coding agent MUST emit a <strong>bound runbook</strong> (placeholders replaced from Bind). MUST NOT apply live <code>ip rule</code>, nft, iptables, ip6tables, sysctl, <code>wg set</code>, daemon restart, or deploy until a <strong>human</strong> filled Bind. MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS. MUST NOT file an upstream bug from this page. MUST NOT publish real addresses, hostnames, or custom ports.</p></blockquote>
+<h2 id="procedure">Procedure</h2>
+<p>Placeholders only until Bind is filled: <code>&lt;cloud-vps&gt;</code>, <code>&lt;lan-pi&gt;</code>, <code>&lt;overlay-peer&gt;</code>, <code>&lt;exit-node&gt;</code>, <code>&lt;wg-iface&gt;</code>, <code>&lt;gcp-nic&gt;</code>, plus the Bind extras on this page.</p>
+<h3>Copy-paste commands (after Bind)</h3>
+<pre><code class="language-bash">ssh -o ControlPath=none &lt;user&gt;@&lt;cloud-vps&gt; &#x27;systemctl is-active crowdsec; grep -n crowdsec /etc/hosts || true&#x27;
+# Dummy enroll POST (no credentials) v4 vs v6 — expect 401 (accepted path) vs 403 (banned family)
+curl -4 -sS -o /dev/null -w &#x27;%{http_code}\n&#x27; --max-time 15 -X POST https://api.crowdsec.net/v2/watchers
+curl -6 -sS -o /dev/null -w &#x27;%{http_code}\n&#x27; --max-time 15 -X POST https://api.crowdsec.net/v2/watchers</code></pre>
+<p>MUST NOT loop <code>cscli capi status</code>. Nested probes MUST read a cache (<a href="../supporting/s34-crowdsec-capi-login-budget.html">OEN-S34</a>).</p>
+<ol><li><strong>P1 — Stop looping cscli.</strong><br>
+- <strong>Action:</strong> Disable or rate-limit systemd health and fleet collector units that run <code>cscli capi status</code>. Do not run it “to check again.”<br>
+- <strong>Expected:</strong> No further CAPI logins this hour.<br>
+- <strong>On failure:</strong> If you already looped, wait the free-tier window (~1 h) before P3.</li><li><strong>P2 — Dummy enroll POST per family.</strong><br>
+- <strong>Action:</strong> From <code>&lt;cloud-vps&gt;</code>, <code>curl -4</code> and <code>curl -6</code> POST <code>https://api.crowdsec.net/v3/watchers/enroll</code> with empty JSON, no credentials. If <code>/etc/hosts</code> has an A pin, resolve AAAA via a public resolver and <code>curl --resolve</code> for v6.<br>
+- <strong>Expected:</strong> 401 = that source IP is accepted. 403 = that source IP is banned. Compare a second cloud host if you have one.<br>
+- <strong>On failure:</strong> Do not put credentials on the dummy POST.</li><li><strong>P3 — Remove A-record pins.</strong><br>
+- <strong>Action:</strong> If <code>/etc/hosts</code> pins <code>api.crowdsec.net</code> to IPv4, delete it. Confirm <code>getent</code> no longer returns <code>::ffff:</code> mapped v4 for the name.<br>
+- <strong>Expected:</strong> Go/cscli can use IPv6. One <code>cscli capi status</code> after the pin is gone.<br>
+- <strong>On failure:</strong> Do not restore the pin “to force IPv4.”</li><li><strong>P4 — Cache status; skip nested probes.</strong><br>
+- <strong>Action:</strong> Health MUST read a cached CAPI result or log lines, not nested <code>cscli</code> every scrape.<br>
+- <strong>Expected:</strong> Collector interval is far below ~20 / 50 min per IP.<br>
+- <strong>On failure:</strong> If 403 remains on both families on two hosts, wait; do not probe harder.</li></ol>
+<h2 id="expected-samples">Expected samples</h2>
+<pre><code class="language-text"># Banned IPv4 family
+403
+# Other family still accepted (example)
+401</code></pre>
+<h2 id="verify">Verify</h2>
+<ul><li>Dummy enroll: 401 on at least one family on this VPS.</li><li>No api.crowdsec.net A pin in hosts.</li><li>At most rare cscli capi status (cached).</li><li>Console shows enrolled after one successful status.</li><li>ICMP / small ping success was <strong>not</strong> used as the pass criterion when this spec names TCP, SSH, or HTTPS.</li><li>Bind table was filled by a human before any live <code>ip</code> / nft / iptables change.</li></ul>
+<h2 id="must-not" class="must-not">MUST NOT</h2>
+<ul><li>MUST NOT loop cscli capi status or console enroll.</li><li>MUST NOT pin api.crowdsec.net to an A record.</li><li>MUST NOT publish VPS public IPs or control-host names.</li><li>MUST NOT treat a fleet dashboard “CAPI push FAIL” as proof of not enrolled without parsing console status.</li><li>MUST NOT route CAPI “through the tunnel” as the first fix — default egress is often already the public NIC.</li><li>MUST NOT apply live network or firewall changes until Bind is filled by a human.</li><li>MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.</li><li>MUST NOT publish hostnames, addresses, ULAs, or custom ports.</li></ul>
+<h2 id="related-specs">Related specs</h2>
+<ul><li><a href="../supporting/s34-crowdsec-capi-login-budget.html">OEN-S34 CrowdSec free-tier CAPI login budget</a></li><li><a href="21-shared-vpn-nat-crowdsec-ban.html">OEN-21 Shared VPN NAT house ban</a></li><li><a href="15-split-host-vs-overlay-resolver.html">OEN-15 Split host vs overlay resolver</a></li></ul>
+<h2 id="prior-art-not-novel">Prior art (Not novel)</h2>
+<p>Docker healthcheck CAPI bans are documented. This spec’s claim is native systemd + fleet collector + hosts A-pin + 401/403 dummy matrix without more cscli.</p>
+      </article>
+    </main>
+    <footer class="site-footer">
+      <div class="site-footer-inner">
+    <p class="byline">Written by <a href="https://www.armsteadent.com/">Eugene Armstead</a> · <a href="https://www.armsteadent.com/">https://www.armsteadent.com/</a> · <a rel="license" href="https://creativecommons.org/licenses/by/4.0/">CC-BY-4.0</a></p>
+    <p class="license-line">Living field notes. Stable IDs. Do not copy private inventory into public text.</p>
+      </div>
+    </footer>
+  </body>
+</html>

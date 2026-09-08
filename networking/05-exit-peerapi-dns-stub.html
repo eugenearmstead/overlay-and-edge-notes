@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>OEN-05: Exit-node overlay peer-API DNS stub (loopback only) — Overlay and Edge Notes</title>
+    <meta name="description" content="Android exit DNS is overlay peer-API DNS over HTTPS on a dynamic port. A loopback stub that forces Recursion Desired works; binding the stub on the overlay address:53 breaks all exit.">
+    <link rel="canonical" href="https://eugenearmstead.github.io/overlay-and-edge-notes/networking/05-exit-peerapi-dns-stub.html">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Source+Sans+3:wght@400;500;600&amp;display=swap">
+    <link rel="stylesheet" href="../assets/spec.css">
+    <link rel="describedby" href="../llms.txt">
+    <meta name="author" content="Eugene Armstead">
+    <meta name="citation_author" content="Eugene Armstead">
+    <meta name="dcterms.creator" content="Eugene Armstead">
+    <link rel="author" href="https://www.armsteadent.com/">
+    <meta property="article:author" content="Eugene Armstead">
+    <meta property="og:see_also" content="https://www.armsteadent.com/">
+    <meta property="og:title" content="OEN-05: Exit-node overlay peer-API DNS stub (loopback only) — Overlay and Edge Notes">
+    <meta property="og:description" content="Android exit DNS is overlay peer-API DNS over HTTPS on a dynamic port. A loopback stub that forces Recursion Desired works; binding the stub on the overlay address:53 breaks all exit.">
+    <meta property="og:url" content="https://eugenearmstead.github.io/overlay-and-edge-notes/networking/05-exit-peerapi-dns-stub.html">
+    <meta property="og:type" content="article">
+    <meta property="article:published_time" content="2026-09-08">
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "TechArticle",
+      "@id": "https://eugenearmstead.github.io/overlay-and-edge-notes/networking/05-exit-peerapi-dns-stub.html#article",
+      "headline": "Exit-node overlay peer-API DNS stub (loopback only)",
+      "description": "Android exit DNS is overlay peer-API DNS over HTTPS on a dynamic port. A loopback stub that forces Recursion Desired works; binding the stub on the overlay address:53 breaks all exit.",
+      "datePublished": "2026-09-08",
+      "author": {
+        "@type": "Person",
+        "name": "Eugene Armstead",
+        "url": "https://www.armsteadent.com/",
+        "sameAs": [
+          "https://github.com/eugenearmstead"
+        ]
+      },
+      "url": "https://eugenearmstead.github.io/overlay-and-edge-notes/networking/05-exit-peerapi-dns-stub.html",
+      "identifier": "OEN-05",
+      "license": "https://creativecommons.org/licenses/by/4.0/",
+      "inLanguage": "en"
+    },
+    {
+      "@type": "HowTo",
+      "name": "Exit-node overlay peer-API DNS stub (loopback only)",
+      "description": "Android exit DNS is overlay peer-API DNS over HTTPS on a dynamic port. A loopback stub that forces Recursion Desired works; binding the stub on the overlay address:53 breaks all exit.",
+      "author": {
+        "@type": "Person",
+        "name": "Eugene Armstead",
+        "url": "https://www.armsteadent.com/",
+        "sameAs": [
+          "https://github.com/eugenearmstead"
+        ]
+      },
+      "step": [
+        {
+          "@type": "HowToStep",
+          "position": 1,
+          "name": "P1 \u2014 Read the live PeerAPI URL.",
+          "text": "Action: On `<exit-node>`, `tailscale status --json` (or equivalent) and note `PeerAPIURL`. It is HTTP DoH on an ephemeral port, not `:53`. Expected: A URL on the overlay address with a high port. On failure: If PeerAPI is down, heal the overlay DNS process \u2014 do not restart the coordinator ([OEN-14](14-exit-dns-is-peerapi.md))."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 2,
+          "name": "P2 \u2014 Confirm the stub binds loopback only.",
+          "text": "Action: `ss` / `netstat` for UDP/TCP 53. The stub MUST show `127.0.0.1:53` (and optionally `::1`), not the overlay address. Expected: Listen address is loopback. On failure: If it is on the overlay address, stop the stub, rebind loopback, restart. Expect exit to recover."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 3,
+          "name": "P3 \u2014 Forward with RD=1.",
+          "text": "Action: From the exit, `dig +norecurse @127.0.0.1 example.com` vs `dig @127.0.0.1 example.com`. The stub MUST turn RD on before Unbound (or equivalent). Expected: RD=0 without the stub is REFUSED ([OEN-19](19-unbound-refuses-rd0.md)); through the stub, queries answer. On failure: Do not point PeerAPI at loopback Unbound with RD=0."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 4,
+          "name": "P4 \u2014 Load: receive queue must not grow.",
+          "text": "Action: During a phone soak, watch UDP recv-Q on the stub socket. If it climbs, the event loop is blocked ([OEN-S29](../supporting/s29-peerapi-stub-event-loop.md)). Expected: recv-Q stays near 0. Cellular DNS keeps working. On failure: Add a thread pool and upstream timeout; do not add more `select()` handlers that call network inline."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 5,
+          "name": "P5 \u2014 Verify from a non-exit client.",
+          "text": "Action: From `<overlay-peer>` using the exit, fetch `http://<exit>:<ephemeral>/dns-query` (DoH) and `curl -6 https://example.com`. Expected: DoH rcode NOERROR; IPv6 HTTP 200. On failure: DNS-only success is not enough."
+        }
+      ]
+    }
+  ]
+}
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <div class="site-header-inner">
+        <p class="site-title"><a href="../index.html">Overlay and Edge Notes</a></p>
+        <p class="site-tag">Public field notes by Eugene Armstead</p>
+    <nav class="site-nav" aria-label="Site">
+      <a href="../index.html">Home</a>
+      <a href="../DISCLOSURE.html">Disclosure</a>
+      <a href="../changelog.html">Changelog</a>
+      <a href="../editions/2026.html">2026</a>
+      <a href="../AGENTS.md">AGENTS.md</a>
+      <a href="../index.html#networking">Networking</a>
+      <a href="../index.html#web">Web</a>
+      <a href="../index.html#supporting">Supporting</a>
+    </nav>
+      </div>
+    </header>
+    <nav class="breadcrumb" aria-label="Breadcrumb"><ol><li><a href="../index.html">Home</a></li><li><a href="../index.html#networking">Networking</a></li><li>OEN-05</li></ol></nav>
+    <main id="main">
+      <article>
+        <h1>Exit-node overlay peer-API DNS stub (loopback only)</h1>
+        <p class="meta-line"><span>OEN-05</span> · original · edition 1 · 2026-09-08</p>
+        <h2 id="context">Context</h2>
+<p>Phone clients using an <code>&lt;exit-node&gt;</code> do not talk to a hardcoded <code>:53</code> or a guessed high port. Exit application Domain Name System (DNS) is DNS over HTTPS (DoH) to the overlay <strong>peer application-programming interface (PeerAPI)</strong> on a <strong>dynamic</strong> port (<code>PeerAPIURL</code> in <code>tailscale status --json</code>).</p>
+<p>A local stub that listens on <code>127.0.0.1:53</code> and forwards with Recursion Desired (RD)=1 is the right shape when the exit’s local resolver would otherwise refuse RD=0 (<a href="19-unbound-refuses-rd0.html">OEN-19</a>). Binding that stub on the <strong>overlay address:53</strong> broke <strong>all</strong> exit in the field.</p>
+<p>Under phone load, a single-threaded <code>select()</code> stub that calls upstream synchronously filled the User Datagram Protocol (UDP) receive queue (~160 KB) and cellular DNS died. Thread pool plus upstream timeout fixed it (<a href="../supporting/s29-peerapi-stub-event-loop.html">OEN-S29</a>).</p>
+
+<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>LAN</dt><dd>Local Area Network</dd><dt>WAN</dt><dd>Wide Area Network</dd><dt>KB</dt><dd>kilobyte</dd><dt>TCP</dt><dd>Transmission Control Protocol</dd><dt>UDP</dt><dd>User Datagram Protocol</dd><dt>MTU</dt><dd>Maximum Transmission Unit</dd><dt>ICMP</dt><dd>Internet Control Message Protocol</dd><dt>HTTP</dt><dd>Hypertext Transfer Protocol</dd><dt>HTTPS</dt><dd>Hypertext Transfer Protocol Secure</dd><dt>IPv6</dt><dd>Internet Protocol version 6</dd><dt>DNS</dt><dd>Domain Name System</dd><dt>DoH</dt><dd>DNS over HTTPS</dd><dt>GCP</dt><dd>Google Cloud Platform</dd><dt>VM</dt><dd>virtual machine</dd><dt>NIC</dt><dd>network interface card</dd><dt>API</dt><dd>application programming interface</dd><dt>CLI</dt><dd>command-line interface</dd><dt>PeerAPI</dt><dd>overlay peer application-programming interface (exit DNS over HTTPS)</dd><dt>RD</dt><dd>Recursion Desired (DNS flag)</dd><dt>nft</dt><dd>nftables (Linux packet filter)</dd><dt>ControlPath</dt><dd>OpenSSH multiplexing socket path option</dd><dt>JSON</dt><dd>JavaScript Object Notation</dd><dt>URL</dt><dd>Uniform Resource Locator</dd><dt>Pi</dt><dd>single-board computer (Raspberry Pi class)</dd><dt>REFUSES</dt><dd>DNS response code meaning the server will not answer</dd><dt>REFUSED</dt><dd>DNS response code meaning the server will not answer</dd><dt>Unbound</dt><dd>validating recursive DNS resolver</dd><dt>Android</dt><dd>mobile operating system</dd><dt>UNCONN</dt><dd>ss(8) unconnected socket state</dd><dt>NOERROR</dt><dd>DNS response code meaning the query succeeded</dd></dl></section>
+<h2 id="topology">Topology</h2>
+<pre><code class="language-text">[phone] --HTTPS DoH--&gt;  http://&lt;exit-node&gt;:&lt;ephemeral&gt;/dns-query   (PeerAPI)
+[&lt;exit-node&gt;]
+    stub MUST bind 127.0.0.1:53 only  --&gt;  upstream with RD=1
+    MUST NOT bind overlay:53  (broke all exit in the field)
+    select() MUST NOT call upstream synchronously  ([OEN-S29](../supporting/s29-peerapi-stub-event-loop.html))</code></pre>
+<h2 id="bind">Bind</h2>
+<p>Fill this table <strong>before</strong> any live change. Do <strong>not</strong> paste real values back into public notes.</p>
+<table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><code>&lt;exit-node&gt;</code></td><td>Overlay exit node</td><td>Cloud VM or LAN Pi used as exit</td></tr><tr><td><code>&lt;overlay-peer&gt;</code></td><td>Soak client (<strong>not</strong> the agent workstation)</td><td>LAN Pi</td></tr><tr><td><code>&lt;user&gt;</code></td><td>SSH user</td><td>Guest</td></tr><tr><td><code>&lt;overlay-tun&gt;</code></td><td>Overlay tun on the exit</td><td>Iface</td></tr><tr><td><code>&lt;gcp-nic&gt;</code></td><td>Public NIC on a Google Cloud guest</td><td>Iface; omit on non-GCP exits</td></tr><tr><td><code>&lt;wan-iface&gt;</code></td><td>WAN / public NIC</td><td>Iface</td></tr><tr><td><code>&lt;mss4&gt;</code> / <code>&lt;mss6&gt;</code></td><td>Computed from underlay or overlay tun MTU</td><td>Formulas</td></tr></tbody></table>
+<h2 id="formulas">Formulas</h2>
+<p>PeerAPI port is <strong>dynamic</strong>. Read it from overlay status JSON (<code>PeerAPIURL</code>). Do not hardcode 53 or a lab debug port.</p>
+<h2 id="decision">Decision</h2>
+<p>The exit DNS stub MUST listen on loopback only. It MUST force RD=1 toward the local resolver. It MUST NOT bind overlay <code>:53</code>.</p>
+<p>The stub MUST NOT block the event loop on a synchronous upstream. Verify IPv6 <strong>data</strong> on a leak test, not DNS alone (<a href="../supporting/s32-dns-leak-test-not-v6-dataplane.html">OEN-S32</a>).</p>
+<h2 id="consequences">Consequences</h2>
+<ul><li>Phones can resolve through the exit.</li><li>Binding mistakes no longer blackhole the node.</li><li>Cellular DNS survives burst load.</li></ul>
+<h2 id="agent-stop-rule">Agent stop rule</h2>
+<blockquote><p>A coding agent MUST emit a <strong>bound runbook</strong> (placeholders replaced from Bind). MUST NOT apply live <code>ip rule</code>, nft, iptables, ip6tables, sysctl, <code>wg set</code>, daemon restart, or deploy until a <strong>human</strong> filled Bind. MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS. MUST NOT file an upstream bug from this page. MUST NOT publish real addresses, hostnames, or custom ports.</p></blockquote>
+<h2 id="procedure">Procedure</h2>
+<p>Placeholders only until Bind is filled: <code>&lt;cloud-vps&gt;</code>, <code>&lt;lan-pi&gt;</code>, <code>&lt;overlay-peer&gt;</code>, <code>&lt;exit-node&gt;</code>, <code>&lt;wg-iface&gt;</code>, <code>&lt;gcp-nic&gt;</code>, plus the Bind extras on this page.</p>
+<h3>Copy-paste commands (after Bind)</h3>
+<pre><code class="language-bash">ssh -o ControlPath=none &lt;user&gt;@&lt;exit-node&gt; &#x27;ss -ulnp | grep -E &quot;:53|:dns&quot;&#x27;
+# Expect 127.0.0.1:53 for the stub, not overlay-v4:53.
+
+# From a NON-exit client:
+curl -sS --max-time 8 &quot;http://&lt;overlay-v4&gt;:&lt;peerapi-port&gt;/dns-query&quot; -H &#x27;content-type: application/dns-message&#x27; --data-binary @- &lt;/dev/null | wc -c
+# Or the overlay CLI equivalent that prints PeerAPIURL.
+
+ss -u -n | awk &#x27;NR==1 || /:53/&#x27;</code></pre>
+<p>If UDP recv-Q grows under phone load, follow <a href="../supporting/s29-peerapi-stub-event-loop.html">OEN-S29</a>.</p>
+<ol><li><strong>P1 — Read the live PeerAPI URL.</strong><br>
+- <strong>Action:</strong> On <code>&lt;exit-node&gt;</code>, <code>tailscale status --json</code> (or equivalent) and note <code>PeerAPIURL</code>. It is HTTP DoH on an ephemeral port, not <code>:53</code>.<br>
+- <strong>Expected:</strong> A URL on the overlay address with a high port.<br>
+- <strong>On failure:</strong> If PeerAPI is down, heal the overlay DNS process — do not restart the coordinator (<a href="14-exit-dns-is-peerapi.html">OEN-14</a>).</li><li><strong>P2 — Confirm the stub binds loopback only.</strong><br>
+- <strong>Action:</strong> <code>ss</code> / <code>netstat</code> for UDP/TCP 53. The stub MUST show <code>127.0.0.1:53</code> (and optionally <code>::1</code>), not the overlay address.<br>
+- <strong>Expected:</strong> Listen address is loopback.<br>
+- <strong>On failure:</strong> If it is on the overlay address, stop the stub, rebind loopback, restart. Expect exit to recover.</li><li><strong>P3 — Forward with RD=1.</strong><br>
+- <strong>Action:</strong> From the exit, <code>dig +norecurse @127.0.0.1 example.com</code> vs <code>dig @127.0.0.1 example.com</code>. The stub MUST turn RD on before Unbound (or equivalent).<br>
+- <strong>Expected:</strong> RD=0 without the stub is REFUSED (<a href="19-unbound-refuses-rd0.html">OEN-19</a>); through the stub, queries answer.<br>
+- <strong>On failure:</strong> Do not point PeerAPI at loopback Unbound with RD=0.</li><li><strong>P4 — Load: receive queue must not grow.</strong><br>
+- <strong>Action:</strong> During a phone soak, watch UDP recv-Q on the stub socket. If it climbs, the event loop is blocked (<a href="../supporting/s29-peerapi-stub-event-loop.html">OEN-S29</a>).<br>
+- <strong>Expected:</strong> recv-Q stays near 0. Cellular DNS keeps working.<br>
+- <strong>On failure:</strong> Add a thread pool and upstream timeout; do not add more <code>select()</code> handlers that call network inline.</li><li><strong>P5 — Verify from a non-exit client.</strong><br>
+- <strong>Action:</strong> From <code>&lt;overlay-peer&gt;</code> using the exit, fetch <code>http://&lt;exit&gt;:&lt;ephemeral&gt;/dns-query</code> (DoH) and <code>curl -6 https://example.com</code>.<br>
+- <strong>Expected:</strong> DoH rcode NOERROR; IPv6 HTTP 200.<br>
+- <strong>On failure:</strong> DNS-only success is not enough.</li></ol>
+<h2 id="expected-samples">Expected samples</h2>
+<pre><code class="language-text"># Good listen
+udp  UNCONN  0  0  127.0.0.1:53  0.0.0.0:*
+
+# Bad listen (this spec)
+udp  UNCONN  0  0  &lt;overlay-v4&gt;:53  0.0.0.0:*</code></pre>
+<h2 id="verify">Verify</h2>
+<ul><li>PeerAPIURL is live; stub is loopback-only.</li><li>RD=0 to Unbound REFUSED; RD=1 via stub answers.</li><li>UDP recv-Q does not grow under phone load.</li><li>IPv6 HTTP through the exit works, not only DNS.</li><li>ICMP / small ping success was <strong>not</strong> used as the pass criterion when this spec names TCP, SSH, or HTTPS.</li><li>Bind table was filled by a human before any live <code>ip</code> / nft / iptables change.</li></ul>
+<h2 id="must-not" class="must-not">MUST NOT</h2>
+<ul><li>MUST NOT bind the DNS stub on the overlay address:53.</li><li>MUST NOT assume PeerAPI is :53 or a fixed high port.</li><li>MUST NOT claim exit DNS is healed from a leak-test name alone.</li><li>MUST NOT restart the coordinator to “fix DNS.”</li><li>MUST NOT apply live network or firewall changes until Bind is filled by a human.</li><li>MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.</li><li>MUST NOT publish hostnames, addresses, ULAs, or custom ports.</li></ul>
+<h2 id="related-specs">Related specs</h2>
+<ul><li><a href="14-exit-dns-is-peerapi.html">OEN-14 Exit app DNS is PeerAPI</a></li><li><a href="19-unbound-refuses-rd0.html">OEN-19 Unbound REFUSES RD=0</a></li><li><a href="../supporting/s29-peerapi-stub-event-loop.html">OEN-S29 PeerAPI stub event-loop</a></li><li><a href="../supporting/s32-dns-leak-test-not-v6-dataplane.html">OEN-S32 DNS leak-test vs data plane</a></li></ul>
+<h2 id="prior-art-not-novel">Prior art (Not novel)</h2>
+<p>“Use local DNS for exit” is in public overlay docs. They rarely say loopback-only, dynamic PeerAPI port, RD=1, and non-blocking upstream as one contract.</p>
+      </article>
+    </main>
+    <footer class="site-footer">
+      <div class="site-footer-inner">
+    <p class="byline">Written by <a href="https://www.armsteadent.com/">Eugene Armstead</a> · <a href="https://www.armsteadent.com/">https://www.armsteadent.com/</a> · <a rel="license" href="https://creativecommons.org/licenses/by/4.0/">CC-BY-4.0</a></p>
+    <p class="license-line">Living field notes. Stable IDs. Do not copy private inventory into public text.</p>
+      </div>
+    </footer>
+  </body>
+</html>

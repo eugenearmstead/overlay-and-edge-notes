@@ -27,91 +27,96 @@ Open `http://127.0.0.1:8765/` or open `index.html` as a `file://` URL. Relative 
 - [How humans should read it](#how-to-read-a-spec)
 - [How agents should apply it](AGENTS.md)
 - [Disclosure and license](DISCLOSURE.md) · [DISCLOSURE.html](DISCLOSURE.html)
+- [Changelog](CHANGELOG.md) · [changelog.html](changelog.html)
+- [2026 edition index](editions/2026.md)
 
 ## How to read a spec
 
-Every original spec is a [MADR](https://adr.github.io/madr/)-shaped decision: Context, Decision, Consequences, then a replicable **Procedure** / **Verify** / **MUST NOT**. Supporting notes are methods. Placeholders only: `<cloud-vps>`, `<lan-pi>`, `<overlay-peer>`, `<exit-node>`, `<wg-iface>`, `<gcp-nic>`.
+Every original spec is a [MADR](https://adr.github.io/madr/)-shaped decision: Context, Topology, Bind, Formulas, Decision, Consequences, Agent stop rule, then a replicable **Procedure** / **Expected samples** / **Verify** / **MUST NOT**. Supporting notes are methods. Placeholders only until a human fills Bind: `<cloud-vps>`, `<lan-pi>`, `<overlay-peer>`, `<exit-node>`, `<wg-iface>`, `<gcp-nic>`.
 
 IDs are living. `OEN-01` stays `OEN-01`. New findings get the next unused number. Year pages are indexes, not copies.
 
+A remote agent MUST emit a bound runbook and MUST NOT apply live `ip` / nft / iptables until Bind is filled. ICMP ping success is not a TCP/SSH/HTTPS fix.
+
 ## Original specs — Networking
 
-| ID | Title | Status |
-|----|--------|--------|
-| [OEN-01](networking/01-overlay-ssh-byte-cliff.md) ([html](networking/01-overlay-ssh-byte-cliff.html)) | Overlay SSH stalls at a byte cliff | built |
-| OEN-02 | Chromium TLS fails while curl returns 200 | forthcoming |
-| OEN-03 | Router VPN DNS hijack looks like a path-MTU problem | forthcoming |
-| OEN-04 | Exit-node TCP maximum-segment-size clamp after ts-forward never runs | forthcoming |
-| OEN-05 | Exit-node overlay peer-API DNS stub (loopback only) | forthcoming |
-| OEN-06 | Netfilter-off IPv6 return-path blackhole | forthcoming |
-| OEN-07 | CrowdSec Central API HTTP 403 from native health probes | forthcoming |
-| OEN-12 | Consumer-router WireGuard FORWARD only on a phantom bridge | forthcoming |
-| OEN-13 | Overlay ≠ underlay ≠ tunnel unique-local ≠ LAN unique-local | forthcoming |
-| OEN-14 | Exit app DNS is overlay peer-API, not coordinator Unbound | forthcoming |
-| OEN-15 | Split host vs overlay resolver views on the coordinator VPS | forthcoming |
-| [OEN-16](networking/16-commercial-wg-endpoint-rotation.md) ([html](networking/16-commercial-wg-endpoint-rotation.html)) | Commercial WireGuard endpoint rotation (IPv6, shuffle bag, hub watch) | built |
-| [OEN-17](networking/17-gcp-overlay-exit.md) ([html](networking/17-gcp-overlay-exit.html)) | Google Cloud overlay exit (IP forwarding, listen port, Identity-Aware Proxy) | built |
-| [OEN-18](networking/18-per-node-changelog-contract.md) ([html](networking/18-per-node-changelog-contract.html)) | Per-node changelog contract (repo + hashed on-device copy) | built |
-| OEN-19 | Local Unbound REFUSES overlay peer-API queries with Recursion Desired off | forthcoming |
-| OEN-20 | LAN unique-local + remote exit: IPv4 takes the exit, IPv6 leaks | forthcoming |
-| OEN-21 | Shared commercial-VPN network address translation: CrowdSec bans the whole house | forthcoming |
-| OEN-22 | Delayed WireGuard start wipes FORWARD with no restart event | forthcoming |
-| OEN-23 | Cloud-exit accept-dns=true pretty-prints, breaks overlay peer-API DNS | forthcoming |
+| ID | Title |
+|----|--------|
+| [OEN-01](networking/01-overlay-ssh-byte-cliff.md) ([html](networking/01-overlay-ssh-byte-cliff.html)) | Overlay SSH stalls at a byte cliff |
+| [OEN-02](networking/02-chromium-tls-pmtu.md) ([html](networking/02-chromium-tls-pmtu.html)) | Chromium TLS fails while curl returns 200 |
+| [OEN-03](networking/03-router-vpn-dns-hijack.md) ([html](networking/03-router-vpn-dns-hijack.html)) | Router VPN DNS hijack looks like a path-MTU problem |
+| [OEN-04](networking/04-exit-tcpmss-after-ts-forward.md) ([html](networking/04-exit-tcpmss-after-ts-forward.html)) | Exit-node TCP maximum-segment-size clamp after ts-forward never runs |
+| [OEN-05](networking/05-exit-peerapi-dns-stub.md) ([html](networking/05-exit-peerapi-dns-stub.html)) | Exit-node overlay peer-API DNS stub (loopback only) |
+| [OEN-06](networking/06-netfilter-off-v6-return.md) ([html](networking/06-netfilter-off-v6-return.html)) | Netfilter-off IPv6 return-path blackhole |
+| [OEN-07](networking/07-crowdsec-capi-403.md) ([html](networking/07-crowdsec-capi-403.html)) | CrowdSec Central API HTTP 403 from native health probes |
+| [OEN-12](networking/12-consumer-wg-phantom-bridge.md) ([html](networking/12-consumer-wg-phantom-bridge.html)) | Consumer-router WireGuard FORWARD only on a phantom bridge |
+| [OEN-13](networking/13-overlay-underlay-ula-layers.md) ([html](networking/13-overlay-underlay-ula-layers.html)) | Overlay ≠ underlay ≠ tunnel unique-local ≠ LAN unique-local |
+| [OEN-14](networking/14-exit-dns-is-peerapi.md) ([html](networking/14-exit-dns-is-peerapi.html)) | Exit app DNS is overlay peer-API, not coordinator Unbound |
+| [OEN-15](networking/15-split-host-vs-overlay-resolver.md) ([html](networking/15-split-host-vs-overlay-resolver.html)) | Split host vs overlay resolver views on the coordinator VPS |
+| [OEN-16](networking/16-commercial-wg-endpoint-rotation.md) ([html](networking/16-commercial-wg-endpoint-rotation.html)) | Commercial WireGuard endpoint rotation (IPv6, shuffle bag, hub watch) |
+| [OEN-17](networking/17-gcp-overlay-exit.md) ([html](networking/17-gcp-overlay-exit.html)) | Google Cloud overlay exit (IP forwarding, listen port, Identity-Aware Proxy) |
+| [OEN-18](networking/18-per-node-changelog-contract.md) ([html](networking/18-per-node-changelog-contract.html)) | Per-node changelog contract (repo + hashed on-device copy) |
+| [OEN-19](networking/19-unbound-refuses-rd0.md) ([html](networking/19-unbound-refuses-rd0.html)) | Local Unbound REFUSES overlay peer-API queries with Recursion Desired off |
+| [OEN-20](networking/20-lan-ula-happy-eyeballs-leak.md) ([html](networking/20-lan-ula-happy-eyeballs-leak.html)) | LAN unique-local + remote exit: IPv4 takes the exit, IPv6 leaks |
+| [OEN-21](networking/21-shared-vpn-nat-crowdsec-ban.md) ([html](networking/21-shared-vpn-nat-crowdsec-ban.html)) | Shared commercial-VPN network address translation: CrowdSec bans the whole house |
+| [OEN-22](networking/22-delayed-wg-forward-wipe.md) ([html](networking/22-delayed-wg-forward-wipe.html)) | Delayed WireGuard start wipes FORWARD with no restart event |
+| [OEN-23](networking/23-cloud-exit-accept-dns.md) ([html](networking/23-cloud-exit-accept-dns.html)) | Cloud-exit accept-dns=true pretty-prints, breaks overlay peer-API DNS |
 
 ## Original specs — Web and Cloudflare
 
-| ID | Title | Status |
-|----|--------|--------|
-| [OEN-08](web/08-worker-html-localhost-debug.md) ([html](web/08-worker-html-localhost-debug.html)) | Do not ship localhost debug beacons in Worker HTML | built |
-| OEN-09 | Git merge is not a live Worker (timed Wrangler fallback) | forthcoming |
-| OEN-10 | One generated blocking stylesheet and variable fonts | forthcoming |
-| OEN-11 | Worker chat wrapper, Turnstile, sanitize large-language-model drift | forthcoming |
+| ID | Title |
+|----|--------|
+| [OEN-08](web/08-worker-html-localhost-debug.md) ([html](web/08-worker-html-localhost-debug.html)) | Do not ship localhost debug beacons in Worker HTML |
+| [OEN-09](web/09-git-merge-is-not-a-live-worker.md) ([html](web/09-git-merge-is-not-a-live-worker.html)) | Git merge is not a live Worker (timed Wrangler fallback) |
+| [OEN-10](web/10-one-blocking-stylesheet-variable-fonts.md) ([html](web/10-one-blocking-stylesheet-variable-fonts.html)) | One generated blocking stylesheet and variable fonts |
+| [OEN-11](web/11-worker-chat-wrapper-turnstile.md) ([html](web/11-worker-chat-wrapper-turnstile.html)) | Worker chat wrapper, Turnstile, sanitize large-language-model drift |
 
 ## Supporting specs (methods and replications)
 
-| ID | Title | Status |
-|----|--------|--------|
-| [OEN-S01](supporting/s01-pmtud-size-ladder.md) ([html](supporting/s01-pmtud-size-ladder.html)) | Don't-fragment ping size ladder (path MTU discovery) | built |
-| OEN-S02 | clamp-mss-to-pmtu is a no-op when ICMP is dropped | forthcoming |
-| OEN-S03 | 1 KB vs 1 MB transfer matrix + ControlPath=none | forthcoming |
-| OEN-S04 | Purge the content delivery network after deploy | forthcoming |
-| OEN-S05 | Tunnel preview HIT with a stale body | forthcoming |
-| OEN-S06 | Do not ship HTML-only | forthcoming |
-| OEN-S07 | Git merge 405 while mergeability is pending | forthcoming |
-| OEN-S08 | Canonical disk + tmpfs RAM origin on a Pi | forthcoming |
-| OEN-S09 | Playwright Desktop + iPhone + Pixel | forthcoming |
-| OEN-S10 | file(1) before image deploy | forthcoming |
-| OEN-S11 | Overlay session-mirror remote desktop and access-control list without deny | forthcoming |
-| OEN-S12 | Rocket Loader Off | forthcoming |
-| OEN-S13 | Restart=always on a missing unit hung the workstation | forthcoming |
-| OEN-S14 | Broadcom in-kernel WireGuard SUnreclaim (flow-cache/runner A/B fail) | forthcoming |
-| OEN-S15 | Router squashfs is always 100%; Save settings misses persistent overlay | forthcoming |
-| OEN-S16 | Never nft flush / never start stock nftables.service | forthcoming |
-| OEN-S17 | Coordination CLI blocks on SQLite write-ahead log while serve is up | forthcoming |
-| OEN-S18 | Do not set exit-node on the agent workstation | forthcoming |
-| OEN-S19 | Push small overlay snapshots; do not copy-pull large JSON | forthcoming |
-| OEN-S20 | SSH TCP-open with no banner is userspace-sick | forthcoming |
-| OEN-S21 | Cloud exit hairpins home LAN HTTP while overlay SSH still works | forthcoming |
-| OEN-S22 | Identity-Aware Proxy is break-glass; overlay SSH key-exchange can fail on some cloud VMs | forthcoming |
-| OEN-S23 | Cloud firewall UDP 41641 is useless while overlay PORT=0 | forthcoming |
-| OEN-S24 | LAN DNS returning 0.0.0.0 is a sinkhole, not a site bug | forthcoming |
-| OEN-S25 | Network Time Security chrony address-family flags need a newer chrony than the distro | forthcoming |
-| OEN-S26 | Wi-Fi underlay vs cellular underlay to the same cloud exit | forthcoming |
-| OEN-S27 | iptables-nft PREROUTING MARK does not win before the forwarding information base | forthcoming |
-| OEN-S28 | Reconnect during overlay peer-API outage sticks after heal | forthcoming |
-| OEN-S29 | Overlay peer-API stub event-loop blocks; UDP receive queue grows | forthcoming |
-| OEN-S30 | TS_DEBUG_MTU below 1280 disables overlay IPv6 | forthcoming |
-| OEN-S31 | prefixes.v6 needs nodes backfillips, not restart alone | forthcoming |
-| OEN-S32 | DNS leak-test green is not IPv6 data-plane green | forthcoming |
-| OEN-S33 | Consumer-router cron PATH omits curl; watchdog log() + set -e exits | forthcoming |
-| OEN-S34 | CrowdSec free-tier Central API login budget | forthcoming |
+| ID | Title |
+|----|--------|
+| [OEN-S01](supporting/s01-pmtud-size-ladder.md) ([html](supporting/s01-pmtud-size-ladder.html)) | Don't-fragment ping size ladder (path MTU discovery) |
+| [OEN-S02](supporting/s02-clamp-mss-to-pmtu-noop.md) ([html](supporting/s02-clamp-mss-to-pmtu-noop.html)) | clamp-mss-to-pmtu is a no-op when ICMP is dropped |
+| [OEN-S03](supporting/s03-transfer-matrix-controlpath.md) ([html](supporting/s03-transfer-matrix-controlpath.html)) | 1 KB vs 1 MB transfer matrix + ControlPath=none |
+| [OEN-S04](supporting/s04-purge-cdn-after-deploy.md) ([html](supporting/s04-purge-cdn-after-deploy.html)) | Purge the content delivery network after deploy |
+| [OEN-S05](supporting/s05-tunnel-preview-stale-hit.md) ([html](supporting/s05-tunnel-preview-stale-hit.html)) | Tunnel preview HIT with a stale body |
+| [OEN-S06](supporting/s06-do-not-ship-html-only.md) ([html](supporting/s06-do-not-ship-html-only.html)) | Do not ship HTML-only |
+| [OEN-S07](supporting/s07-git-merge-405-pending.md) ([html](supporting/s07-git-merge-405-pending.html)) | Git merge 405 while mergeability is pending |
+| [OEN-S08](supporting/s08-canonical-disk-tmpfs-origin.md) ([html](supporting/s08-canonical-disk-tmpfs-origin.html)) | Canonical disk + tmpfs RAM origin on a Pi |
+| [OEN-S09](supporting/s09-playwright-desktop-iphone-pixel.md) ([html](supporting/s09-playwright-desktop-iphone-pixel.html)) | Playwright Desktop + iPhone + Pixel |
+| [OEN-S10](supporting/s10-file-before-image-deploy.md) ([html](supporting/s10-file-before-image-deploy.html)) | file(1) before image deploy |
+| [OEN-S11](supporting/s11-overlay-rdp-acl.md) ([html](supporting/s11-overlay-rdp-acl.html)) | Overlay session-mirror remote desktop and access-control list without deny |
+| [OEN-S12](supporting/s12-rocket-loader-off.md) ([html](supporting/s12-rocket-loader-off.html)) | Rocket Loader Off |
+| [OEN-S13](supporting/s13-restart-always-missing-unit.md) ([html](supporting/s13-restart-always-missing-unit.html)) | Restart=always on a missing unit hung the workstation |
+| [OEN-S14](supporting/s14-broadcom-wg-sunreclaim.md) ([html](supporting/s14-broadcom-wg-sunreclaim.html)) | Broadcom in-kernel WireGuard SUnreclaim (flow-cache/runner A/B fail) |
+| [OEN-S15](supporting/s15-router-squashfs-jffs.md) ([html](supporting/s15-router-squashfs-jffs.html)) | Router squashfs is always 100%; Save settings misses persistent overlay |
+| [OEN-S16](supporting/s16-never-nft-flush.md) ([html](supporting/s16-never-nft-flush.html)) | Never nft flush / never start stock nftables.service |
+| [OEN-S17](supporting/s17-coordination-cli-sqlite-wal.md) ([html](supporting/s17-coordination-cli-sqlite-wal.html)) | Coordination CLI blocks on SQLite write-ahead log while serve is up |
+| [OEN-S18](supporting/s18-do-not-set-exit-on-agent-workstation.md) ([html](supporting/s18-do-not-set-exit-on-agent-workstation.html)) | Do not set exit-node on the agent workstation |
+| [OEN-S19](supporting/s19-push-small-overlay-snapshots.md) ([html](supporting/s19-push-small-overlay-snapshots.html)) | Push small overlay snapshots; do not copy-pull large JSON |
+| [OEN-S20](supporting/s20-ssh-open-no-banner.md) ([html](supporting/s20-ssh-open-no-banner.html)) | SSH TCP-open with no banner is userspace-sick |
+| [OEN-S21](supporting/s21-cloud-exit-hairpin-lan.md) ([html](supporting/s21-cloud-exit-hairpin-lan.html)) | Cloud exit hairpins home LAN HTTP while overlay SSH still works |
+| [OEN-S22](supporting/s22-iap-break-glass-kex.md) ([html](supporting/s22-iap-break-glass-kex.html)) | Identity-Aware Proxy is break-glass; overlay SSH key-exchange can fail on some cloud VMs |
+| [OEN-S23](supporting/s23-vpc-41641-useless-while-port-0.md) ([html](supporting/s23-vpc-41641-useless-while-port-0.html)) | Cloud firewall UDP 41641 is useless while overlay PORT=0 |
+| [OEN-S24](supporting/s24-lan-dns-sinkhole-0-0-0-0.md) ([html](supporting/s24-lan-dns-sinkhole-0-0-0-0.html)) | LAN DNS returning 0.0.0.0 is a sinkhole, not a site bug |
+| [OEN-S25](supporting/s25-chrony-nts-address-family.md) ([html](supporting/s25-chrony-nts-address-family.html)) | Network Time Security chrony address-family flags need a newer chrony than the distro |
+| [OEN-S26](supporting/s26-wifi-vs-cellular-underlay.md) ([html](supporting/s26-wifi-vs-cellular-underlay.html)) | Wi-Fi underlay vs cellular underlay to the same cloud exit |
+| [OEN-S27](supporting/s27-iptables-nft-mark-before-fib.md) ([html](supporting/s27-iptables-nft-mark-before-fib.html)) | iptables-nft PREROUTING MARK does not win before the forwarding information base |
+| [OEN-S28](supporting/s28-sticky-reconnect-during-peerapi-outage.md) ([html](supporting/s28-sticky-reconnect-during-peerapi-outage.html)) | Reconnect during overlay peer-API outage sticks after heal |
+| [OEN-S29](supporting/s29-peerapi-stub-event-loop.md) ([html](supporting/s29-peerapi-stub-event-loop.html)) | Overlay peer-API stub event-loop blocks; UDP receive queue grows |
+| [OEN-S30](supporting/s30-ts-debug-mtu-below-1280.md) ([html](supporting/s30-ts-debug-mtu-below-1280.html)) | TS_DEBUG_MTU below 1280 disables overlay IPv6 |
+| [OEN-S31](supporting/s31-prefixes-v6-needs-backfillips.md) ([html](supporting/s31-prefixes-v6-needs-backfillips.html)) | prefixes.v6 needs nodes backfillips, not restart alone |
+| [OEN-S32](supporting/s32-dns-leak-test-not-v6-dataplane.md) ([html](supporting/s32-dns-leak-test-not-v6-dataplane.html)) | DNS leak-test green is not IPv6 data-plane green |
+| [OEN-S33](supporting/s33-router-cron-path-set-e.md) ([html](supporting/s33-router-cron-path-set-e.html)) | Consumer-router cron PATH omits curl; watchdog log() + set -e exits |
+| [OEN-S34](supporting/s34-crowdsec-capi-login-budget.md) ([html](supporting/s34-crowdsec-capi-login-budget.html)) | CrowdSec free-tier Central API login budget |
 
 ## Editions
 
-Year indexes are not copies of specs. A 2026 edition page is forthcoming after review.
+- [2026 year index](editions/2026.md) ([html](editions/2026.html)) — what first shipped this calendar year
 
 ## Discovery
 
 - [llms.txt](llms.txt) — curated map with absolute Pages URLs
+- [llms-full.txt](llms-full.txt) — concatenated Markdown of every spec
 - [robots.txt](robots.txt) — allow all
-- [AGENTS.md](AGENTS.md) — agent contract, leak gates, monthly delta
+- [AGENTS.md](AGENTS.md) — agent contract, leak gates, Bind-before-apply

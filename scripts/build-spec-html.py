@@ -144,6 +144,34 @@ ACRONYM_EXCLUDE = {
     "CHANGELOG",
     "LICENSE",
     "CC-BY-4",
+    "DOWN",
+    "EXISTING",
+    "FAIL",
+    "FIX",
+    "LACKS",
+    "LEAK",
+    "NEW",
+    "NON",
+    "PUSH",
+    "TOP",
+    "TRAP",
+    "WORKS",
+    "ALLOW",
+    "GA",
+    "PAT",
+    "QUERY",
+    "HEADER",
+    "NR",
+    "CANONICAL",
+    "AFTER",
+    "BEFORE",
+    "SCOPE",
+    "WRONG",
+    "PING",
+    "NEVER",
+    "PAYLOAD",
+    "AGENTS",
+    "ASCII",
 }
 
 # Mixed-case tokens that the ALL-CAPS scanner misses.
@@ -164,74 +192,32 @@ MIXED_TOKENS = (
     "PREROUTING",
     "Happy-Eyeballs",
     "JSON-LD",
-    "WireGuard",
+    "ICMPv6",
+    "CrowdSec",
+    "Unbound",
+    "chrony",
+    "systemd",
+    "Cloudflare",
+    "Chromium",
+    "Android",
+    "Playwright",
+    "Turnstile",
+    "Wrangler",
+    "GitLab",
+    "SQLite",
+    "nftables",
+    "nftables",
+    "dnsmasq",
+    "Chromium",
+    "ICMPv6",
 )
 
-INDEX_TERMS = [
+HOME_TERMS = [
     {"abbr": "OEN", "expansion": "Overlay and Edge Notes (this series)"},
     {"abbr": "SSH", "expansion": "Secure Shell"},
-    {"abbr": "TLS", "expansion": "Transport Layer Security"},
-    {"abbr": "DNS", "expansion": "Domain Name System"},
-    {"abbr": "VPN", "expansion": "Virtual Private Network"},
     {"abbr": "MTU", "expansion": "Maximum Transmission Unit"},
-    {"abbr": "TCP", "expansion": "Transmission Control Protocol"},
-    {"abbr": "MSS", "expansion": "Maximum Segment Size"},
-    {"abbr": "TCPMSS", "expansion": "iptables/nft target that sets TCP Maximum Segment Size"},
-    {"abbr": "PeerAPI", "expansion": "overlay peer application-programming interface (exit DNS over HTTPS)"},
-    {"abbr": "ULA", "expansion": "unique-local address (IPv6)"},
-    {"abbr": "LAN", "expansion": "Local Area Network"},
-    {"abbr": "VPS", "expansion": "Virtual Private Server"},
-    {"abbr": "WG", "expansion": "WireGuard"},
-    {"abbr": "WireGuard", "expansion": "UDP-based VPN protocol"},
-    {"abbr": "GCP", "expansion": "Google Cloud Platform"},
-    {"abbr": "IP", "expansion": "Internet Protocol"},
-    {"abbr": "IPv4", "expansion": "Internet Protocol version 4"},
-    {"abbr": "IPv6", "expansion": "Internet Protocol version 6"},
-    {"abbr": "IAP", "expansion": "Identity-Aware Proxy"},
-    {"abbr": "NAT", "expansion": "network address translation"},
-    {"abbr": "UDP", "expansion": "User Datagram Protocol"},
     {"abbr": "HTML", "expansion": "HyperText Markup Language"},
-    {"abbr": "HTTP", "expansion": "Hypertext Transfer Protocol"},
-    {"abbr": "HTTPS", "expansion": "Hypertext Transfer Protocol Secure"},
-    {"abbr": "CDN", "expansion": "content delivery network"},
-    {"abbr": "CSS", "expansion": "Cascading Style Sheets"},
-    {"abbr": "LLM", "expansion": "large language model"},
-    {"abbr": "ICMP", "expansion": "Internet Control Message Protocol"},
-    {"abbr": "DF", "expansion": "don't-fragment (IP flag)"},
-    {"abbr": "PMTUD", "expansion": "path MTU discovery"},
-    {"abbr": "RDP", "expansion": "Remote Desktop Protocol"},
-    {"abbr": "ACL", "expansion": "access-control list"},
-    {"abbr": "NTS", "expansion": "Network Time Security"},
-    {"abbr": "FIB", "expansion": "forwarding information base"},
-    {"abbr": "CAPI", "expansion": "CrowdSec Central API"},
-    {"abbr": "API", "expansion": "application programming interface"},
-    {"abbr": "KEX", "expansion": "key exchange"},
-    {"abbr": "VPC", "expansion": "Virtual Private Cloud"},
-    {"abbr": "DoH", "expansion": "DNS over HTTPS"},
-    {"abbr": "RD", "expansion": "Recursion Desired (DNS flag)"},
-    {"abbr": "nft", "expansion": "nftables (Linux packet filter)"},
-    {"abbr": "WAL", "expansion": "write-ahead log"},
-    {"abbr": "JSON", "expansion": "JavaScript Object Notation"},
-    {"abbr": "SCP", "expansion": "secure copy"},
-    {"abbr": "CLI", "expansion": "command-line interface"},
-    {"abbr": "VM", "expansion": "virtual machine"},
-    {"abbr": "KB", "expansion": "kilobyte"},
-    {"abbr": "MB", "expansion": "megabyte"},
-    {"abbr": "RAM", "expansion": "random-access memory"},
-    {"abbr": "HIT", "expansion": "cache HIT (content still served from cache)"},
-    {"abbr": "PORT", "expansion": "overlay UDP listen port setting"},
-    {"abbr": "FORWARD", "expansion": "netfilter/iptables forward chain"},
-    {"abbr": "MARK", "expansion": "netfilter packet mark"},
-    {"abbr": "PREROUTING", "expansion": "netfilter prerouting chain"},
-    {"abbr": "TS_DEBUG_MTU", "expansion": "overlay debug environment variable that sets tunnel MTU"},
-    {"abbr": "ControlPath", "expansion": "OpenSSH multiplexing socket path option"},
-    {"abbr": "canIpForward", "expansion": "Google Cloud instance flag that allows IP forwarding"},
-    {"abbr": "SUnreclaim", "expansion": "kernel slab unreclaimable memory"},
-    {"abbr": "FC", "expansion": "flow-cache (Broadcom hardware forwarding cache)"},
-    {"abbr": "PATH", "expansion": "Unix executable search path"},
-    {"abbr": "Pi", "expansion": "single-board computer (Raspberry Pi class)"},
-    {"abbr": "REFUSES", "expansion": "DNS response code meaning the server will not answer"},
-    {"abbr": "UDP", "expansion": "User Datagram Protocol"},
+    {"abbr": "WireGuard", "expansion": "UDP-based virtual private network protocol"},
 ]
 
 DISCLOSURE_TERMS = [
@@ -631,11 +617,12 @@ def nav_html(page: Path) -> str:
     return f"""    <nav class="site-nav" aria-label="Site">
       <a href="{h('index.html')}">Home</a>
       <a href="{h('DISCLOSURE.html')}">Disclosure</a>
+      <a href="{h('changelog.html')}">Changelog</a>
+      <a href="{h('editions/2026.html')}">2026</a>
       <a href="{h('AGENTS.md')}">AGENTS.md</a>
       <a href="{h('index.html')}#networking">Networking</a>
       <a href="{h('index.html')}#web">Web</a>
       <a href="{h('index.html')}#supporting">Supporting</a>
-      <a href="{h('index.html')}#editions">Editions</a>
     </nav>"""
 
 
@@ -801,18 +788,26 @@ def write_index() -> None:
         "Living field notes on overlay SSH path MTU, commercial WireGuard, "
         "cloud exit nodes, and edge HTML. Written by Eugene Armstead."
     )
-    catalog_text = "\n".join(f"{i} {t}" for i, _s, _g, t in CATALOG)
-    assert_terms_cover("index.html", f"{SITE_NAME}\n{desc}\n{catalog_text}", INDEX_TERMS)
-    terms_html = terms_section_html(INDEX_TERMS)
+    home_prose = (
+        f"{SITE_NAME}\n{desc}\n"
+        "Named traps with replicable procedures. Stable IDs that do not reset by year. "
+        "Markdown is the source of truth; HTML is generated. "
+        "This edition ships original specs and supporting methods. "
+        "Year pages are indexes, not copies of specs. "
+        "Disclosure, changelog, agents, crawlers."
+    )
+    assert_terms_cover("index.html", home_prose, HOME_TERMS)
+    terms_html = terms_section_html(HOME_TERMS)
     body = f"""      <div class="page-body">
         <h1>{html.escape(SITE_NAME)}</h1>
         <p class="lede">Named traps with replicable procedures. Stable IDs that do not reset by year. Markdown is the source of truth; HTML is generated.</p>
-        <p>This first inspectable slice ships a handful of originals plus one supporting method. The citation index lists the full planned set. Unbuilt IDs are marked forthcoming and are not links.</p>
+        <p>This edition ships twenty-three original specs and thirty-four supporting methods. Year pages are indexes, not copies of specs.</p>
         {terms_html}
         <h2 id="about">About</h2>
         <ul>
           <li><a href="{href_from(out_path, 'DISCLOSURE.html')}">Disclosure and license</a></li>
           <li><a href="{href_from(out_path, 'AGENTS.md')}">How agents should apply it (AGENTS.md)</a></li>
+          <li><a href="{href_from(out_path, 'changelog.html')}">Series changelog</a></li>
           <li><a href="{href_from(out_path, 'llms.txt')}">llms.txt</a> for crawlers and coding agents</li>
         </ul>
         <h2 id="networking">Original specs — Networking</h2>
@@ -822,7 +817,7 @@ def write_index() -> None:
         <h2 id="supporting">Supporting specs</h2>
         {catalog_list_html("supporting", out_path)}
         <h2 id="editions">Editions</h2>
-        <p><span class="forthcoming">2026 year index forthcoming</span> after this slice is reviewed. Year pages are indexes, not copies of specs.</p>
+        <p><a href="{href_from(out_path, 'editions/2026.html')}">2026 year index</a> — what first shipped this calendar year. Not a copy of the specs.</p>
       </div>"""
     html_out = wrap_page(
         out_path=out_path,
@@ -898,7 +893,9 @@ def write_llms_txt() -> None:
         "",
         f"- [Disclosure and license]({SITE_ORIGIN}/DISCLOSURE.html): author, site, CC-BY-4.0",
         f"- [AGENTS.md]({SITE_ORIGIN}/AGENTS.md): how coding agents MUST apply these specs",
-        f"- [Home]({SITE_ORIGIN}/): citation index of all planned IDs (unbuilt rows are forthcoming)",
+        f"- [Home]({SITE_ORIGIN}/): citation index of all living IDs",
+        f"- [2026 edition]({SITE_ORIGIN}/editions/2026.html): what first shipped this year",
+        f"- [Changelog]({SITE_ORIGIN}/changelog.html): monthly series log",
         "",
     ]
     (ROOT / "llms.txt").write_text("\n".join(lines), encoding="utf-8")
@@ -906,7 +903,12 @@ def write_llms_txt() -> None:
 
 
 def write_sitemap() -> None:
-    urls = [f"{SITE_ORIGIN}/", f"{SITE_ORIGIN}/DISCLOSURE.html"]
+    urls = [
+        f"{SITE_ORIGIN}/",
+        f"{SITE_ORIGIN}/DISCLOSURE.html",
+        f"{SITE_ORIGIN}/changelog.html",
+        f"{SITE_ORIGIN}/editions/2026.html",
+    ]
     for _spec_id, section, slug, _title in CATALOG:
         if is_built(section, slug):
             urls.append(f"{SITE_ORIGIN}/{section}/{slug}.html")
@@ -932,6 +934,57 @@ def write_robots() -> None:
     print("wrote robots.txt")
 
 
+def write_frontmatter_page(md_path: Path, *, crumb: str) -> None:
+    meta, body = parse_frontmatter(md_path.read_text(encoding="utf-8"))
+    terms = normalize_terms(meta.get("terms"))
+    if not terms:
+        raise SystemExit(f"{md_path}: missing YAML terms")
+    rel_html = md_path.relative_to(ROOT).with_suffix(".html")
+    out_path = ROOT / rel_html
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    canonical = meta.get("canonical") or f"{SITE_ORIGIN}/{rel_html.as_posix()}"
+    title = meta.get("title") or md_path.stem
+    desc = meta.get("description") or title
+    body_for_html = strip_markdown_terms_section(body)
+    assert_terms_cover(str(md_path.relative_to(ROOT)), f"{title}\n{desc}\n{body_for_html}", terms)
+    inner = md_to_html(body_for_html)
+    inner = re.sub(r"^<h1>.*?</h1>\n?", "", inner, count=1)
+    inner = inject_terms_html(inner, terms_section_html(terms))
+    body_wrapped = f"""      <article>
+        <h1>{html.escape(title)}</h1>
+        {inner}
+      </article>"""
+    html_out = wrap_page(
+        out_path=out_path,
+        title=f"{title} — {SITE_NAME}",
+        description=desc,
+        canonical=canonical,
+        body=body_wrapped,
+        json_ld=json_ld_website(canonical, title, desc),
+        og_type="article",
+        published=str(meta.get("date_published") or date.today().isoformat()),
+        crumbs=[("Home", href_from(out_path, "index.html")), (crumb, None)],
+    )
+    out_path.write_text(html_out, encoding="utf-8")
+    print(f"wrote {rel_html.as_posix()}")
+
+
+def write_llms_full() -> None:
+    chunks = [
+        f"# {SITE_NAME} (full Markdown)",
+        "",
+        f"> Field notes by {AUTHOR_NAME} ({AUTHOR_URL}). CC-BY-4.0.",
+        "",
+    ]
+    for _spec_id, section, slug, _title in CATALOG:
+        md_path = ROOT / section / f"{slug}.md"
+        if not md_path.is_file():
+            continue
+        chunks.append(f"\n\n---\n\n{md_path.read_text(encoding='utf-8').rstrip()}\n")
+    (ROOT / "llms-full.txt").write_text("".join(chunks), encoding="utf-8")
+    print("wrote llms-full.txt")
+
+
 def main() -> None:
     for folder in ("networking", "web", "supporting"):
         d = ROOT / folder
@@ -941,8 +994,21 @@ def main() -> None:
             render_spec(md_path)
     if (ROOT / "DISCLOSURE.md").is_file():
         write_disclosure()
+    if (ROOT / "CHANGELOG.md").is_file():
+        write_frontmatter_page(ROOT / "CHANGELOG.md", crumb="Changelog")
+        # Pages URL is changelog.html at repo root (CHANGELOG.md → CHANGELOG.html).
+        # Copy/alias to changelog.html for nav.
+        src = ROOT / "CHANGELOG.html"
+        dst = ROOT / "changelog.html"
+        if src.is_file():
+            dst.write_text(src.read_text(encoding="utf-8"), encoding="utf-8")
+            print("wrote changelog.html")
+    ed = ROOT / "editions" / "2026.md"
+    if ed.is_file():
+        write_frontmatter_page(ed, crumb="2026")
     write_index()
     write_llms_txt()
+    write_llms_full()
     write_sitemap()
     write_robots()
 

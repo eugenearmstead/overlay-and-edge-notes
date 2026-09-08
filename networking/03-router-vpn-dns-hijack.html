@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>OEN-03: Router VPN DNS hijack looks like a path-MTU problem — Overlay and Edge Notes</title>
+    <meta name="description" content="Consumer-router VPN DNS Server fields can destination-NAT LAN port 53 into the tunnel, producing hung DNS and browser timeouts that look like a path-MTU failure.">
+    <link rel="canonical" href="https://eugenearmstead.github.io/overlay-and-edge-notes/networking/03-router-vpn-dns-hijack.html">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Source+Sans+3:wght@400;500;600&amp;display=swap">
+    <link rel="stylesheet" href="../assets/spec.css">
+    <link rel="describedby" href="../llms.txt">
+    <meta name="author" content="Eugene Armstead">
+    <meta name="citation_author" content="Eugene Armstead">
+    <meta name="dcterms.creator" content="Eugene Armstead">
+    <link rel="author" href="https://www.armsteadent.com/">
+    <meta property="article:author" content="Eugene Armstead">
+    <meta property="og:see_also" content="https://www.armsteadent.com/">
+    <meta property="og:title" content="OEN-03: Router VPN DNS hijack looks like a path-MTU problem — Overlay and Edge Notes">
+    <meta property="og:description" content="Consumer-router VPN DNS Server fields can destination-NAT LAN port 53 into the tunnel, producing hung DNS and browser timeouts that look like a path-MTU failure.">
+    <meta property="og:url" content="https://eugenearmstead.github.io/overlay-and-edge-notes/networking/03-router-vpn-dns-hijack.html">
+    <meta property="og:type" content="article">
+    <meta property="article:published_time" content="2026-09-08">
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "TechArticle",
+      "@id": "https://eugenearmstead.github.io/overlay-and-edge-notes/networking/03-router-vpn-dns-hijack.html#article",
+      "headline": "Router VPN DNS hijack looks like a path-MTU problem",
+      "description": "Consumer-router VPN DNS Server fields can destination-NAT LAN port 53 into the tunnel, producing hung DNS and browser timeouts that look like a path-MTU failure.",
+      "datePublished": "2026-09-08",
+      "author": {
+        "@type": "Person",
+        "name": "Eugene Armstead",
+        "url": "https://www.armsteadent.com/",
+        "sameAs": [
+          "https://github.com/eugenearmstead"
+        ]
+      },
+      "url": "https://eugenearmstead.github.io/overlay-and-edge-notes/networking/03-router-vpn-dns-hijack.html",
+      "identifier": "OEN-03",
+      "license": "https://creativecommons.org/licenses/by/4.0/",
+      "inLanguage": "en"
+    },
+    {
+      "@type": "HowTo",
+      "name": "Router VPN DNS hijack looks like a path-MTU problem",
+      "description": "Consumer-router VPN DNS Server fields can destination-NAT LAN port 53 into the tunnel, producing hung DNS and browser timeouts that look like a path-MTU failure.",
+      "author": {
+        "@type": "Person",
+        "name": "Eugene Armstead",
+        "url": "https://www.armsteadent.com/",
+        "sameAs": [
+          "https://github.com/eugenearmstead"
+        ]
+      },
+      "step": [
+        {
+          "@type": "HowToStep",
+          "position": 1,
+          "name": "P1 \u2014 Reproduce with overlay off.",
+          "text": "Action: Disable overlay on the client. Retry the failing HTTPS site in Chromium and with `curl`. Expected: Failure remains. This is not overlay mesh MTU. On failure: If failure disappears, go to [OEN-02](02-chromium-tls-pmtu.md) / [OEN-01](01-overlay-ssh-byte-cliff.md) instead."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 2,
+          "name": "P2 \u2014 Compare LAN DNS vs DNS over HTTPS.",
+          "text": "Action: `dig @<lan-resolver> example.com` with a short timeout. Then resolve the same name over DoH (or any resolver not on LAN `:53`). Expected: LAN times out, REFUSED, or returns `0.0.0.0` while DoH works \u2014 or LAN is slow enough that browsers look hung. On failure: If both work, DNS hijack is not this incident. Continue to MTU."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 3,
+          "name": "P3 \u2014 Inspect the router VPN DNS fields.",
+          "text": "Action: On the consumer router WireGuard client, read DNS Server. Check for DNAT of LAN `:53` toward the tunnel (`DNSVPN2` or firmware equivalent). Expected: A populated DNS Server plus DNAT rules matches this trap. On failure: Do not add tunnel DNS \u201cto fix\u201d LAN; that is how the trap is installed."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 4,
+          "name": "P4 \u2014 Empty the VPN DNS Server; keep LAN resolver.",
+          "text": "Action: Clear the WireGuard DNS Server fields. Confirm DNAT toward the tunnel is gone. Leave LAN DHCP/RA DNS as the intended resolver. Expected: LAN `dig` returns real answers. Browser loads. On failure: If LAN still returns `0.0.0.0`, follow [OEN-S24](../supporting/s24-lan-dns-sinkhole-0-0-0-0.md)."
+        }
+      ]
+    }
+  ]
+}
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <div class="site-header-inner">
+        <p class="site-title"><a href="../index.html">Overlay and Edge Notes</a></p>
+        <p class="site-tag">Public field notes by Eugene Armstead</p>
+    <nav class="site-nav" aria-label="Site">
+      <a href="../index.html">Home</a>
+      <a href="../DISCLOSURE.html">Disclosure</a>
+      <a href="../changelog.html">Changelog</a>
+      <a href="../editions/2026.html">2026</a>
+      <a href="../AGENTS.md">AGENTS.md</a>
+      <a href="../index.html#networking">Networking</a>
+      <a href="../index.html#web">Web</a>
+      <a href="../index.html#supporting">Supporting</a>
+    </nav>
+      </div>
+    </header>
+    <nav class="breadcrumb" aria-label="Breadcrumb"><ol><li><a href="../index.html">Home</a></li><li><a href="../index.html#networking">Networking</a></li><li>OEN-03</li></ol></nav>
+    <main id="main">
+      <article>
+        <h1>Router VPN DNS hijack looks like a path-MTU problem</h1>
+        <p class="meta-line"><span>OEN-03</span> · original · edition 1 · 2026-09-08</p>
+        <h2 id="context">Context</h2>
+<p>Browser <code>ERR_TIMED_OUT</code>, IPv6 stall, or “the site is down” can appear <strong>with overlay off</strong>. Operators then clamp Maximum Segment Size (MSS) or shrink the Local Area Network (LAN) bridge — the <a href="02-chromium-tls-pmtu.html">OEN-02</a> playbook — and nothing changes.</p>
+<p>On ASUSWRT-Merlin-class firmware, filling WireGuard <strong>DNS Server</strong> fields can enable a destination network address translation (DNAT) helper (<code>DNSVPN2</code>) that steers LAN <code>:53</code> into the tunnel. When that resolver is unreachable, hung Domain Name System (DNS) looks like path Maximum Transmission Unit (MTU) or Happy-Eyeballs. A leak-test page that still shows “VPN DNS” is <strong>not</strong> proof the path is fine.</p>
+<p>Public wording: consumer Merlin-class firmware, LAN DNS hijack into a commercial WireGuard client. MUST NOT name the commercial provider.</p>
+
+<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>LAN</dt><dd>Local Area Network</dd><dt>WAN</dt><dd>Wide Area Network</dd><dt>VPN</dt><dd>Virtual Private Network</dd><dt>TCP</dt><dd>Transmission Control Protocol</dd><dt>UDP</dt><dd>User Datagram Protocol</dd><dt>MSS</dt><dd>Maximum Segment Size</dd><dt>MTU</dt><dd>Maximum Transmission Unit</dd><dt>ICMP</dt><dd>Internet Control Message Protocol</dd><dt>PMTU</dt><dd>path Maximum Transmission Unit</dd><dt>DF</dt><dd>don&#x27;t-fragment (IP flag)</dd><dt>TLS</dt><dd>Transport Layer Security</dd><dt>HTTPS</dt><dd>Hypertext Transfer Protocol Secure</dd><dt>IP</dt><dd>Internet Protocol</dd><dt>IPv4</dt><dd>Internet Protocol version 4</dd><dt>IPv6</dt><dd>Internet Protocol version 6</dd><dt>WireGuard</dt><dd>UDP-based VPN protocol</dd><dt>DNS</dt><dd>Domain Name System</dd><dt>DoH</dt><dd>DNS over HTTPS</dd><dt>NAT</dt><dd>network address translation</dd><dt>DNAT</dt><dd>destination network address translation</dd><dt>nft</dt><dd>nftables (Linux packet filter)</dd><dt>Happy-Eyeballs</dt><dd>dual-stack connection racing (RFC 8305)</dd><dt>REFUSED</dt><dd>DNS response code meaning the server will not answer</dd><dt>DHCP</dt><dd>Dynamic Host Configuration Protocol</dd><dt>RA</dt><dd>Router Advertisement (IPv6)</dd><dt>ASUSWRT-Merlin</dt><dd>consumer-router firmware class</dd><dt>Chromium</dt><dd>open-source browser engine</dd><dt>ASUSWRT</dt><dd>ASUS consumer-router firmware family</dd></dl></section>
+<h2 id="topology">Topology</h2>
+<pre><code class="language-text">[LAN client] --UDP/TCP 53--&gt; [&lt;lan-resolver&gt; intended]
+                 \
+                  +-- DNAT (firmware DNSVPN2-class) --&gt; &lt;wg-iface&gt; tunnel DNS  (TRAP)
+
+Overlay MAY be off. Browser ERR_TIMED_OUT still happens.</code></pre>
+<h2 id="bind">Bind</h2>
+<p>Fill this table <strong>before</strong> any live change. Do <strong>not</strong> paste real values back into public notes.</p>
+<table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><code>&lt;wg-iface&gt;</code></td><td>Consumer-router WireGuard client iface</td><td>Iface</td></tr><tr><td><code>&lt;lan-bridge&gt;</code></td><td>LAN bridge</td><td>Iface; MTU 1500</td></tr><tr><td><code>&lt;wan-iface&gt;</code></td><td>WAN iface</td><td>Iface</td></tr><tr><td><code>&lt;lan-resolver&gt;</code></td><td>Intended LAN DNS</td><td>Address; never publish</td></tr></tbody></table>
+<h2 id="formulas">Formulas</h2>
+<pre><code class="language-text"># Measure &lt;wg-mtu&gt; from: ip link show &lt;wg-iface&gt;
+mss4 = &lt;wg-mtu&gt; - 40    # IPv4 TCP (20-byte IP + 20-byte TCP)
+mss6 = &lt;wg-mtu&gt; - 60    # IPv6 TCP (40-byte IPv6 + 20-byte TCP)
+# IPv4 DF ping: IP size ≈ payload + 28
+# IPv6 DF ping: IP size ≈ payload + 48
+# Historical 1160 / 1146-byte SSH cliff = wrong-scope clamp, not this recipe.
+# LAN bridge MTU MUST stay 1500.</code></pre>
+<p>See <a href="../networking/01-overlay-ssh-byte-cliff.html">OEN-01</a> and <a href="../supporting/s01-pmtud-size-ladder.html">OEN-S01</a>.</p>
+<h2 id="decision">Decision</h2>
+<p>Operators MUST check tunnel DNS hijack <strong>before</strong> MSS.</p>
+<ul><li>VPN <strong>DNS Server</strong> fields on the consumer router client SHOULD be empty when LAN devices already have a working resolver.</li><li>Operators MUST compare LAN <code>dig</code> with DNS over HTTPS (DoH). If LAN is sinkhole or timeout and DoH works, this is DNS, not MTU.</li><li>Overlay being down is a useful A/B: if the browser still fails with overlay off, stop blaming overlay.</li></ul>
+<h2 id="consequences">Consequences</h2>
+<ul><li>Clearing the hijack restores LAN DNS without touching MTU.</li><li>MSS work is not wasted on a DNS outage.</li><li>LAN clients keep their advertised resolver instead of a tunnel-only one.</li></ul>
+<h2 id="agent-stop-rule">Agent stop rule</h2>
+<blockquote><p>A coding agent MUST emit a <strong>bound runbook</strong> (placeholders replaced from Bind). MUST NOT apply live <code>ip rule</code>, nft, iptables, ip6tables, sysctl, <code>wg set</code>, daemon restart, or deploy until a <strong>human</strong> filled Bind. MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS. MUST NOT file an upstream bug from this page. MUST NOT publish real addresses, hostnames, or custom ports.</p></blockquote>
+<h2 id="procedure">Procedure</h2>
+<p>Placeholders only until Bind is filled: <code>&lt;cloud-vps&gt;</code>, <code>&lt;lan-pi&gt;</code>, <code>&lt;overlay-peer&gt;</code>, <code>&lt;exit-node&gt;</code>, <code>&lt;wg-iface&gt;</code>, <code>&lt;gcp-nic&gt;</code>, plus the Bind extras on this page.</p>
+<h3>Copy-paste commands (after Bind)</h3>
+<pre><code class="language-bash"># Overlay off on the client, then:
+dig +time=2 +tries=1 @&lt;lan-resolver&gt; example.com
+# Compare with DNS over HTTPS (operator&#x27;s DoH tool). If LAN fails and DoH works, this is DNS.
+
+iptables -t nat -S | grep -i -E &#x27;53|dnat|dns&#x27; || true
+ip6tables -t nat -S | grep -i -E &#x27;53|dnat|dns&#x27; || true
+nft list ruleset | grep -i -E &#x27;dport 53|dnat&#x27; || true</code></pre>
+<p>Empty the consumer-router WireGuard <strong>DNS Server</strong> fields. Do not shrink <code>&lt;lan-bridge&gt;</code> MTU.</p>
+<ol><li><strong>P1 — Reproduce with overlay off.</strong><br>
+- <strong>Action:</strong> Disable overlay on the client. Retry the failing HTTPS site in Chromium and with <code>curl</code>.<br>
+- <strong>Expected:</strong> Failure remains. This is not overlay mesh MTU.<br>
+- <strong>On failure:</strong> If failure disappears, go to <a href="02-chromium-tls-pmtu.html">OEN-02</a> / <a href="01-overlay-ssh-byte-cliff.html">OEN-01</a> instead.</li><li><strong>P2 — Compare LAN DNS vs DNS over HTTPS.</strong><br>
+- <strong>Action:</strong> <code>dig @&lt;lan-resolver&gt; example.com</code> with a short timeout. Then resolve the same name over DoH (or any resolver not on LAN <code>:53</code>).<br>
+- <strong>Expected:</strong> LAN times out, REFUSED, or returns <code>0.0.0.0</code> while DoH works — or LAN is slow enough that browsers look hung.<br>
+- <strong>On failure:</strong> If both work, DNS hijack is not this incident. Continue to MTU.</li><li><strong>P3 — Inspect the router VPN DNS fields.</strong><br>
+- <strong>Action:</strong> On the consumer router WireGuard client, read DNS Server. Check for DNAT of LAN <code>:53</code> toward the tunnel (<code>DNSVPN2</code> or firmware equivalent).<br>
+- <strong>Expected:</strong> A populated DNS Server plus DNAT rules matches this trap.<br>
+- <strong>On failure:</strong> Do not add tunnel DNS “to fix” LAN; that is how the trap is installed.</li><li><strong>P4 — Empty the VPN DNS Server; keep LAN resolver.</strong><br>
+- <strong>Action:</strong> Clear the WireGuard DNS Server fields. Confirm DNAT toward the tunnel is gone. Leave LAN DHCP/RA DNS as the intended resolver.<br>
+- <strong>Expected:</strong> LAN <code>dig</code> returns real answers. Browser loads.<br>
+- <strong>On failure:</strong> If LAN still returns <code>0.0.0.0</code>, follow <a href="../supporting/s24-lan-dns-sinkhole-0-0-0-0.html">OEN-S24</a>.</li></ol>
+<h2 id="expected-samples">Expected samples</h2>
+<pre><code class="language-text"># Hung LAN DNS
+;; connection timed out; no servers could be reached
+
+# Sinkhole
+example.com.  0  IN  A  0.0.0.0</code></pre>
+<h2 id="verify">Verify</h2>
+<ul><li>Overlay off: site loads in Chromium.</li><li>LAN dig and DoH agree on non-sinkhole answers.</li><li>VPN DNS Server fields are empty; no LAN <code>:53</code> DNAT into <code>&lt;wg-iface&gt;</code>.</li><li>LAN bridge MTU was not changed as part of this fix.</li><li>ICMP / small ping success was <strong>not</strong> used as the pass criterion when this spec names TCP, SSH, or HTTPS.</li><li>Bind table was filled by a human before any live <code>ip</code> / nft / iptables change.</li></ul>
+<h2 id="must-not" class="must-not">MUST NOT</h2>
+<ul><li>MUST NOT name the commercial VPN provider.</li><li>MUST NOT “fix” hung DNS by shrinking the LAN bridge or adding tunnel DNS servers.</li><li>MUST NOT treat a leak-test DNS name as proof of a working data path.</li><li>MUST NOT publish LAN resolver addresses.</li><li>MUST NOT apply live network or firewall changes until Bind is filled by a human.</li><li>MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.</li><li>MUST NOT publish hostnames, addresses, ULAs, or custom ports.</li></ul>
+<h2 id="related-specs">Related specs</h2>
+<ul><li><a href="02-chromium-tls-pmtu.html">OEN-02 Chromium TLS vs curl</a></li><li><a href="../supporting/s24-lan-dns-sinkhole-0-0-0-0.html">OEN-S24 LAN DNS returning 0.0.0.0</a></li><li><a href="16-commercial-wg-endpoint-rotation.html">OEN-16 Commercial WireGuard endpoint rotation</a></li></ul>
+<h2 id="prior-art-not-novel">Prior art (Not novel)</h2>
+<p>VPN DNS on routers is a known footgun. This spec’s claim is that Merlin-class DNSVPN2 hijack <strong>mimics</strong> browser PMTU, so MSS-first diagnosis is wrong.</p>
+      </article>
+    </main>
+    <footer class="site-footer">
+      <div class="site-footer-inner">
+    <p class="byline">Written by <a href="https://www.armsteadent.com/">Eugene Armstead</a> · <a href="https://www.armsteadent.com/">https://www.armsteadent.com/</a> · <a rel="license" href="https://creativecommons.org/licenses/by/4.0/">CC-BY-4.0</a></p>
+    <p class="license-line">Living field notes. Stable IDs. Do not copy private inventory into public text.</p>
+      </div>
+    </footer>
+  </body>
+</html>

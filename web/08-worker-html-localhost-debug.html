@@ -80,7 +80,7 @@
           "@type": "HowToStep",
           "position": 4,
           "name": "P4 \u2014 After a bad ship, clean cache.",
-          "text": "Action: Remove beacons, redeploy, purge the HTML URL if a content delivery network (CDN) caches it (forthcoming OEN-S04). Ask the operator to Block the prompt if it still appears, then hard-refresh. Expected: View-source on the live HTML has zero `7450` / `X-Debug-Session-Id`. On failure: Search generated strings, not only source files (templates may interpolate)."
+          "text": "Action: Remove beacons, redeploy, purge the HTML URL if a content delivery network (CDN) caches it ([OEN-S04](../supporting/s04-purge-cdn-after-deploy.md)). Ask the operator to Block the prompt if it still appears, then hard-refresh. Expected: View-source on the live HTML has zero `7450` / `X-Debug-Session-Id`. On failure: Search generated strings, not only source files (templates may interpolate)."
         }
       ]
     }
@@ -97,11 +97,12 @@
     <nav class="site-nav" aria-label="Site">
       <a href="../index.html">Home</a>
       <a href="../DISCLOSURE.html">Disclosure</a>
+      <a href="../changelog.html">Changelog</a>
+      <a href="../editions/2026.html">2026</a>
       <a href="../AGENTS.md">AGENTS.md</a>
       <a href="../index.html#networking">Networking</a>
       <a href="../index.html#web">Web</a>
       <a href="../index.html#supporting">Supporting</a>
-      <a href="../index.html#editions">Editions</a>
     </nav>
       </div>
     </header>
@@ -109,7 +110,7 @@
     <main id="main">
       <article>
         <h1>Do not ship localhost debug beacons in Worker HTML</h1>
-        <p class="meta-line"><span>OEN-08</span> · original · edition 1 · 2026-09-07</p>
+        <p class="meta-line"><span>OEN-08</span> · original · edition 2 · 2026-09-07</p>
         <h2 id="context">Context</h2>
 <p>Coding-agent debug templates often inject a browser beacon:</p>
 <pre><code class="language-js">fetch(&#x27;http://127.0.0.1:7450/ingest/…&#x27;, { /* headers include X-Debug-Session-Id */ })</code></pre>
@@ -118,7 +119,18 @@
 <p>A Worker <code>fetch(&#x27;http://127.0.0.1:…&#x27;)</code> on the <strong>edge</strong> is also useless: the isolate cannot reach the author’s personal computer (PC). It is dead code plus noise.</p>
 <p>Local Network Access (LNA) itself is documented. The unique warning is <strong>shipping agent ingest into Worker-rendered HTML</strong>.</p>
 
-<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>HTML</dt><dd>HyperText Markup Language</dd><dt>JS</dt><dd>JavaScript</dd><dt>HTTP</dt><dd>Hypertext Transfer Protocol</dd><dt>HTTPS</dt><dd>Hypertext Transfer Protocol Secure</dd><dt>URL</dt><dd>Uniform Resource Locator</dd><dt>CDN</dt><dd>content delivery network</dd><dt>NDJSON</dt><dd>newline-delimited JavaScript Object Notation</dd><dt>LNA</dt><dd>Local Network Access (browser permission)</dd><dt>UI</dt><dd>user interface</dd><dt>PC</dt><dd>personal computer</dd><dt>JS</dt><dd>JavaScript</dd><dt>JSON</dt><dd>JavaScript Object Notation</dd><dt>HIT</dt><dd>cache HIT (content still served from cache)</dd><dt>CSS</dt><dd>Cascading Style Sheets</dd></dl></section>
+<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>HTML</dt><dd>HyperText Markup Language</dd><dt>JS</dt><dd>JavaScript</dd><dt>HTTP</dt><dd>Hypertext Transfer Protocol</dd><dt>HTTPS</dt><dd>Hypertext Transfer Protocol Secure</dd><dt>URL</dt><dd>Uniform Resource Locator</dd><dt>CDN</dt><dd>content delivery network</dd><dt>NDJSON</dt><dd>newline-delimited JavaScript Object Notation</dd><dt>LNA</dt><dd>Local Network Access (browser permission)</dd><dt>UI</dt><dd>user interface</dd><dt>PC</dt><dd>personal computer</dd><dt>JS</dt><dd>JavaScript</dd><dt>JSON</dt><dd>JavaScript Object Notation</dd><dt>HIT</dt><dd>cache HIT (content still served from cache)</dd><dt>CSS</dt><dd>Cascading Style Sheets</dd><dt>Chromium</dt><dd>open-source browser engine</dd><dt>Cloudflare</dt><dd>content delivery and Workers platform</dd></dl></section>
+<h2 id="topology">Topology</h2>
+<pre><code class="language-text">[author PC]  Cursor debug ingest 127.0.0.1:7450     (local only — OK)
+[Cloudflare Worker] --Response HTML/JS--&gt; [visitor browser]
+    fetch(&#x27;http://127.0.0.1:7450/ingest/…&#x27;)     TRAP: public https page
+    Worker fetch(&#x27;http://127.0.0.1&#x27;)            also useless: edge cannot reach the PC</code></pre>
+<h2 id="bind">Bind</h2>
+<table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><code>&lt;worker-root&gt;</code></td><td>Worker / UI source tree</td><td>Directory</td></tr><tr><td><code>&lt;live-url&gt;</code></td><td>Public HTTPS origin</td><td>URL</td></tr><tr><td><code>&lt;html-path&gt;</code></td><td>Files that become a Response body</td><td>Glob</td></tr></tbody></table>
+<h2 id="parameters">Parameters</h2>
+<pre><code class="language-text">Fail the ship on client-executed matches:
+  127.0.0.1:7450   localhost:7450   /ingest/   X-Debug-Session-Id
+Log from office NDJSON files or server console.log — not page JS.</code></pre>
 <h2 id="decision">Decision</h2>
 <p>Anything that becomes a Hypertext Transfer Protocol (HTTP) <strong>Response body</strong> (HTML templates, inline <code>&lt;script&gt;</code>, bundled browser JS) MUST NOT contain:</p>
 <ul><li><code>127.0.0.1:7450</code> or <code>localhost:7450</code></li><li><code>/ingest/</code> debug paths of that family</li><li><code>X-Debug-Session-Id</code></li></ul>
@@ -126,6 +138,8 @@
 <p>Log from office scripts that write newline-delimited JSON (NDJSON) to a local file, or from temporary <strong>server</strong> <code>console.log</code> / audit rows — not from page JS.</p>
 <h2 id="consequences">Consequences</h2>
 <ul><li>Public pages stop triggering local-network permission prompts.</li><li>Debug still exists, just not in the browser.</li><li>If a prompt already fired, remove beacons, redeploy, and tell the operator to <strong>Block</strong> once if the old page is cached, then hard-refresh.</li></ul>
+<h2 id="agent-stop-rule">Agent stop rule</h2>
+<blockquote><p>MUST emit the grep command with <code>&lt;worker-root&gt;</code> filled.   MUST NOT <code>wrangler deploy</code> until Bind is filled and grep is clean.   MUST NOT claim a CDN HIT means the beacons are gone — view-source the live HTML (<a href="../supporting/s04-purge-cdn-after-deploy.html">OEN-S04</a>, <a href="../supporting/s05-tunnel-preview-stale-hit.html">OEN-S05</a>).</p></blockquote>
 <h2 id="procedure">Procedure</h2>
 <p>Placeholders: a Worker or static origin that emits HTML. No private site internals.</p>
 <ol><li><strong>P1 — Search the ship tree before deploy.</strong><br>
@@ -140,15 +154,21 @@
 - <strong>Action:</strong> Review Worker <code>fetch</code> handlers for <code>127.0.0.1</code> / <code>localhost</code>.<br>
 - <strong>Expected:</strong> None. The edge cannot reach the author’s machine.<br>
 - <strong>On failure:</strong> Remove it. Use <code>console.log</code> on the isolate or an origin you actually control.</li><li><strong>P4 — After a bad ship, clean cache.</strong><br>
-- <strong>Action:</strong> Remove beacons, redeploy, purge the HTML URL if a content delivery network (CDN) caches it (forthcoming OEN-S04). Ask the operator to Block the prompt if it still appears, then hard-refresh.<br>
+- <strong>Action:</strong> Remove beacons, redeploy, purge the HTML URL if a content delivery network (CDN) caches it (<a href="../supporting/s04-purge-cdn-after-deploy.html">OEN-S04</a>). Ask the operator to Block the prompt if it still appears, then hard-refresh.<br>
 - <strong>Expected:</strong> View-source on the live HTML has zero <code>7450</code> / <code>X-Debug-Session-Id</code>.<br>
 - <strong>On failure:</strong> Search generated strings, not only source files (templates may interpolate).</li></ol>
 <h2 id="verify">Verify</h2>
 <ul><li>Predeploy <code>rg</code> is clean for client-executed paths.</li><li>Live view-source has no loopback ingest URL.</li><li>No Worker code fetches loopback.</li><li>A browser on a fresh profile does not show a local-network permission prompt on that page.</li></ul>
+<h2 id="expected-samples">Expected samples</h2>
+<pre><code class="language-text"># Clean predeploy
+# (no output from rg)
+
+# Hit (blocker)
+src/ui.js:42: fetch(&#x27;http://127.0.0.1:7450/ingest/…&#x27;</code></pre>
 <h2 id="must-not" class="must-not">MUST NOT</h2>
 <ul><li>MUST NOT leave Cursor/agent ingest beacons in Worker HTML, even “just for this debug session.”</li><li>MUST NOT fetch <code>127.0.0.1</code> from page JS on a public <code>https://</code> origin.</li><li>MUST NOT fetch <code>127.0.0.1</code> from the Worker isolate expecting to reach the author’s PC.</li><li>MUST NOT ship HTML comments that still contain ingest URLs (view-source is public).</li><li>MUST NOT tell the operator the prompt is a “browser bug” before grepping the response body.</li></ul>
 <h2 id="related-specs">Related specs</h2>
-<ul><li>OEN-09 Git merge is not a live Worker (forthcoming)</li><li>OEN-S04 purge the CDN after deploy (forthcoming)</li><li>OEN-S05 tunnel preview HIT with a stale body (forthcoming)</li><li>OEN-S06 do not ship HTML-only (forthcoming)</li></ul>
+<ul><li><a href="09-git-merge-is-not-a-live-worker.html">OEN-09 Git merge is not a live Worker</a></li><li><a href="../supporting/s04-purge-cdn-after-deploy.html">OEN-S04 Purge the CDN after deploy</a></li><li><a href="../supporting/s05-tunnel-preview-stale-hit.html">OEN-S05 Tunnel preview HIT with a stale body</a></li><li><a href="../supporting/s06-do-not-ship-html-only.html">OEN-S06 Do not ship HTML-only</a></li></ul>
 <h2 id="prior-art-not-novel">Prior art (Not novel)</h2>
 <p>Local Network Access prompts and “don’t call localhost from production” are known. This spec’s claim is the <strong>agent-ingest + Worker HTML</strong> failure mode: templates designed for a desktop debug port leaking onto a public HTTPS response.</p>
       </article>

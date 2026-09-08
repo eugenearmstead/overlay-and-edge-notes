@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>OEN-S17: Coordination CLI blocks on SQLite write-ahead log while serve is up — Overlay and Edge Notes</title>
+    <meta name="description" content="Coordination nodes-list CLI can block minutes on SQLite WAL while serve is up. Health checks MUST use HTTP /health or a readonly sqlite query, not the admin CLI.">
+    <link rel="canonical" href="https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s17-coordination-cli-sqlite-wal.html">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Source+Sans+3:wght@400;500;600&amp;display=swap">
+    <link rel="stylesheet" href="../assets/spec.css">
+    <link rel="describedby" href="../llms.txt">
+    <meta name="author" content="Eugene Armstead">
+    <meta name="citation_author" content="Eugene Armstead">
+    <meta name="dcterms.creator" content="Eugene Armstead">
+    <link rel="author" href="https://www.armsteadent.com/">
+    <meta property="article:author" content="Eugene Armstead">
+    <meta property="og:see_also" content="https://www.armsteadent.com/">
+    <meta property="og:title" content="OEN-S17: Coordination CLI blocks on SQLite write-ahead log while serve is up — Overlay and Edge Notes">
+    <meta property="og:description" content="Coordination nodes-list CLI can block minutes on SQLite WAL while serve is up. Health checks MUST use HTTP /health or a readonly sqlite query, not the admin CLI.">
+    <meta property="og:url" content="https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s17-coordination-cli-sqlite-wal.html">
+    <meta property="og:type" content="article">
+    <meta property="article:published_time" content="2026-09-08">
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "TechArticle",
+      "@id": "https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s17-coordination-cli-sqlite-wal.html#article",
+      "headline": "Coordination CLI blocks on SQLite write-ahead log while serve is up",
+      "description": "Coordination nodes-list CLI can block minutes on SQLite WAL while serve is up. Health checks MUST use HTTP /health or a readonly sqlite query, not the admin CLI.",
+      "datePublished": "2026-09-08",
+      "author": {
+        "@type": "Person",
+        "name": "Eugene Armstead",
+        "url": "https://www.armsteadent.com/",
+        "sameAs": [
+          "https://github.com/eugenearmstead"
+        ]
+      },
+      "url": "https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s17-coordination-cli-sqlite-wal.html",
+      "identifier": "OEN-S17",
+      "license": "https://creativecommons.org/licenses/by/4.0/",
+      "inLanguage": "en"
+    },
+    {
+      "@type": "HowTo",
+      "name": "Coordination CLI blocks on SQLite write-ahead log while serve is up",
+      "description": "Coordination nodes-list CLI can block minutes on SQLite WAL while serve is up. Health checks MUST use HTTP /health or a readonly sqlite query, not the admin CLI.",
+      "author": {
+        "@type": "Person",
+        "name": "Eugene Armstead",
+        "url": "https://www.armsteadent.com/",
+        "sameAs": [
+          "https://github.com/eugenearmstead"
+        ]
+      },
+      "step": [
+        {
+          "@type": "HowToStep",
+          "position": 1,
+          "name": "P1 \u2014 Reproduce the block.",
+          "text": "Action: With serve up, run nodes list; time it. Concurrently GET /health. Expected: /health is fast; CLI blocks. On failure: If both hang, that is a different outage."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 2,
+          "name": "P2 \u2014 Switch health to HTTP.",
+          "text": "Action: Replace CLI in systemd/fleet health with /health. Expected: Health 200 while CLI may still be slow. On failure: Do not SIGKILL serve to unblock the CLI."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 3,
+          "name": "P3 \u2014 Readonly sqlite if you must query.",
+          "text": "Action: A readonly query against the DB MAY be used. Not the admin CLI. Expected: Returns without taking the write lock the CLI wants. On failure: Do not vacuum from health."
+        }
+      ]
+    }
+  ]
+}
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <div class="site-header-inner">
+        <p class="site-title"><a href="../index.html">Overlay and Edge Notes</a></p>
+        <p class="site-tag">Public field notes by Eugene Armstead</p>
+    <nav class="site-nav" aria-label="Site">
+      <a href="../index.html">Home</a>
+      <a href="../DISCLOSURE.html">Disclosure</a>
+      <a href="../changelog.html">Changelog</a>
+      <a href="../editions/2026.html">2026</a>
+      <a href="../AGENTS.md">AGENTS.md</a>
+      <a href="../index.html#networking">Networking</a>
+      <a href="../index.html#web">Web</a>
+      <a href="../index.html#supporting">Supporting</a>
+    </nav>
+      </div>
+    </header>
+    <nav class="breadcrumb" aria-label="Breadcrumb"><ol><li><a href="../index.html">Home</a></li><li><a href="../index.html#supporting">Supporting</a></li><li>OEN-S17</li></ol></nav>
+    <main id="main">
+      <article>
+        <h1>Coordination CLI blocks on SQLite write-ahead log while serve is up</h1>
+        <p class="meta-line"><span>OEN-S17</span> · supporting · edition 1 · 2026-09-08</p>
+        <h2 id="context">Context</h2>
+<p>Operators hang SSH sessions on <code>nodes list</code> during WAL checkpoints. Serve is fine.</p>
+
+<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>VPS</dt><dd>Virtual Private Server</dd><dt>LAN</dt><dd>Local Area Network</dd><dt>WAN</dt><dd>Wide Area Network</dd><dt>TCP</dt><dd>Transmission Control Protocol</dd><dt>MSS</dt><dd>Maximum Segment Size</dd><dt>MTU</dt><dd>Maximum Transmission Unit</dd><dt>ICMP</dt><dd>Internet Control Message Protocol</dd><dt>HTTP</dt><dd>Hypertext Transfer Protocol</dd><dt>HTTPS</dt><dd>Hypertext Transfer Protocol Secure</dd><dt>WireGuard</dt><dd>UDP-based VPN protocol</dd><dt>CLI</dt><dd>command-line interface</dd><dt>nft</dt><dd>nftables (Linux packet filter)</dd><dt>WAL</dt><dd>write-ahead log</dd><dt>Pi</dt><dd>single-board computer (Raspberry Pi class)</dd><dt>SQLite</dt><dd>embedded SQL database</dd><dt>systemd</dt><dd>Linux service manager</dd><dt>GET</dt><dd>HTTP method</dd><dt>DB</dt><dd>database</dd><dt>SIGKILL</dt><dd>Unix signal 9 (kill)</dd></dl></section>
+<h2 id="topology">Topology</h2>
+<pre><code class="language-text">coordination `nodes list` CLI  --&gt;  blocks minutes on SQLite WAL
+HTTP /health or readonly sqlite still works
+Health checks MUST NOT use the admin CLI</code></pre>
+<h2 id="bind">Bind</h2>
+<p>Fill this table <strong>before</strong> any live change. Do <strong>not</strong> paste real values back into public notes.</p>
+<table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><code>&lt;cloud-vps&gt;</code></td><td>Overlay SSH target</td><td>Cloud VPS</td></tr><tr><td><code>&lt;lan-pi&gt;</code></td><td>Overlay SSH target</td><td>LAN Pi</td></tr><tr><td><code>&lt;user&gt;</code></td><td>SSH user</td><td>Guest account</td></tr><tr><td><code>&lt;wg-iface&gt;</code></td><td>Commercial WireGuard iface</td><td>Router or VPS client</td></tr><tr><td><code>&lt;wan-iface&gt;</code></td><td>WAN iface</td><td>Router</td></tr><tr><td><code>&lt;lan-bridge&gt;</code></td><td>LAN bridge</td><td>Router (MTU 1500)</td></tr><tr><td><code>&lt;overlay-tun&gt;</code></td><td>Overlay tun iface</td><td>Node under test</td></tr><tr><td><code>&lt;wg-mtu&gt;</code></td><td>MTU integer from <code>ip link</code></td><td>Measured</td></tr><tr><td><code>&lt;mss4&gt;</code> / <code>&lt;mss6&gt;</code></td><td>Computed MSS</td><td>Formulas</td></tr><tr><td><code>&lt;vps-public-v4&gt;</code> / <code>&lt;vps-public-v6&gt;</code></td><td>VPS public addresses</td><td>WAN; never publish</td></tr><tr><td><code>&lt;overlay-v4&gt;</code> / <code>&lt;overlay-v6&gt;</code></td><td>Overlay addresses</td><td>Overlay; never publish</td></tr></tbody></table>
+<h2 id="formulas">Formulas</h2>
+<p>Serve can be up while CLI is stuck.</p>
+<h2 id="method">Method</h2>
+<p>Health MUST NOT call the admin CLI. Use HTTP <code>/health</code> or a readonly sqlite query.</p>
+<h2 id="consequences">Consequences</h2>
+<p>Health checks return. Serve is not mistaken for dead.</p>
+<h2 id="agent-stop-rule">Agent stop rule</h2>
+<blockquote><p>A coding agent MUST emit a <strong>bound runbook</strong> (placeholders replaced from Bind). MUST NOT apply live <code>ip rule</code>, nft, iptables, ip6tables, sysctl, <code>wg set</code>, daemon restart, or deploy until a <strong>human</strong> filled Bind. MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS. MUST NOT file an upstream bug from this page. MUST NOT publish real addresses, hostnames, or custom ports.</p></blockquote>
+<h2 id="procedure">Procedure</h2>
+<p>Placeholders only until Bind is filled: <code>&lt;cloud-vps&gt;</code>, <code>&lt;lan-pi&gt;</code>, <code>&lt;overlay-peer&gt;</code>, <code>&lt;exit-node&gt;</code>, <code>&lt;wg-iface&gt;</code>, <code>&lt;gcp-nic&gt;</code>, plus the Bind extras on this page.</p>
+<h3>Copy-paste commands (after Bind)</h3>
+<pre><code class="language-bash">curl -sS --max-time 5 http://127.0.0.1:&lt;health-port&gt;/health
+# Do not: coordination nodes list   from a 15-min timer</code></pre>
+<ol><li><strong>P1 — Reproduce the block.</strong><br>
+- <strong>Action:</strong> With serve up, run nodes list; time it. Concurrently GET /health.<br>
+- <strong>Expected:</strong> /health is fast; CLI blocks.<br>
+- <strong>On failure:</strong> If both hang, that is a different outage.</li><li><strong>P2 — Switch health to HTTP.</strong><br>
+- <strong>Action:</strong> Replace CLI in systemd/fleet health with /health.<br>
+- <strong>Expected:</strong> Health 200 while CLI may still be slow.<br>
+- <strong>On failure:</strong> Do not SIGKILL serve to unblock the CLI.</li><li><strong>P3 — Readonly sqlite if you must query.</strong><br>
+- <strong>Action:</strong> A readonly query against the DB MAY be used. Not the admin CLI.<br>
+- <strong>Expected:</strong> Returns without taking the write lock the CLI wants.<br>
+- <strong>On failure:</strong> Do not vacuum from health.</li></ol>
+<h2 id="expected-samples">Expected samples</h2>
+<pre><code class="language-text">ok
+# CLI still hung on WAL</code></pre>
+<h2 id="verify">Verify</h2>
+<ul><li>Health uses /health.</li><li>CLI slowness no longer pages as down.</li><li>ICMP / small ping success was <strong>not</strong> used as the pass criterion when this spec names TCP, SSH, or HTTPS.</li><li>Bind table was filled by a human before any live <code>ip</code> / nft / iptables change.</li></ul>
+<h2 id="must-not" class="must-not">MUST NOT</h2>
+<ul><li>MUST NOT health-check with nodes list.</li><li>MUST NOT publish the DB path.</li><li>MUST NOT apply live network or firewall changes until Bind is filled by a human.</li><li>MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.</li><li>MUST NOT publish hostnames, addresses, ULAs, or custom ports.</li></ul>
+<h2 id="related-specs">Related specs</h2>
+<ul><li><a href="../networking/14-exit-dns-is-peerapi.html">OEN-14</a></li><li><a href="s19-push-small-overlay-snapshots.html">OEN-S19</a></li></ul>
+<h2 id="prior-art-not-novel">Prior art (Not novel)</h2>
+<p>SQLite WAL blocking is known. This note is coordination CLI vs /health as the health contract.</p>
+      </article>
+    </main>
+    <footer class="site-footer">
+      <div class="site-footer-inner">
+    <p class="byline">Written by <a href="https://www.armsteadent.com/">Eugene Armstead</a> · <a href="https://www.armsteadent.com/">https://www.armsteadent.com/</a> · <a rel="license" href="https://creativecommons.org/licenses/by/4.0/">CC-BY-4.0</a></p>
+    <p class="license-line">Living field notes. Stable IDs. Do not copy private inventory into public text.</p>
+      </div>
+    </footer>
+  </body>
+</html>

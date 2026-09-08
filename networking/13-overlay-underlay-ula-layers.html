@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>OEN-13: Overlay ≠ underlay ≠ tunnel unique-local ≠ LAN unique-local — Overlay and Edge Notes</title>
+    <meta name="description" content="Four address layers get conflated: WAN global, overlay unique-local, commercial-tunnel addresses, and LAN unique-local. Bind overlay services to specific overlay v4 and node unique-local, not WAN ::.">
+    <link rel="canonical" href="https://eugenearmstead.github.io/overlay-and-edge-notes/networking/13-overlay-underlay-ula-layers.html">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Source+Sans+3:wght@400;500;600&amp;display=swap">
+    <link rel="stylesheet" href="../assets/spec.css">
+    <link rel="describedby" href="../llms.txt">
+    <meta name="author" content="Eugene Armstead">
+    <meta name="citation_author" content="Eugene Armstead">
+    <meta name="dcterms.creator" content="Eugene Armstead">
+    <link rel="author" href="https://www.armsteadent.com/">
+    <meta property="article:author" content="Eugene Armstead">
+    <meta property="og:see_also" content="https://www.armsteadent.com/">
+    <meta property="og:title" content="OEN-13: Overlay ≠ underlay ≠ tunnel unique-local ≠ LAN unique-local — Overlay and Edge Notes">
+    <meta property="og:description" content="Four address layers get conflated: WAN global, overlay unique-local, commercial-tunnel addresses, and LAN unique-local. Bind overlay services to specific overlay v4 and node unique-local, not WAN ::.">
+    <meta property="og:url" content="https://eugenearmstead.github.io/overlay-and-edge-notes/networking/13-overlay-underlay-ula-layers.html">
+    <meta property="og:type" content="article">
+    <meta property="article:published_time" content="2026-09-08">
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "TechArticle",
+      "@id": "https://eugenearmstead.github.io/overlay-and-edge-notes/networking/13-overlay-underlay-ula-layers.html#article",
+      "headline": "Overlay \u2260 underlay \u2260 tunnel unique-local \u2260 LAN unique-local",
+      "description": "Four address layers get conflated: WAN global, overlay unique-local, commercial-tunnel addresses, and LAN unique-local. Bind overlay services to specific overlay v4 and node unique-local, not WAN ::.",
+      "datePublished": "2026-09-08",
+      "author": {
+        "@type": "Person",
+        "name": "Eugene Armstead",
+        "url": "https://www.armsteadent.com/",
+        "sameAs": [
+          "https://github.com/eugenearmstead"
+        ]
+      },
+      "url": "https://eugenearmstead.github.io/overlay-and-edge-notes/networking/13-overlay-underlay-ula-layers.html",
+      "identifier": "OEN-13",
+      "license": "https://creativecommons.org/licenses/by/4.0/",
+      "inLanguage": "en"
+    },
+    {
+      "@type": "HowTo",
+      "name": "Overlay \u2260 underlay \u2260 tunnel unique-local \u2260 LAN unique-local",
+      "description": "Four address layers get conflated: WAN global, overlay unique-local, commercial-tunnel addresses, and LAN unique-local. Bind overlay services to specific overlay v4 and node unique-local, not WAN ::.",
+      "author": {
+        "@type": "Person",
+        "name": "Eugene Armstead",
+        "url": "https://www.armsteadent.com/",
+        "sameAs": [
+          "https://github.com/eugenearmstead"
+        ]
+      },
+      "step": [
+        {
+          "@type": "HowToStep",
+          "position": 1,
+          "name": "P1 \u2014 Name the four addresses on one node.",
+          "text": "Action: On `<cloud-vps>` and `<lan-pi>`, list WAN GUA, overlay IPv4, overlay IPv6/ULA, tunnel address, LAN ULA. Write a four-row table. No public paste of real values. Expected: Four distinct scopes. Overlay v6 may be empty until backfill. On failure: If overlay v6 is empty, do not bind services to it ([OEN-S31](../supporting/s31-prefixes-v6-needs-backfillips.md))."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 2,
+          "name": "P2 \u2014 See that SSH overlay v4 may ride WAN v6.",
+          "text": "Action: `ssh` to the overlay IPv4 while watching underlay (`ss` / `tcpdump` on WAN vs LAN). Repeat to overlay IPv6 if present. Expected: Underlay family need not match overlay family. On failure: Do not \u201cfix\u201d this by forcing IPv6-only mesh."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 3,
+          "name": "P3 \u2014 Bind explicitly.",
+          "text": "Action: Overlay listeners: specific overlay IPv4 and node ULA. Not `::` on WAN. HTTPS login MUST NOT target overlay ULA until `ip -6` shows it at boot. Expected: Process listens where you documented. Boot does not take down login if ULA is late. On failure: If ULA appears only after backfillips, sequence the bind after that."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 4,
+          "name": "P4 \u2014 Do not drop overlay IPv6 with debug MTU.",
+          "text": "Action: If `TS_DEBUG_MTU` is set below 1280, remove or raise it ([OEN-S30](../supporting/s30-ts-debug-mtu-below-1280.md)). Expected: `tailscale ip -6` can exist; kernel is not dropping v6 on the tun. On failure: Do not use debug MTU as a production clamp."
+        }
+      ]
+    }
+  ]
+}
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <div class="site-header-inner">
+        <p class="site-title"><a href="../index.html">Overlay and Edge Notes</a></p>
+        <p class="site-tag">Public field notes by Eugene Armstead</p>
+    <nav class="site-nav" aria-label="Site">
+      <a href="../index.html">Home</a>
+      <a href="../DISCLOSURE.html">Disclosure</a>
+      <a href="../changelog.html">Changelog</a>
+      <a href="../editions/2026.html">2026</a>
+      <a href="../AGENTS.md">AGENTS.md</a>
+      <a href="../index.html#networking">Networking</a>
+      <a href="../index.html#web">Web</a>
+      <a href="../index.html#supporting">Supporting</a>
+    </nav>
+      </div>
+    </header>
+    <nav class="breadcrumb" aria-label="Breadcrumb"><ol><li><a href="../index.html">Home</a></li><li><a href="../index.html#networking">Networking</a></li><li>OEN-13</li></ol></nav>
+    <main id="main">
+      <article>
+        <h1>Overlay ≠ underlay ≠ tunnel unique-local ≠ LAN unique-local</h1>
+        <p class="meta-line"><span>OEN-13</span> · original · edition 1 · 2026-09-08</p>
+        <h2 id="context">Context</h2>
+<p>People treat “the IPv6 address” as one thing. There are four layers:</p>
+<ol><li>Host Wide Area Network (WAN) global unicast (GUA)</li><li>Overlay unique-local address (ULA) on the mesh</li><li>Commercial-tunnel addresses</li><li>Local Area Network (LAN) ULA</li></ol>
+<p>Secure Shell (SSH) to overlay IPv4 can ride WAN IPv6. SSH to overlay IPv6 can ride LAN IPv4. IPv6-only mesh is not a practical ops target.</p>
+<p><code>TS_DEBUG_MTU</code> below 1280 disables overlay IPv6 (<a href="../supporting/s30-ts-debug-mtu-below-1280.html">OEN-S30</a>). Coordination <code>prefixes.v6</code> on <strong>existing</strong> nodes needs <code>nodes backfillips</code> (or equivalent); restart alone leaves <code>tailscale ip -6</code> empty (<a href="../supporting/s31-prefixes-v6-needs-backfillips.html">OEN-S31</a>).</p>
+
+<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>VPS</dt><dd>Virtual Private Server</dd><dt>LAN</dt><dd>Local Area Network</dd><dt>WAN</dt><dd>Wide Area Network</dd><dt>TCP</dt><dd>Transmission Control Protocol</dd><dt>MSS</dt><dd>Maximum Segment Size</dd><dt>MTU</dt><dd>Maximum Transmission Unit</dd><dt>ICMP</dt><dd>Internet Control Message Protocol</dd><dt>HTTP</dt><dd>Hypertext Transfer Protocol</dd><dt>HTTPS</dt><dd>Hypertext Transfer Protocol Secure</dd><dt>IPv4</dt><dd>Internet Protocol version 4</dd><dt>IPv6</dt><dd>Internet Protocol version 6</dd><dt>WireGuard</dt><dd>UDP-based VPN protocol</dd><dt>ULA</dt><dd>unique-local address (IPv6)</dd><dt>GUA</dt><dd>global unicast address (IPv6)</dd><dt>nft</dt><dd>nftables (Linux packet filter)</dd><dt>ControlPath</dt><dd>OpenSSH multiplexing socket path option</dd><dt>Pi</dt><dd>single-board computer (Raspberry Pi class)</dd><dt>Happy-Eyeballs</dt><dd>dual-stack connection racing (RFC 8305)</dd></dl></section>
+<h2 id="topology">Topology</h2>
+<pre><code class="language-text">Layer 1  host WAN GUA
+Layer 2  overlay ULA / overlay v4
+Layer 3  commercial-tunnel addresses
+Layer 4  LAN ULA
+
+ssh to overlay v4 MAY ride WAN v6 underlay
+ssh to overlay v6 MAY ride LAN v4 underlay
+IPv6-only mesh is not a practical ops target</code></pre>
+<h2 id="bind">Bind</h2>
+<p>Fill this table <strong>before</strong> any live change. Do <strong>not</strong> paste real values back into public notes.</p>
+<table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><code>&lt;cloud-vps&gt;</code></td><td>Overlay SSH target</td><td>Cloud VPS</td></tr><tr><td><code>&lt;lan-pi&gt;</code></td><td>Overlay SSH target</td><td>LAN Pi</td></tr><tr><td><code>&lt;user&gt;</code></td><td>SSH user</td><td>Guest account</td></tr><tr><td><code>&lt;wg-iface&gt;</code></td><td>Commercial WireGuard iface</td><td>Router or VPS client</td></tr><tr><td><code>&lt;wan-iface&gt;</code></td><td>WAN iface</td><td>Router</td></tr><tr><td><code>&lt;lan-bridge&gt;</code></td><td>LAN bridge</td><td>Router (MTU 1500)</td></tr><tr><td><code>&lt;overlay-tun&gt;</code></td><td>Overlay tun iface</td><td>Node under test</td></tr><tr><td><code>&lt;wg-mtu&gt;</code></td><td>MTU integer from <code>ip link</code></td><td>Measured</td></tr><tr><td><code>&lt;mss4&gt;</code> / <code>&lt;mss6&gt;</code></td><td>Computed MSS</td><td>Formulas</td></tr><tr><td><code>&lt;vps-public-v4&gt;</code> / <code>&lt;vps-public-v6&gt;</code></td><td>VPS public addresses</td><td>WAN; never publish</td></tr><tr><td><code>&lt;overlay-v4&gt;</code> / <code>&lt;overlay-v6&gt;</code></td><td>Overlay addresses</td><td>Overlay; never publish</td></tr></tbody></table>
+<h2 id="formulas">Formulas</h2>
+<p>Existing nodes do not grow overlay IPv6 from a prefixes flag + restart alone (<a href="../supporting/s31-prefixes-v6-needs-backfillips.html">OEN-S31</a>). <code>TS_DEBUG_MTU</code> &lt; 1280 disables overlay IPv6 (<a href="../supporting/s30-ts-debug-mtu-below-1280.html">OEN-S30</a>).</p>
+<h2 id="decision">Decision</h2>
+<p>Bind overlay services to <strong>specific</strong> overlay IPv4 <strong>and</strong> node ULA — not WAN <code>::</code>. Do <strong>not</strong> bind login HTTPS to overlay ULA if that address is missing at boot.</p>
+<p>Default ops SSH stays on overlay IPv4. HTTP overlay IPv6 needs brackets. MUST NOT treat IPv6-only mesh as an ops goal.</p>
+<h2 id="consequences">Consequences</h2>
+<ul><li>Services stay up when one layer is missing.</li><li>Operators stop debugging “the VPS IPv6” when they meant overlay ULA.</li><li>Existing nodes actually receive ULA after prefix enable.</li></ul>
+<h2 id="agent-stop-rule">Agent stop rule</h2>
+<blockquote><p>A coding agent MUST emit a <strong>bound runbook</strong> (placeholders replaced from Bind). MUST NOT apply live <code>ip rule</code>, nft, iptables, ip6tables, sysctl, <code>wg set</code>, daemon restart, or deploy until a <strong>human</strong> filled Bind. MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS. MUST NOT file an upstream bug from this page. MUST NOT publish real addresses, hostnames, or custom ports.</p></blockquote>
+<h2 id="procedure">Procedure</h2>
+<p>Placeholders only until Bind is filled: <code>&lt;cloud-vps&gt;</code>, <code>&lt;lan-pi&gt;</code>, <code>&lt;overlay-peer&gt;</code>, <code>&lt;exit-node&gt;</code>, <code>&lt;wg-iface&gt;</code>, <code>&lt;gcp-nic&gt;</code>, plus the Bind extras on this page.</p>
+<h3>Copy-paste commands (after Bind)</h3>
+<pre><code class="language-bash">ssh -o ControlPath=none &lt;user&gt;@&lt;cloud-vps&gt; &#x27;ip -4 addr; ip -6 addr; ip -6 route | head&#x27;
+# Bind overlay services to specific overlay v4 AND node ULA — not WAN ::
+# Default ops SSH stays overlay v4. HTTP overlay v6 URLs need brackets.</code></pre>
+<ol><li><strong>P1 — Name the four addresses on one node.</strong><br>
+- <strong>Action:</strong> On <code>&lt;cloud-vps&gt;</code> and <code>&lt;lan-pi&gt;</code>, list WAN GUA, overlay IPv4, overlay IPv6/ULA, tunnel address, LAN ULA. Write a four-row table. No public paste of real values.<br>
+- <strong>Expected:</strong> Four distinct scopes. Overlay v6 may be empty until backfill.<br>
+- <strong>On failure:</strong> If overlay v6 is empty, do not bind services to it (<a href="../supporting/s31-prefixes-v6-needs-backfillips.html">OEN-S31</a>).</li><li><strong>P2 — See that SSH overlay v4 may ride WAN v6.</strong><br>
+- <strong>Action:</strong> <code>ssh</code> to the overlay IPv4 while watching underlay (<code>ss</code> / <code>tcpdump</code> on WAN vs LAN). Repeat to overlay IPv6 if present.<br>
+- <strong>Expected:</strong> Underlay family need not match overlay family.<br>
+- <strong>On failure:</strong> Do not “fix” this by forcing IPv6-only mesh.</li><li><strong>P3 — Bind explicitly.</strong><br>
+- <strong>Action:</strong> Overlay listeners: specific overlay IPv4 and node ULA. Not <code>::</code> on WAN. HTTPS login MUST NOT target overlay ULA until <code>ip -6</code> shows it at boot.<br>
+- <strong>Expected:</strong> Process listens where you documented. Boot does not take down login if ULA is late.<br>
+- <strong>On failure:</strong> If ULA appears only after backfillips, sequence the bind after that.</li><li><strong>P4 — Do not drop overlay IPv6 with debug MTU.</strong><br>
+- <strong>Action:</strong> If <code>TS_DEBUG_MTU</code> is set below 1280, remove or raise it (<a href="../supporting/s30-ts-debug-mtu-below-1280.html">OEN-S30</a>).<br>
+- <strong>Expected:</strong> <code>tailscale ip -6</code> can exist; kernel is not dropping v6 on the tun.<br>
+- <strong>On failure:</strong> Do not use debug MTU as a production clamp.</li></ol>
+<h2 id="expected-samples">Expected samples</h2>
+<pre><code class="language-text"># Overlay v6 empty after prefixes.v6 + restart only — need backfillips</code></pre>
+<h2 id="verify">Verify</h2>
+<ul><li>Four-layer table exists in the private ops notes (not in this public spec).</li><li>Login HTTPS is not bound to a missing overlay ULA.</li><li>Ops SSH default is overlay IPv4.</li><li>TS_DEBUG_MTU is not below 1280.</li><li>ICMP / small ping success was <strong>not</strong> used as the pass criterion when this spec names TCP, SSH, or HTTPS.</li><li>Bind table was filled by a human before any live <code>ip</code> / nft / iptables change.</li></ul>
+<h2 id="must-not" class="must-not">MUST NOT</h2>
+<ul><li>MUST NOT publish real ULA, GUA, or overlay addresses.</li><li>MUST NOT bind WAN <code>::</code> for overlay-only services.</li><li>MUST NOT expect restart alone to backfill prefixes.v6.</li><li>MUST NOT treat IPv6-only overlay as the daily control plane.</li><li>MUST NOT apply live network or firewall changes until Bind is filled by a human.</li><li>MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.</li><li>MUST NOT publish hostnames, addresses, ULAs, or custom ports.</li></ul>
+<h2 id="related-specs">Related specs</h2>
+<ul><li><a href="20-lan-ula-happy-eyeballs-leak.html">OEN-20 LAN ULA Happy-Eyeballs leak</a></li><li><a href="../supporting/s26-wifi-vs-cellular-underlay.html">OEN-S26 Wi-Fi vs cellular underlay</a></li><li><a href="../supporting/s30-ts-debug-mtu-below-1280.html">OEN-S30 TS_DEBUG_MTU below 1280</a></li><li><a href="../supporting/s31-prefixes-v6-needs-backfillips.html">OEN-S31 prefixes.v6 needs backfillips</a></li></ul>
+<h2 id="prior-art-not-novel">Prior art (Not novel)</h2>
+<p>Unique-local vs global is textbook IPv6. This spec’s claim is four layers in an overlay-plus-commercial-tunnel home, plus bind and backfill traps.</p>
+      </article>
+    </main>
+    <footer class="site-footer">
+      <div class="site-footer-inner">
+    <p class="byline">Written by <a href="https://www.armsteadent.com/">Eugene Armstead</a> · <a href="https://www.armsteadent.com/">https://www.armsteadent.com/</a> · <a rel="license" href="https://creativecommons.org/licenses/by/4.0/">CC-BY-4.0</a></p>
+    <p class="license-line">Living field notes. Stable IDs. Do not copy private inventory into public text.</p>
+      </div>
+    </footer>
+  </body>
+</html>

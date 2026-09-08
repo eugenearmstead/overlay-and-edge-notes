@@ -1,0 +1,164 @@
+---
+id: OEN-S11
+title: "Overlay session-mirror remote desktop and access-control list without deny"
+kind: supporting
+status: active
+edition: 1
+date_published: 2026-09-08
+author: Eugene Armstead
+author_url: https://www.armsteadent.com/
+canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s11-overlay-rdp-acl.html
+keywords:
+  - rdp
+  - acl
+  - overlay
+backs:
+  - OEN-01
+  - OEN-06
+backed_by: []
+description: "The overlay is an access plane, not only SSH. Session-mirror remote desktop plus a locked-screen extension. Coordination ACLs with no deny action need port-range allow holes. Generic peers only."
+terms:
+  - abbr: OEN
+    expansion: Overlay and Edge Notes
+  - abbr: SSH
+    expansion: Secure Shell
+  - abbr: VPS
+    expansion: Virtual Private Server
+  - abbr: LAN
+    expansion: Local Area Network
+  - abbr: WAN
+    expansion: Wide Area Network
+  - abbr: VPN
+    expansion: Virtual Private Network
+  - abbr: TCP
+    expansion: Transmission Control Protocol
+  - abbr: MSS
+    expansion: Maximum Segment Size
+  - abbr: MTU
+    expansion: Maximum Transmission Unit
+  - abbr: ICMP
+    expansion: Internet Control Message Protocol
+  - abbr: HTTPS
+    expansion: Hypertext Transfer Protocol Secure
+  - abbr: WireGuard
+    expansion: UDP-based VPN protocol
+  - abbr: nft
+    expansion: nftables (Linux packet filter)
+  - abbr: ACL
+    expansion: access-control list
+  - abbr: RDP
+    expansion: Remote Desktop Protocol
+  - abbr: Pi
+    expansion: single-board computer (Raspberry Pi class)
+  - abbr: LISTEN
+    expansion: ss(8) listening socket state
+---
+
+# Overlay session-mirror remote desktop and access-control list without deny
+
+## Context
+
+Remote Desktop Protocol (RDP) over overlay: session mirror, locked-screen extension. Self-hosted coordination with no `"deny"` action needs allow holes by port range. MUST NOT paste real access-control lists (ACL) or peer names.
+
+## Topology
+
+```text
+[workstation] overlay RDP :3389  session mirror + locked-screen extension
+Coordination ACL without a deny action needs port-range ALLOW holes
+Generic peers only
+```
+
+## Bind
+
+Fill this table **before** any live change. Do **not** paste real values back into public notes.
+
+| Placeholder | Operator fills | Class |
+|-------------|----------------|-------|
+| `<cloud-vps>` | Overlay SSH target | Cloud VPS |
+| `<lan-pi>` | Overlay SSH target | LAN Pi |
+| `<user>` | SSH user | Guest account |
+| `<wg-iface>` | Commercial WireGuard iface | Router or VPS client |
+| `<wan-iface>` | WAN iface | Router |
+| `<lan-bridge>` | LAN bridge | Router (MTU 1500) |
+| `<overlay-tun>` | Overlay tun iface | Node under test |
+| `<wg-mtu>` | MTU integer from `ip link` | Measured |
+| `<mss4>` / `<mss6>` | Computed MSS | Formulas |
+| `<vps-public-v4>` / `<vps-public-v6>` | VPS public addresses | WAN; never publish |
+| `<overlay-v4>` / `<overlay-v6>` | Overlay addresses | Overlay; never publish |
+
+
+## Formulas
+
+Overlay is an access plane, not only SSH. MUST NOT publish real ACL peers.
+
+## Method
+
+Document RDP as overlay, not a second VPN. ACL: allow the needed port range for the intended peer class. No real inventory.
+
+## Consequences
+
+Operators stop thinking overlay is SSH-only. ACL holes are explicit.
+
+## Agent stop rule
+
+> A coding agent MUST emit a **bound runbook** (placeholders replaced from Bind).
+> MUST NOT apply live `ip rule`, nft, iptables, ip6tables, sysctl, `wg set`, daemon restart, or deploy until a **human** filled Bind.
+> MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
+> MUST NOT file an upstream bug from this page.
+> MUST NOT publish real addresses, hostnames, or custom ports.
+
+## Procedure
+
+Placeholders only until Bind is filled: `<cloud-vps>`, `<lan-pi>`, `<overlay-peer>`, `<exit-node>`, `<wg-iface>`, `<gcp-nic>`, plus the Bind extras on this page.
+
+### Copy-paste commands (after Bind)
+
+```bash
+ss -lntp | grep 3389 || true
+# Confirm overlay ACL allows the session-mirror port range; a product with no deny still needs allow holes.
+```
+
+1. **P1 — Session mirror + locked screen.**
+   - **Action:** Use the desktop’s remote-desktop stack that mirrors the session. Enable locked-screen remote if required.
+   - **Expected:** A phone client can attach to the existing session.
+   - **On failure:** xrdp-style new sessions are a different product.
+2. **P2 — Overlay bind, not WAN.**
+   - **Action:** Listen on overlay addresses. Firewall: overlay prefix only.
+   - **Expected:** WAN RDP closed.
+   - **On failure:** Do not publish the overlay address.
+3. **P3 — ACL without deny.**
+   - **Action:** If the coordinator has no deny action, punch allow port ranges for the peer class that must RDP.
+   - **Expected:** Intended peer can connect; others cannot.
+   - **On failure:** Generic peers only in public text.
+
+## Expected samples
+
+```text
+LISTEN 0  ... *:3389
+```
+
+## Verify
+
+- RDP works over overlay while WAN is closed.
+- ACL text in public has no real peers.
+- ICMP / small ping success was **not** used as the pass criterion when this spec names TCP, SSH, or HTTPS.
+- Bind table was filled by a human before any live `ip` / nft / iptables change.
+
+## MUST NOT
+
+- MUST NOT paste real ACL peer lists.
+- MUST NOT expose RDP on WAN.
+- MUST NOT publish hostnames.
+- MUST NOT apply live network or firewall changes until Bind is filled by a human.
+- MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
+- MUST NOT publish hostnames, addresses, ULAs, or custom ports.
+
+## Related specs
+
+- [OEN-01](../networking/01-overlay-ssh-byte-cliff.md)
+- [OEN-13](../networking/13-overlay-underlay-ula-layers.md)
+
+## Prior art (Not novel)
+
+RDP and Tailscale ACLs are documented. This note is session-mirror + no-deny ACL holes as overlay access, not SSH-only.
+

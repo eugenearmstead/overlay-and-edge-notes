@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>OEN-S03: 1 KB vs 1 MB transfer matrix + ControlPath=none — Overlay and Edge Notes</title>
+    <meta name="description" content="Prove overlay SSH size: 1 KB vs about 1 MB with ControlPath=none. Mux death is a symptom. Userspace overlay SSH is less forgiving than kernel SSH on the same host.">
+    <link rel="canonical" href="https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s03-transfer-matrix-controlpath.html">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Source+Sans+3:wght@400;500;600&amp;display=swap">
+    <link rel="stylesheet" href="../assets/spec.css">
+    <link rel="describedby" href="../llms.txt">
+    <meta name="author" content="Eugene Armstead">
+    <meta name="citation_author" content="Eugene Armstead">
+    <meta name="dcterms.creator" content="Eugene Armstead">
+    <link rel="author" href="https://www.armsteadent.com/">
+    <meta property="article:author" content="Eugene Armstead">
+    <meta property="og:see_also" content="https://www.armsteadent.com/">
+    <meta property="og:title" content="OEN-S03: 1 KB vs 1 MB transfer matrix + ControlPath=none — Overlay and Edge Notes">
+    <meta property="og:description" content="Prove overlay SSH size: 1 KB vs about 1 MB with ControlPath=none. Mux death is a symptom. Userspace overlay SSH is less forgiving than kernel SSH on the same host.">
+    <meta property="og:url" content="https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s03-transfer-matrix-controlpath.html">
+    <meta property="og:type" content="article">
+    <meta property="article:published_time" content="2026-09-08">
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "TechArticle",
+      "@id": "https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s03-transfer-matrix-controlpath.html#article",
+      "headline": "1 KB vs 1 MB transfer matrix + ControlPath=none",
+      "description": "Prove overlay SSH size: 1 KB vs about 1 MB with ControlPath=none. Mux death is a symptom. Userspace overlay SSH is less forgiving than kernel SSH on the same host.",
+      "datePublished": "2026-09-08",
+      "author": {
+        "@type": "Person",
+        "name": "Eugene Armstead",
+        "url": "https://www.armsteadent.com/",
+        "sameAs": [
+          "https://github.com/eugenearmstead"
+        ]
+      },
+      "url": "https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s03-transfer-matrix-controlpath.html",
+      "identifier": "OEN-S03",
+      "license": "https://creativecommons.org/licenses/by/4.0/",
+      "inLanguage": "en"
+    },
+    {
+      "@type": "HowTo",
+      "name": "1 KB vs 1 MB transfer matrix + ControlPath=none",
+      "description": "Prove overlay SSH size: 1 KB vs about 1 MB with ControlPath=none. Mux death is a symptom. Userspace overlay SSH is less forgiving than kernel SSH on the same host.",
+      "author": {
+        "@type": "Person",
+        "name": "Eugene Armstead",
+        "url": "https://www.armsteadent.com/",
+        "sameAs": [
+          "https://github.com/eugenearmstead"
+        ]
+      },
+      "step": [
+        {
+          "@type": "HowToStep",
+          "position": 1,
+          "name": "P1 \u2014 Disable mux.",
+          "text": "Action: Every SSH command in the audit: `-o ControlPath=none`. Expected: New TCP session. On failure: Heal mux sockets; they are not the MTU fix."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 2,
+          "name": "P2 \u2014 Tiny vs large on the cloud VPS.",
+          "text": "Action: Overlay SSH `echo ok` then `dd if=/dev/zero bs=1024 count=1024 | wc -c` (or `top -bn1 | wc -c`). Expected: Tiny works; large hangs on the VPS if OEN-01 applies. On failure: If large already works, the cliff is gone."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 3,
+          "name": "P3 \u2014 Same client, LAN Pi and kernel SSH.",
+          "text": "Action: Repeat on `<lan-pi>`. If a kernel SSH door exists on the VPS, compare (custom admin port is not the daily workaround). Expected: Pi accepts 3 KB+. Kernel SSH may pass where userspace overlay hangs. On failure: Do not switch daily ops to the custom port; fix the path."
+        }
+      ]
+    }
+  ]
+}
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <div class="site-header-inner">
+        <p class="site-title"><a href="../index.html">Overlay and Edge Notes</a></p>
+        <p class="site-tag">Public field notes by Eugene Armstead</p>
+    <nav class="site-nav" aria-label="Site">
+      <a href="../index.html">Home</a>
+      <a href="../DISCLOSURE.html">Disclosure</a>
+      <a href="../changelog.html">Changelog</a>
+      <a href="../editions/2026.html">2026</a>
+      <a href="../AGENTS.md">AGENTS.md</a>
+      <a href="../index.html#networking">Networking</a>
+      <a href="../index.html#web">Web</a>
+      <a href="../index.html#supporting">Supporting</a>
+    </nav>
+      </div>
+    </header>
+    <nav class="breadcrumb" aria-label="Breadcrumb"><ol><li><a href="../index.html">Home</a></li><li><a href="../index.html#supporting">Supporting</a></li><li>OEN-S03</li></ol></nav>
+    <main id="main">
+      <article>
+        <h1>1 KB vs 1 MB transfer matrix + ControlPath=none</h1>
+        <p class="meta-line"><span>OEN-S03</span> · supporting · edition 1 · 2026-09-08</p>
+        <h2 id="context">Context</h2>
+<p><a href="../networking/01-overlay-ssh-byte-cliff.html">OEN-01</a> needs a size matrix, not a vibe. Dead multiplexing sockets are a <strong>symptom</strong>. Userspace overlay Secure Shell (SSH) cliffs sooner than kernel OpenSSH on the same host.</p>
+
+<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>OpenSSH</dt><dd>OpenBSD Secure Shell</dd><dt>VPS</dt><dd>Virtual Private Server</dd><dt>LAN</dt><dd>Local Area Network</dd><dt>WAN</dt><dd>Wide Area Network</dd><dt>KB</dt><dd>kilobyte</dd><dt>MB</dt><dd>megabyte</dd><dt>TCP</dt><dd>Transmission Control Protocol</dd><dt>MSS</dt><dd>Maximum Segment Size</dd><dt>MTU</dt><dd>Maximum Transmission Unit</dd><dt>ICMP</dt><dd>Internet Control Message Protocol</dd><dt>DF</dt><dd>don&#x27;t-fragment (IP flag)</dd><dt>HTTPS</dt><dd>Hypertext Transfer Protocol Secure</dd><dt>IP</dt><dd>Internet Protocol</dd><dt>IPv4</dt><dd>Internet Protocol version 4</dd><dt>IPv6</dt><dd>Internet Protocol version 6</dd><dt>WireGuard</dt><dd>UDP-based VPN protocol</dd><dt>nft</dt><dd>nftables (Linux packet filter)</dd><dt>ControlPath</dt><dd>OpenSSH multiplexing socket path option</dd><dt>Pi</dt><dd>single-board computer (Raspberry Pi class)</dd></dl></section>
+<h2 id="topology">Topology</h2>
+<pre><code class="language-text">[client] -o ControlPath=none --&gt; overlay SSH
+    1 KB echo/dd    vs    ~1 MB dd
+    userspace overlay SSH cliffs sooner than kernel SSH on the same host
+Mux death is a symptom.</code></pre>
+<h2 id="bind">Bind</h2>
+<p>Fill this table <strong>before</strong> any live change. Do <strong>not</strong> paste real values back into public notes.</p>
+<table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><code>&lt;cloud-vps&gt;</code></td><td>Overlay SSH target</td><td>Cloud VPS</td></tr><tr><td><code>&lt;lan-pi&gt;</code></td><td>Overlay SSH target</td><td>LAN Pi</td></tr><tr><td><code>&lt;user&gt;</code></td><td>SSH user</td><td>Guest account</td></tr><tr><td><code>&lt;wg-iface&gt;</code></td><td>Commercial WireGuard iface</td><td>Router or VPS client</td></tr><tr><td><code>&lt;wan-iface&gt;</code></td><td>WAN iface</td><td>Router</td></tr><tr><td><code>&lt;lan-bridge&gt;</code></td><td>LAN bridge</td><td>Router (MTU 1500)</td></tr><tr><td><code>&lt;overlay-tun&gt;</code></td><td>Overlay tun iface</td><td>Node under test</td></tr><tr><td><code>&lt;wg-mtu&gt;</code></td><td>MTU integer from <code>ip link</code></td><td>Measured</td></tr><tr><td><code>&lt;mss4&gt;</code> / <code>&lt;mss6&gt;</code></td><td>Computed MSS</td><td>Formulas</td></tr><tr><td><code>&lt;vps-public-v4&gt;</code> / <code>&lt;vps-public-v6&gt;</code></td><td>VPS public addresses</td><td>WAN; never publish</td></tr><tr><td><code>&lt;overlay-v4&gt;</code> / <code>&lt;overlay-v6&gt;</code></td><td>Overlay addresses</td><td>Overlay; never publish</td></tr></tbody></table>
+<h2 id="formulas">Formulas</h2>
+<pre><code class="language-text"># Measure &lt;wg-mtu&gt; from: ip link show &lt;wg-iface&gt;
+mss4 = &lt;wg-mtu&gt; - 40    # IPv4 TCP (20-byte IP + 20-byte TCP)
+mss6 = &lt;wg-mtu&gt; - 60    # IPv6 TCP (40-byte IPv6 + 20-byte TCP)
+# IPv4 DF ping: IP size ≈ payload + 28
+# IPv6 DF ping: IP size ≈ payload + 48
+# Historical 1160 / 1146-byte SSH cliff = wrong-scope clamp, not this recipe.
+# LAN bridge MTU MUST stay 1500.</code></pre>
+<p>See <a href="../networking/01-overlay-ssh-byte-cliff.html">OEN-01</a> and <a href="../supporting/s01-pmtud-size-ladder.html">OEN-S01</a>.</p>
+<h2 id="method">Method</h2>
+<p>Audits MUST use <code>-o ControlPath=none</code>. Record tiny vs ~1 MB (or 3 KB+) on <code>&lt;cloud-vps&gt;</code> vs <code>&lt;lan-pi&gt;</code>, overlay SSH vs kernel SSH if both exist.</p>
+<h2 id="consequences">Consequences</h2>
+<p>The byte cliff is evidenced; mux is not “the fix.”</p>
+<h2 id="agent-stop-rule">Agent stop rule</h2>
+<blockquote><p>A coding agent MUST emit a <strong>bound runbook</strong> (placeholders replaced from Bind). MUST NOT apply live <code>ip rule</code>, nft, iptables, ip6tables, sysctl, <code>wg set</code>, daemon restart, or deploy until a <strong>human</strong> filled Bind. MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS. MUST NOT file an upstream bug from this page. MUST NOT publish real addresses, hostnames, or custom ports.</p></blockquote>
+<h2 id="procedure">Procedure</h2>
+<p>Placeholders only until Bind is filled: <code>&lt;cloud-vps&gt;</code>, <code>&lt;lan-pi&gt;</code>, <code>&lt;overlay-peer&gt;</code>, <code>&lt;exit-node&gt;</code>, <code>&lt;wg-iface&gt;</code>, <code>&lt;gcp-nic&gt;</code>, plus the Bind extras on this page.</p>
+<h3>Copy-paste commands (after Bind)</h3>
+<pre><code class="language-bash">ssh -o ControlPath=none &lt;user&gt;@&lt;cloud-vps&gt; &#x27;dd if=/dev/zero bs=1024 count=1 status=none | wc -c&#x27;
+ssh -o ControlPath=none &lt;user&gt;@&lt;cloud-vps&gt; &#x27;dd if=/dev/zero bs=1024 count=1024 status=none | wc -c&#x27;
+ssh -o ControlPath=none &lt;user&gt;@&lt;lan-pi&gt; &#x27;dd if=/dev/zero bs=1024 count=1024 status=none | wc -c&#x27;</code></pre>
+<ol><li><strong>P1 — Disable mux.</strong><br>
+- <strong>Action:</strong> Every SSH command in the audit: <code>-o ControlPath=none</code>.<br>
+- <strong>Expected:</strong> New TCP session.<br>
+- <strong>On failure:</strong> Heal mux sockets; they are not the MTU fix.</li><li><strong>P2 — Tiny vs large on the cloud VPS.</strong><br>
+- <strong>Action:</strong> Overlay SSH <code>echo ok</code> then <code>dd if=/dev/zero bs=1024 count=1024 | wc -c</code> (or <code>top -bn1 | wc -c</code>).<br>
+- <strong>Expected:</strong> Tiny works; large hangs on the VPS if OEN-01 applies.<br>
+- <strong>On failure:</strong> If large already works, the cliff is gone.</li><li><strong>P3 — Same client, LAN Pi and kernel SSH.</strong><br>
+- <strong>Action:</strong> Repeat on <code>&lt;lan-pi&gt;</code>. If a kernel SSH door exists on the VPS, compare (custom admin port is not the daily workaround).<br>
+- <strong>Expected:</strong> Pi accepts 3 KB+. Kernel SSH may pass where userspace overlay hangs.<br>
+- <strong>On failure:</strong> Do not switch daily ops to the custom port; fix the path.</li></ol>
+<h2 id="expected-samples">Expected samples</h2>
+<pre><code class="language-text">1024
+# hang on VPS before path fix; 1048576 after</code></pre>
+<h2 id="verify">Verify</h2>
+<ul><li>ControlPath=none used.</li><li>Size matrix recorded for VPS vs Pi.</li><li>Mux not blamed as the MTU fix.</li><li>ICMP / small ping success was <strong>not</strong> used as the pass criterion when this spec names TCP, SSH, or HTTPS.</li><li>Bind table was filled by a human before any live <code>ip</code> / nft / iptables change.</li></ul>
+<h2 id="must-not" class="must-not">MUST NOT</h2>
+<ul><li>MUST NOT use a custom kernel SSH port as the daily fix.</li><li>MUST NOT publish that port number.</li><li>MUST NOT skip ControlPath=none.</li><li>MUST NOT apply live network or firewall changes until Bind is filled by a human.</li><li>MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.</li><li>MUST NOT publish hostnames, addresses, ULAs, or custom ports.</li></ul>
+<h2 id="related-specs">Related specs</h2>
+<ul><li><a href="../networking/01-overlay-ssh-byte-cliff.html">OEN-01</a></li><li><a href="s19-push-small-overlay-snapshots.html">OEN-S19</a></li></ul>
+<h2 id="prior-art-not-novel">Prior art (Not novel)</h2>
+<p>SSH mux docs are public. This method is the size matrix plus userspace-vs-kernel split.</p>
+      </article>
+    </main>
+    <footer class="site-footer">
+      <div class="site-footer-inner">
+    <p class="byline">Written by <a href="https://www.armsteadent.com/">Eugene Armstead</a> · <a href="https://www.armsteadent.com/">https://www.armsteadent.com/</a> · <a rel="license" href="https://creativecommons.org/licenses/by/4.0/">CC-BY-4.0</a></p>
+    <p class="license-line">Living field notes. Stable IDs. Do not copy private inventory into public text.</p>
+      </div>
+    </footer>
+  </body>
+</html>

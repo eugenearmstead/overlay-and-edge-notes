@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>OEN-S28: Reconnect during overlay peer-API outage sticks after heal — Overlay and Edge Notes</title>
+    <meta name="description" content="Phones that rejoin while DoH is dead stay stuck after PeerAPI recovers until that client toggles. Heal the exit stub, not coordinator DNS yaml. Empty use_with_exit_node does not open PeerAPI.">
+    <link rel="canonical" href="https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s28-sticky-reconnect-during-peerapi-outage.html">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Source+Sans+3:wght@400;500;600&amp;display=swap">
+    <link rel="stylesheet" href="../assets/spec.css">
+    <link rel="describedby" href="../llms.txt">
+    <meta name="author" content="Eugene Armstead">
+    <meta name="citation_author" content="Eugene Armstead">
+    <meta name="dcterms.creator" content="Eugene Armstead">
+    <link rel="author" href="https://www.armsteadent.com/">
+    <meta property="article:author" content="Eugene Armstead">
+    <meta property="og:see_also" content="https://www.armsteadent.com/">
+    <meta property="og:title" content="OEN-S28: Reconnect during overlay peer-API outage sticks after heal — Overlay and Edge Notes">
+    <meta property="og:description" content="Phones that rejoin while DoH is dead stay stuck after PeerAPI recovers until that client toggles. Heal the exit stub, not coordinator DNS yaml. Empty use_with_exit_node does not open PeerAPI.">
+    <meta property="og:url" content="https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s28-sticky-reconnect-during-peerapi-outage.html">
+    <meta property="og:type" content="article">
+    <meta property="article:published_time" content="2026-09-08">
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "TechArticle",
+      "@id": "https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s28-sticky-reconnect-during-peerapi-outage.html#article",
+      "headline": "Reconnect during overlay peer-API outage sticks after heal",
+      "description": "Phones that rejoin while DoH is dead stay stuck after PeerAPI recovers until that client toggles. Heal the exit stub, not coordinator DNS yaml. Empty use_with_exit_node does not open PeerAPI.",
+      "datePublished": "2026-09-08",
+      "author": {
+        "@type": "Person",
+        "name": "Eugene Armstead",
+        "url": "https://www.armsteadent.com/",
+        "sameAs": [
+          "https://github.com/eugenearmstead"
+        ]
+      },
+      "url": "https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s28-sticky-reconnect-during-peerapi-outage.html",
+      "identifier": "OEN-S28",
+      "license": "https://creativecommons.org/licenses/by/4.0/",
+      "inLanguage": "en"
+    },
+    {
+      "@type": "HowTo",
+      "name": "Reconnect during overlay peer-API outage sticks after heal",
+      "description": "Phones that rejoin while DoH is dead stay stuck after PeerAPI recovers until that client toggles. Heal the exit stub, not coordinator DNS yaml. Empty use_with_exit_node does not open PeerAPI.",
+      "author": {
+        "@type": "Person",
+        "name": "Eugene Armstead",
+        "url": "https://www.armsteadent.com/",
+        "sameAs": [
+          "https://github.com/eugenearmstead"
+        ]
+      },
+      "step": [
+        {
+          "@type": "HowToStep",
+          "position": 1,
+          "name": "P1 \u2014 Heal exit DoH.",
+          "text": "Action: Fix stub/RD ([OEN-05](../networking/05-exit-peerapi-dns-stub.md), [OEN-19](../networking/19-unbound-refuses-rd0.md)). New client works. Expected: PeerAPI up. On failure: Do not touch coordinator yaml."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 2,
+          "name": "P2 \u2014 Toggle stuck phones.",
+          "text": "Action: Phones that reconnected during the outage stay dead until exit off/on or app toggle. Expected: They recover after toggle. On failure: Do not restart coordination for them."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 3,
+          "name": "P3 \u2014 Empty use_with_exit_node.",
+          "text": "Action: That flag does not open PeerAPI. Expected: Do not set it as a heal. On failure: Local DNS on exit still needs the stub."
+        }
+      ]
+    }
+  ]
+}
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <div class="site-header-inner">
+        <p class="site-title"><a href="../index.html">Overlay and Edge Notes</a></p>
+        <p class="site-tag">Public field notes by Eugene Armstead</p>
+    <nav class="site-nav" aria-label="Site">
+      <a href="../index.html">Home</a>
+      <a href="../DISCLOSURE.html">Disclosure</a>
+      <a href="../changelog.html">Changelog</a>
+      <a href="../editions/2026.html">2026</a>
+      <a href="../AGENTS.md">AGENTS.md</a>
+      <a href="../index.html#networking">Networking</a>
+      <a href="../index.html#web">Web</a>
+      <a href="../index.html#supporting">Supporting</a>
+    </nav>
+      </div>
+    </header>
+    <nav class="breadcrumb" aria-label="Breadcrumb"><ol><li><a href="../index.html">Home</a></li><li><a href="../index.html#supporting">Supporting</a></li><li>OEN-S28</li></ol></nav>
+    <main id="main">
+      <article>
+        <h1>Reconnect during overlay peer-API outage sticks after heal</h1>
+        <p class="meta-line"><span>OEN-S28</span> · supporting · edition 1 · 2026-09-08</p>
+        <h2 id="context">Context</h2>
+<p>Backs <a href="../networking/14-exit-dns-is-peerapi.html">OEN-14</a>. Sticky client after outage.</p>
+
+<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>LAN</dt><dd>Local Area Network</dd><dt>WAN</dt><dd>Wide Area Network</dd><dt>TCP</dt><dd>Transmission Control Protocol</dd><dt>MTU</dt><dd>Maximum Transmission Unit</dd><dt>ICMP</dt><dd>Internet Control Message Protocol</dd><dt>HTTPS</dt><dd>Hypertext Transfer Protocol Secure</dd><dt>DNS</dt><dd>Domain Name System</dd><dt>DoH</dt><dd>DNS over HTTPS</dd><dt>GCP</dt><dd>Google Cloud Platform</dd><dt>VM</dt><dd>virtual machine</dd><dt>NIC</dt><dd>network interface card</dd><dt>API</dt><dd>application programming interface</dd><dt>PeerAPI</dt><dd>overlay peer application-programming interface (exit DNS over HTTPS)</dd><dt>RD</dt><dd>Recursion Desired (DNS flag)</dd><dt>nft</dt><dd>nftables (Linux packet filter)</dd><dt>Pi</dt><dd>single-board computer (Raspberry Pi class)</dd></dl></section>
+<h2 id="topology">Topology</h2>
+<pre><code class="language-text">Phone reconnects while PeerAPI DoH is dead
+PeerAPI heals  --&gt;  that phone stays stuck until client toggle
+Heal exit stub, not coordinator DNS yaml</code></pre>
+<h2 id="bind">Bind</h2>
+<p>Fill this table <strong>before</strong> any live change. Do <strong>not</strong> paste real values back into public notes.</p>
+<table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><code>&lt;exit-node&gt;</code></td><td>Overlay exit node</td><td>Cloud VM or LAN Pi used as exit</td></tr><tr><td><code>&lt;overlay-peer&gt;</code></td><td>Soak client (<strong>not</strong> the agent workstation)</td><td>LAN Pi</td></tr><tr><td><code>&lt;user&gt;</code></td><td>SSH user</td><td>Guest</td></tr><tr><td><code>&lt;overlay-tun&gt;</code></td><td>Overlay tun on the exit</td><td>Iface</td></tr><tr><td><code>&lt;gcp-nic&gt;</code></td><td>Public NIC on a Google Cloud guest</td><td>Iface; omit on non-GCP exits</td></tr><tr><td><code>&lt;wan-iface&gt;</code></td><td>WAN / public NIC</td><td>Iface</td></tr><tr><td><code>&lt;mss4&gt;</code> / <code>&lt;mss6&gt;</code></td><td>Computed from underlay or overlay tun MTU</td><td>Formulas</td></tr></tbody></table>
+<h2 id="formulas">Formulas</h2>
+<p>Empty use_with_exit_node does not open PeerAPI.</p>
+<h2 id="method">Method</h2>
+<p>Heal PeerAPI on the exit. Toggle the stuck client. MUST NOT rewrite coordinator DNS yaml (fleet reconnect).</p>
+<h2 id="consequences">Consequences</h2>
+<p>New clients work; stuck phones need a toggle, not a coordinator bounce.</p>
+<h2 id="agent-stop-rule">Agent stop rule</h2>
+<blockquote><p>A coding agent MUST emit a <strong>bound runbook</strong> (placeholders replaced from Bind). MUST NOT apply live <code>ip rule</code>, nft, iptables, ip6tables, sysctl, <code>wg set</code>, daemon restart, or deploy until a <strong>human</strong> filled Bind. MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS. MUST NOT file an upstream bug from this page. MUST NOT publish real addresses, hostnames, or custom ports.</p></blockquote>
+<h2 id="procedure">Procedure</h2>
+<p>Placeholders only until Bind is filled: <code>&lt;cloud-vps&gt;</code>, <code>&lt;lan-pi&gt;</code>, <code>&lt;overlay-peer&gt;</code>, <code>&lt;exit-node&gt;</code>, <code>&lt;wg-iface&gt;</code>, <code>&lt;gcp-nic&gt;</code>, plus the Bind extras on this page.</p>
+<h3>Copy-paste commands (after Bind)</h3>
+<pre><code class="language-bash"># After stub heal: new client works. Stuck phone: exit off/on or app toggle.</code></pre>
+<ol><li><strong>P1 — Heal exit DoH.</strong><br>
+- <strong>Action:</strong> Fix stub/RD (<a href="../networking/05-exit-peerapi-dns-stub.html">OEN-05</a>, <a href="../networking/19-unbound-refuses-rd0.html">OEN-19</a>). New client works.<br>
+- <strong>Expected:</strong> PeerAPI up.<br>
+- <strong>On failure:</strong> Do not touch coordinator yaml.</li><li><strong>P2 — Toggle stuck phones.</strong><br>
+- <strong>Action:</strong> Phones that reconnected during the outage stay dead until exit off/on or app toggle.<br>
+- <strong>Expected:</strong> They recover after toggle.<br>
+- <strong>On failure:</strong> Do not restart coordination for them.</li><li><strong>P3 — Empty use_with_exit_node.</strong><br>
+- <strong>Action:</strong> That flag does not open PeerAPI.<br>
+- <strong>Expected:</strong> Do not set it as a heal.<br>
+- <strong>On failure:</strong> Local DNS on exit still needs the stub.</li></ol>
+<h2 id="expected-samples">Expected samples</h2>
+<pre><code class="language-text"># new client DoH 200; sticky phone still DNS_PROBE until toggle</code></pre>
+<h2 id="verify">Verify</h2>
+<ul><li>New client DoH works after heal.</li><li>Stuck client documented as toggle, not yaml.</li><li>ICMP / small ping success was <strong>not</strong> used as the pass criterion when this spec names TCP, SSH, or HTTPS.</li><li>Bind table was filled by a human before any live <code>ip</code> / nft / iptables change.</li></ul>
+<h2 id="must-not" class="must-not">MUST NOT</h2>
+<ul><li>MUST NOT change coordinator DNS yaml to heal PeerAPI.</li><li>MUST NOT expect empty use_with_exit_node to open PeerAPI.</li><li>MUST NOT apply live network or firewall changes until Bind is filled by a human.</li><li>MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.</li><li>MUST NOT publish hostnames, addresses, ULAs, or custom ports.</li></ul>
+<h2 id="related-specs">Related specs</h2>
+<ul><li><a href="../networking/14-exit-dns-is-peerapi.html">OEN-14</a></li><li><a href="../networking/05-exit-peerapi-dns-stub.html">OEN-05</a></li></ul>
+<h2 id="prior-art-not-novel">Prior art (Not novel)</h2>
+<p>Sticky DNS caches are known. This note is reconnect-during-PeerAPI-outage staying stuck after heal.</p>
+      </article>
+    </main>
+    <footer class="site-footer">
+      <div class="site-footer-inner">
+    <p class="byline">Written by <a href="https://www.armsteadent.com/">Eugene Armstead</a> · <a href="https://www.armsteadent.com/">https://www.armsteadent.com/</a> · <a rel="license" href="https://creativecommons.org/licenses/by/4.0/">CC-BY-4.0</a></p>
+    <p class="license-line">Living field notes. Stable IDs. Do not copy private inventory into public text.</p>
+      </div>
+    </footer>
+  </body>
+</html>

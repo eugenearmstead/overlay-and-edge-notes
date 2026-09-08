@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>OEN-S23: Cloud firewall UDP 41641 is useless while overlay PORT=0 — Overlay and Edge Notes</title>
+    <meta name="description" content="A VPC allow for UDP 41641 does nothing while the overlay daemon has PORT=0 (ephemeral). Ship PORT, daemon restart, guest firewall, and VPC together. Never leave PORT empty.">
+    <link rel="canonical" href="https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s23-vpc-41641-useless-while-port-0.html">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Source+Sans+3:wght@400;500;600&amp;display=swap">
+    <link rel="stylesheet" href="../assets/spec.css">
+    <link rel="describedby" href="../llms.txt">
+    <meta name="author" content="Eugene Armstead">
+    <meta name="citation_author" content="Eugene Armstead">
+    <meta name="dcterms.creator" content="Eugene Armstead">
+    <link rel="author" href="https://www.armsteadent.com/">
+    <meta property="article:author" content="Eugene Armstead">
+    <meta property="og:see_also" content="https://www.armsteadent.com/">
+    <meta property="og:title" content="OEN-S23: Cloud firewall UDP 41641 is useless while overlay PORT=0 — Overlay and Edge Notes">
+    <meta property="og:description" content="A VPC allow for UDP 41641 does nothing while the overlay daemon has PORT=0 (ephemeral). Ship PORT, daemon restart, guest firewall, and VPC together. Never leave PORT empty.">
+    <meta property="og:url" content="https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s23-vpc-41641-useless-while-port-0.html">
+    <meta property="og:type" content="article">
+    <meta property="article:published_time" content="2026-09-08">
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "TechArticle",
+      "@id": "https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s23-vpc-41641-useless-while-port-0.html#article",
+      "headline": "Cloud firewall UDP 41641 is useless while overlay PORT=0",
+      "description": "A VPC allow for UDP 41641 does nothing while the overlay daemon has PORT=0 (ephemeral). Ship PORT, daemon restart, guest firewall, and VPC together. Never leave PORT empty.",
+      "datePublished": "2026-09-08",
+      "author": {
+        "@type": "Person",
+        "name": "Eugene Armstead",
+        "url": "https://www.armsteadent.com/",
+        "sameAs": [
+          "https://github.com/eugenearmstead"
+        ]
+      },
+      "url": "https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s23-vpc-41641-useless-while-port-0.html",
+      "identifier": "OEN-S23",
+      "license": "https://creativecommons.org/licenses/by/4.0/",
+      "inLanguage": "en"
+    },
+    {
+      "@type": "HowTo",
+      "name": "Cloud firewall UDP 41641 is useless while overlay PORT=0",
+      "description": "A VPC allow for UDP 41641 does nothing while the overlay daemon has PORT=0 (ephemeral). Ship PORT, daemon restart, guest firewall, and VPC together. Never leave PORT empty.",
+      "author": {
+        "@type": "Person",
+        "name": "Eugene Armstead",
+        "url": "https://www.armsteadent.com/",
+        "sameAs": [
+          "https://github.com/eugenearmstead"
+        ]
+      },
+      "step": [
+        {
+          "@type": "HowToStep",
+          "position": 1,
+          "name": "P1 \u2014 ss the listen port.",
+          "text": "Action: `ss`/`netstat` UDP. Production MUST show 41641, not a random high port. Expected: Fixed 41641. On failure: If 0/ephemeral, set PORT and restart."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 2,
+          "name": "P2 \u2014 VPC + guest together.",
+          "text": "Action: Cloud firewall UDP 41641 plus guest UFW/iptables. Never only VPC. Expected: Both exist. On failure: VPC alone with PORT=0 is a no-op."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 3,
+          "name": "P3 \u2014 Do not leave PORT empty.",
+          "text": "Action: Empty PORT can fail start. Never empty. Expected: Daemon running, 41641 listening. On failure: Then large SSH ([OEN-01](../networking/01-overlay-ssh-byte-cliff.md))."
+        }
+      ]
+    }
+  ]
+}
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <div class="site-header-inner">
+        <p class="site-title"><a href="../index.html">Overlay and Edge Notes</a></p>
+        <p class="site-tag">Public field notes by Eugene Armstead</p>
+    <nav class="site-nav" aria-label="Site">
+      <a href="../index.html">Home</a>
+      <a href="../DISCLOSURE.html">Disclosure</a>
+      <a href="../changelog.html">Changelog</a>
+      <a href="../editions/2026.html">2026</a>
+      <a href="../AGENTS.md">AGENTS.md</a>
+      <a href="../index.html#networking">Networking</a>
+      <a href="../index.html#web">Web</a>
+      <a href="../index.html#supporting">Supporting</a>
+    </nav>
+      </div>
+    </header>
+    <nav class="breadcrumb" aria-label="Breadcrumb"><ol><li><a href="../index.html">Home</a></li><li><a href="../index.html#supporting">Supporting</a></li><li>OEN-S23</li></ol></nav>
+    <main id="main">
+      <article>
+        <h1>Cloud firewall UDP 41641 is useless while overlay PORT=0</h1>
+        <p class="meta-line"><span>OEN-S23</span> · supporting · edition 1 · 2026-09-08</p>
+        <h2 id="context">Context</h2>
+<p>Empty <code>PORT=</code> can fail daemon start. Opening the cloud firewall while listen is ephemeral is a decoration.</p>
+
+<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>LAN</dt><dd>Local Area Network</dd><dt>WAN</dt><dd>Wide Area Network</dd><dt>TCP</dt><dd>Transmission Control Protocol</dd><dt>UDP</dt><dd>User Datagram Protocol</dd><dt>MTU</dt><dd>Maximum Transmission Unit</dd><dt>ICMP</dt><dd>Internet Control Message Protocol</dd><dt>HTTPS</dt><dd>Hypertext Transfer Protocol Secure</dd><dt>GCP</dt><dd>Google Cloud Platform</dd><dt>VM</dt><dd>virtual machine</dd><dt>VPC</dt><dd>Virtual Private Cloud</dd><dt>NIC</dt><dd>network interface card</dd><dt>nft</dt><dd>nftables (Linux packet filter)</dd><dt>PORT</dt><dd>overlay UDP listen port setting</dd><dt>ControlPath</dt><dd>OpenSSH multiplexing socket path option</dd><dt>Pi</dt><dd>single-board computer (Raspberry Pi class)</dd><dt>UFW</dt><dd>Uncomplicated Firewall</dd><dt>UNCONN</dt><dd>ss(8) unconnected socket state</dd></dl></section>
+<h2 id="topology">Topology</h2>
+<pre><code class="language-text">VPC allow UDP 41641  +  daemon PORT=0 (ephemeral)  =  decoration
+Empty PORT= can fail start
+Ship PORT=41641 + restart + guest firewall + VPC together</code></pre>
+<h2 id="bind">Bind</h2>
+<p>Fill this table <strong>before</strong> any live change. Do <strong>not</strong> paste real values back into public notes.</p>
+<table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><code>&lt;exit-node&gt;</code></td><td>Overlay exit node</td><td>Cloud VM or LAN Pi used as exit</td></tr><tr><td><code>&lt;overlay-peer&gt;</code></td><td>Soak client (<strong>not</strong> the agent workstation)</td><td>LAN Pi</td></tr><tr><td><code>&lt;user&gt;</code></td><td>SSH user</td><td>Guest</td></tr><tr><td><code>&lt;overlay-tun&gt;</code></td><td>Overlay tun on the exit</td><td>Iface</td></tr><tr><td><code>&lt;gcp-nic&gt;</code></td><td>Public NIC on a Google Cloud guest</td><td>Iface; omit on non-GCP exits</td></tr><tr><td><code>&lt;wan-iface&gt;</code></td><td>WAN / public NIC</td><td>Iface</td></tr><tr><td><code>&lt;mss4&gt;</code> / <code>&lt;mss6&gt;</code></td><td>Computed from underlay or overlay tun MTU</td><td>Formulas</td></tr></tbody></table>
+<h2 id="formulas">Formulas</h2>
+<p>Production listen MUST be 41641, not a random high port.</p>
+<h2 id="method">Method</h2>
+<p>PORT MUST be 41641 in production. Restart daemon. Allow UDP 41641 on guest firewall and VPC together.</p>
+<h2 id="consequences">Consequences</h2>
+<p>Mesh UDP actually arrives. Firewall rules match reality.</p>
+<h2 id="agent-stop-rule">Agent stop rule</h2>
+<blockquote><p>A coding agent MUST emit a <strong>bound runbook</strong> (placeholders replaced from Bind). MUST NOT apply live <code>ip rule</code>, nft, iptables, ip6tables, sysctl, <code>wg set</code>, daemon restart, or deploy until a <strong>human</strong> filled Bind. MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS. MUST NOT file an upstream bug from this page. MUST NOT publish real addresses, hostnames, or custom ports.</p></blockquote>
+<h2 id="procedure">Procedure</h2>
+<p>Placeholders only until Bind is filled: <code>&lt;cloud-vps&gt;</code>, <code>&lt;lan-pi&gt;</code>, <code>&lt;overlay-peer&gt;</code>, <code>&lt;exit-node&gt;</code>, <code>&lt;wg-iface&gt;</code>, <code>&lt;gcp-nic&gt;</code>, plus the Bind extras on this page.</p>
+<h3>Copy-paste commands (after Bind)</h3>
+<pre><code class="language-bash">ssh -o ControlPath=none &lt;user&gt;@&lt;exit-node&gt; &#x27;ss -ulnp | grep 41641&#x27;</code></pre>
+<ol><li><strong>P1 — ss the listen port.</strong><br>
+- <strong>Action:</strong> <code>ss</code>/<code>netstat</code> UDP. Production MUST show 41641, not a random high port.<br>
+- <strong>Expected:</strong> Fixed 41641.<br>
+- <strong>On failure:</strong> If 0/ephemeral, set PORT and restart.</li><li><strong>P2 — VPC + guest together.</strong><br>
+- <strong>Action:</strong> Cloud firewall UDP 41641 plus guest UFW/iptables. Never only VPC.<br>
+- <strong>Expected:</strong> Both exist.<br>
+- <strong>On failure:</strong> VPC alone with PORT=0 is a no-op.</li><li><strong>P3 — Do not leave PORT empty.</strong><br>
+- <strong>Action:</strong> Empty PORT can fail start. Never empty.<br>
+- <strong>Expected:</strong> Daemon running, 41641 listening.<br>
+- <strong>On failure:</strong> Then large SSH (<a href="../networking/01-overlay-ssh-byte-cliff.html">OEN-01</a>).</li></ol>
+<h2 id="expected-samples">Expected samples</h2>
+<pre><code class="language-text">UNCONN ... 0.0.0.0:41641</code></pre>
+<h2 id="verify">Verify</h2>
+<ul><li>UDP 41641 listening.</li><li>VPC and guest allow it.</li><li>PORT not empty/0.</li><li>ICMP / small ping success was <strong>not</strong> used as the pass criterion when this spec names TCP, SSH, or HTTPS.</li><li>Bind table was filled by a human before any live <code>ip</code> / nft / iptables change.</li></ul>
+<h2 id="must-not" class="must-not">MUST NOT</h2>
+<ul><li>MUST NOT count on VPC 41641 while PORT=0.</li><li>MUST NOT leave PORT empty.</li><li>MUST NOT publish project ids.</li><li>MUST NOT apply live network or firewall changes until Bind is filled by a human.</li><li>MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.</li><li>MUST NOT publish hostnames, addresses, ULAs, or custom ports.</li></ul>
+<h2 id="related-specs">Related specs</h2>
+<ul><li><a href="../networking/17-gcp-overlay-exit.html">OEN-17</a></li><li><a href="../networking/01-overlay-ssh-byte-cliff.html">OEN-01</a></li></ul>
+<h2 id="prior-art-not-novel">Prior art (Not novel)</h2>
+<p>Allow UDP 41641 is in every overlay-on-GCP tutorial. This note is PORT=0 making that allow useless.</p>
+      </article>
+    </main>
+    <footer class="site-footer">
+      <div class="site-footer-inner">
+    <p class="byline">Written by <a href="https://www.armsteadent.com/">Eugene Armstead</a> · <a href="https://www.armsteadent.com/">https://www.armsteadent.com/</a> · <a rel="license" href="https://creativecommons.org/licenses/by/4.0/">CC-BY-4.0</a></p>
+    <p class="license-line">Living field notes. Stable IDs. Do not copy private inventory into public text.</p>
+      </div>
+    </footer>
+  </body>
+</html>

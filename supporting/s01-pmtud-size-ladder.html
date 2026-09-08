@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>OEN-S01: Don&#x27;t-fragment ping size ladder (path MTU discovery) — Overlay and Edge Notes</title>
-    <meta name="description" content="Measure path MTU with don&#x27;t-fragment ping size ladders. Small ICMP can succeed while large TCP still dies.">
+    <meta name="description" content="Measure path MTU with don&#x27;t-fragment ping size ladders on IPv4 and IPv6. Small ICMP can succeed while large TCP still dies.">
     <link rel="canonical" href="https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s01-pmtud-size-ladder.html">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,7 +18,7 @@
     <meta property="article:author" content="Eugene Armstead">
     <meta property="og:see_also" content="https://www.armsteadent.com/">
     <meta property="og:title" content="OEN-S01: Don&#x27;t-fragment ping size ladder (path MTU discovery) — Overlay and Edge Notes">
-    <meta property="og:description" content="Measure path MTU with don&#x27;t-fragment ping size ladders. Small ICMP can succeed while large TCP still dies.">
+    <meta property="og:description" content="Measure path MTU with don&#x27;t-fragment ping size ladders on IPv4 and IPv6. Small ICMP can succeed while large TCP still dies.">
     <meta property="og:url" content="https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s01-pmtud-size-ladder.html">
     <meta property="og:type" content="article">
     <meta property="article:published_time" content="2026-09-07">
@@ -30,7 +30,7 @@
       "@type": "TechArticle",
       "@id": "https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s01-pmtud-size-ladder.html#article",
       "headline": "Don't-fragment ping size ladder (path MTU discovery)",
-      "description": "Measure path MTU with don't-fragment ping size ladders. Small ICMP can succeed while large TCP still dies.",
+      "description": "Measure path MTU with don't-fragment ping size ladders on IPv4 and IPv6. Small ICMP can succeed while large TCP still dies.",
       "datePublished": "2026-09-07",
       "author": {
         "@type": "Person",
@@ -48,7 +48,7 @@
     {
       "@type": "HowTo",
       "name": "Don't-fragment ping size ladder (path MTU discovery)",
-      "description": "Measure path MTU with don't-fragment ping size ladders. Small ICMP can succeed while large TCP still dies.",
+      "description": "Measure path MTU with don't-fragment ping size ladders on IPv4 and IPv6. Small ICMP can succeed while large TCP still dies.",
       "author": {
         "@type": "Person",
         "name": "Eugene Armstead",
@@ -62,25 +62,31 @@
           "@type": "HowToStep",
           "position": 1,
           "name": "P1 \u2014 Note interface MTUs.",
-          "text": "Action: `ip link show` on the client (and on the router if you have it). Record Local Area Network (LAN)/bridge vs `<wg-iface>` vs overlay tun. Expected: LAN often 1500; commercial WireGuard often ~1320; overlay tun in the same neighborhood. Exact numbers vary. On failure: If you cannot see the tunnel iface, you are not measuring the path you think you are."
+          "text": "Action: "
         },
         {
           "@type": "HowToStep",
           "position": 2,
           "name": "P2 \u2014 IPv4 DF ladder to the target.",
-          "text": "Action: From the client:"
+          "text": "Action: From the client (replace `<target>` with one bound address). `-M do` is don't-fragment."
         },
         {
           "@type": "HowToStep",
           "position": 3,
-          "name": "P3 \u2014 Compare paths, not just sizes.",
-          "text": "Action: Repeat P2 toward (a) the cloud VPS **public** address, (b) the **overlay** address of `<cloud-vps>`, (c) a general internet target **while traffic uses** `<wg-iface>`. Expected: Double encapsulation ([OEN-01](../networking/01-overlay-ssh-byte-cliff.md)) shows public-address DF via the tunnel stuck ~100 bytes under tunnel MTU, while clear WAN to the same public address is larger. On failure: If all three ladders match, the bottleneck is elsewhere (MSS, not underlay)."
+          "name": "P3 \u2014 IPv6 DF ladder to the target.",
+          "text": "Action: Same idea with ICMPv6. Payload 1452 \u2248 1500 IPv6 IP."
         },
         {
           "@type": "HowToStep",
           "position": 4,
-          "name": "P4 \u2014 Do not stop at ICMP.",
-          "text": "Action: After a successful mid-size ping, retry the **TCP** symptom (overlay SSH 3 KB, or a browser vs curl). Expected: You now know whether ICMP size predicts TCP. Often it does not: TLS ClientHello or SSH output is larger than the ping you tried. On failure: If ping is large and TCP still dies, look at TCPMSS scope (OEN-01 P6) or ICMP-blackholed PMTUD (forthcoming OEN-S02)."
+          "name": "P4 \u2014 Compare paths, not just sizes.",
+          "text": "Action: Repeat P2 and P3 toward (a) `<vps-public-v4>` / `<vps-public-v6>`, (b) `<overlay-v4>` / `<overlay-v6>`, (c) `<https-v4>` **while traffic uses** `<wg-iface>`. Expected: Double encapsulation ([OEN-01](../networking/01-overlay-ssh-byte-cliff.md)) shows public-address DF via the tunnel stuck ~100 bytes under `<wg-mtu>`, while clear WAN to the same public address is larger. On failure: If all three ladders match, the bottleneck is elsewhere (MSS, not underlay)."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 5,
+          "name": "P5 \u2014 Do not stop at ICMP.",
+          "text": "Action: After a successful mid-size ping, retry the **TCP** symptom (overlay SSH 3 KB with `ControlPath=none`, or curl vs Chromium). Expected: You now know whether ICMP size predicts TCP. Often it does not: TLS ClientHello or SSH output is larger than the ping you tried. On failure: If ping is large and TCP still dies, look at TCPMSS scope ([OEN-01](../networking/01-overlay-ssh-byte-cliff.md) P6) or ICMP-blackholed PMTUD ([OEN-S02](s02-clamp-mss-to-pmtu-noop.md))."
         }
       ]
     }
@@ -97,11 +103,12 @@
     <nav class="site-nav" aria-label="Site">
       <a href="../index.html">Home</a>
       <a href="../DISCLOSURE.html">Disclosure</a>
+      <a href="../changelog.html">Changelog</a>
+      <a href="../editions/2026.html">2026</a>
       <a href="../AGENTS.md">AGENTS.md</a>
       <a href="../index.html#networking">Networking</a>
       <a href="../index.html#web">Web</a>
       <a href="../index.html#supporting">Supporting</a>
-      <a href="../index.html#editions">Editions</a>
     </nav>
       </div>
     </header>
@@ -109,46 +116,101 @@
     <main id="main">
       <article>
         <h1>Don&#x27;t-fragment ping size ladder (path MTU discovery)</h1>
-        <p class="meta-line"><span>OEN-S01</span> · supporting · edition 1 · 2026-09-07</p>
+        <p class="meta-line"><span>OEN-S01</span> · supporting · edition 2 · 2026-09-07</p>
         <h2 id="context">Context</h2>
-<p>This is a <strong>method</strong>, not an original trap. It is how <a href="../networking/01-overlay-ssh-byte-cliff.html">OEN-01</a> proved overlay Secure Shell (SSH) cliffs, and how forthcoming OEN-02 / OEN-04 separate “Internet Control Message Protocol (ICMP) looks fine” from “Transmission Control Protocol (TCP) is blackholed.”</p>
-<p>ICMP echo with the don&#x27;t-fragment (DF) bit set (<code>ping -M do</code> on Linux) tells you the largest <strong>Internet Protocol (IP) packet</strong> that path will carry. TCP Maximum Segment Size (MSS) and Transport Layer Security (TLS) ClientHello size are different. <strong>Small ICMP can succeed while large TCP dies.</strong></p>
-<p>IPv4: IP size ≈ payload + 28 (20 IP + 8 ICMP). IPv6: IP size ≈ payload + 48 (40 IPv6 + 8 ICMPv6) when using <code>ping -6 -M do -s</code>.</p>
+<p>This is a <strong>method</strong>, not an original trap. It is how <a href="../networking/01-overlay-ssh-byte-cliff.html">OEN-01</a> proved overlay Secure Shell (SSH) cliffs, and how <a href="../networking/02-chromium-tls-pmtu.html">OEN-02</a> / <a href="../networking/04-exit-tcpmss-after-ts-forward.html">OEN-04</a> separate “Internet Control Message Protocol (ICMP) looks fine” from “Transmission Control Protocol (TCP) is blackholed.”</p>
+<p>ICMP echo with the don&#x27;t-fragment (DF) bit set (<code>ping -M do</code> on Linux IPv4; <code>ping -6 -M do</code> on IPv6) tells you the largest <strong>Internet Protocol (IP) packet</strong> that path will carry. TCP Maximum Segment Size (MSS) and Transport Layer Security (TLS) ClientHello size are different. <strong>Small ICMP can succeed while large TCP dies.</strong> A 56-byte ping MUST NOT be recorded as “path MTU is fine.”</p>
 
-<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>DF</dt><dd>don&#x27;t-fragment (IP flag)</dd><dt>PMTUD</dt><dd>path MTU discovery</dd><dt>MTU</dt><dd>Maximum Transmission Unit</dd><dt>ICMP</dt><dd>Internet Control Message Protocol</dd><dt>TCP</dt><dd>Transmission Control Protocol</dd><dt>MSS</dt><dd>Maximum Segment Size</dd><dt>TCPMSS</dt><dd>iptables/nft target that sets TCP Maximum Segment Size</dd><dt>TLS</dt><dd>Transport Layer Security</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>IP</dt><dd>Internet Protocol</dd><dt>IPv4</dt><dd>Internet Protocol version 4</dd><dt>IPv6</dt><dd>Internet Protocol version 6</dd><dt>LAN</dt><dd>Local Area Network</dd><dt>WAN</dt><dd>Wide Area Network</dd><dt>VPN</dt><dd>Virtual Private Network</dd><dt>WG</dt><dd>WireGuard</dd><dt>WireGuard</dt><dd>UDP-based VPN protocol</dd><dt>VPS</dt><dd>Virtual Private Server</dd><dt>DNS</dt><dd>Domain Name System</dd><dt>HTTPS</dt><dd>Hypertext Transfer Protocol Secure</dd><dt>ClientHello</dt><dd>TLS handshake message sent by the client</dd><dt>KB</dt><dd>kilobyte</dd><dt>UDP</dt><dd>User Datagram Protocol</dd></dl></section>
+<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>DF</dt><dd>don&#x27;t-fragment (IP flag)</dd><dt>PMTUD</dt><dd>path MTU discovery</dd><dt>MTU</dt><dd>Maximum Transmission Unit</dd><dt>ICMP</dt><dd>Internet Control Message Protocol</dd><dt>TCP</dt><dd>Transmission Control Protocol</dd><dt>MSS</dt><dd>Maximum Segment Size</dd><dt>TCPMSS</dt><dd>iptables/nft target that sets TCP Maximum Segment Size</dd><dt>TLS</dt><dd>Transport Layer Security</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>IP</dt><dd>Internet Protocol</dd><dt>IPv4</dt><dd>Internet Protocol version 4</dd><dt>IPv6</dt><dd>Internet Protocol version 6</dd><dt>LAN</dt><dd>Local Area Network</dd><dt>WAN</dt><dd>Wide Area Network</dd><dt>VPN</dt><dd>Virtual Private Network</dd><dt>WG</dt><dd>WireGuard</dd><dt>WireGuard</dt><dd>UDP-based VPN protocol</dd><dt>VPS</dt><dd>Virtual Private Server</dd><dt>DNS</dt><dd>Domain Name System</dd><dt>HTTPS</dt><dd>Hypertext Transfer Protocol Secure</dd><dt>ClientHello</dt><dd>TLS handshake message sent by the client</dd><dt>KB</dt><dd>kilobyte</dd><dt>UDP</dt><dd>User Datagram Protocol</dd><dt>ICMPv6</dt><dd>Internet Control Message Protocol version 6</dd><dt>TEST-NET-3</dt><dd>RFC 5737 documentation IPv4 prefix 203.0.113.0/24</dd><dt>RFC</dt><dd>Request for Comments</dd><dt>AAAA</dt><dd>DNS IPv6 address record</dd><dt>Chromium</dt><dd>open-source browser engine</dd><dt>ControlPath</dt><dd>OpenSSH multiplexing socket path option</dd><dt>nft</dt><dd>nftables (Linux packet filter)</dd></dl></section>
+<h2 id="topology">Topology</h2>
+<p>Measure <strong>three classes of target</strong> from the same client. Do not mix the numbers.</p>
+<pre><code class="language-text">[client]
+    |
+    +-- path A: clear WAN --&gt; &lt;vps-public-v4&gt; / &lt;vps-public-v6&gt;
+    +-- path B: overlay --&gt; &lt;overlay-v4&gt; / &lt;overlay-v6&gt;   (of &lt;cloud-vps&gt;)
+    +-- path C: through &lt;wg-iface&gt; --&gt; a public HTTPS target (general internet)
+
+[consumer router]
+    +-- &lt;lan-bridge&gt;  MTU 1500
+    +-- &lt;wg-iface&gt;    commercial WireGuard (measure &lt;wg-mtu&gt;)
+    +-- &lt;wan-iface&gt;</code></pre>
+<h2 id="bind">Bind</h2>
+<table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><code>&lt;wg-iface&gt;</code></td><td>Commercial WireGuard iface</td><td>Router or client</td></tr><tr><td><code>&lt;wg-mtu&gt;</code></td><td>MTU from <code>ip link show &lt;wg-iface&gt;</code></td><td>Integer</td></tr><tr><td><code>&lt;lan-bridge&gt;</code></td><td>LAN bridge</td><td>Router</td></tr><tr><td><code>&lt;vps-public-v4&gt;</code> / <code>&lt;vps-public-v6&gt;</code></td><td>Cloud VPS public addresses</td><td>WAN; never publish</td></tr><tr><td><code>&lt;overlay-v4&gt;</code> / <code>&lt;overlay-v6&gt;</code></td><td>Overlay addresses of <code>&lt;cloud-vps&gt;</code></td><td>Overlay; never publish</td></tr><tr><td><code>&lt;https-v4&gt;</code> / <code>&lt;https-v6&gt;</code></td><td>A public HTTPS origin used only as a ping/TCP target</td><td>Public; example.com is fine</td></tr></tbody></table>
+<h2 id="formulas">Formulas</h2>
+<pre><code class="language-text"># IPv4: IP size ≈ ICMP payload + 28   (20-byte IPv4 + 8-byte ICMP)
+# IPv6: IP size ≈ ICMPv6 payload + 48 (40-byte IPv6 + 8-byte ICMPv6)
+
+# Linux ping -s is PAYLOAD, not IP size.
+# To probe a 1500-byte IPv4 packet:  ping -M do -s 1472
+# To probe a 1500-byte IPv6 packet:  ping -6 -M do -s 1452
+
+# Compare max successful IP size to &lt;wg-mtu&gt; and to TCP MSS:
+#   mss4 = &lt;wg-mtu&gt; - 40
+#   mss6 = &lt;wg-mtu&gt; - 60
+# See [OEN-01](../networking/01-overlay-ssh-byte-cliff.html). Historical 1160 is not this formula.</code></pre>
 <h2 id="method">Method</h2>
-<p>Pick a destination that represents the path under test (Virtual Private Server (VPS) public address, overlay address, or a public resolver <strong>through</strong> the tunnel). Binary-search or step down from 1472 until DF ping succeeds. Record the <strong>largest successful payload</strong> and the path (Wide Area Network (WAN) vs <code>&lt;wg-iface&gt;</code> vs overlay).</p>
-<p>Do this <strong>before</strong> blaming the overlay SSH binary, Chromium, or an exit node.</p>
+<p>Pick a destination that represents the path under test (VPS public address, overlay address, or a public resolver <strong>through</strong> the tunnel). Binary-search or step down from a LAN-sized payload until DF ping succeeds. Record the <strong>largest successful payload</strong>, the <strong>implied IP size</strong>, and the path (WAN vs <code>&lt;wg-iface&gt;</code> vs overlay).</p>
+<p>Do this <strong>before</strong> blaming the overlay SSH binary, Chromium, or an exit node. Then <strong>retest TCP</strong>.</p>
 <h2 id="consequences">Consequences</h2>
 <ul><li>You get a number you can compare to tunnel MTU and to TCPMSS.</li><li>You stop treating a working 56-byte ping as proof of a working HTTPS or 3 KB SSH path.</li></ul>
+<h2 id="agent-stop-rule">Agent stop rule</h2>
+<blockquote><p>MUST emit a bound ladder (IPv4 and IPv6 commands with targets filled).   MUST NOT change LAN MTU, iptables, or nft to “make the ladder green.”   MUST NOT stop after ICMP success — retest the TCP symptom the original spec names.   MUST NOT publish the real addresses pinged.</p></blockquote>
 <h2 id="procedure">Procedure</h2>
-<p>Placeholders: <code>&lt;cloud-vps&gt;</code> public address, overlay address, <code>&lt;wg-iface&gt;</code>.</p>
 <ol><li><strong>P1 — Note interface MTUs.</strong><br>
-- <strong>Action:</strong> <code>ip link show</code> on the client (and on the router if you have it). Record Local Area Network (LAN)/bridge vs <code>&lt;wg-iface&gt;</code> vs overlay tun.<br>
-- <strong>Expected:</strong> LAN often 1500; commercial WireGuard often ~1320; overlay tun in the same neighborhood. Exact numbers vary.<br>
-- <strong>On failure:</strong> If you cannot see the tunnel iface, you are not measuring the path you think you are.</li><li><strong>P2 — IPv4 DF ladder to the target.</strong><br>
-- <strong>Action:</strong> From the client:</li></ol>
-<pre><code class="language-bash">     ping -c1 -M do -s 1472 &lt;target&gt;   # ~1500 IP — often fails via a tunnel
-     ping -c1 -M do -s 1292 &lt;target&gt;   # ~1320 IP
-     ping -c1 -M do -s 1172 &lt;target&gt;   # safer under 1320 plus overhead
+- <strong>Action:</strong></li></ol>
+<pre><code class="language-bash">     ip -o link show
+     ip link show &lt;lan-bridge&gt;
+     ip link show &lt;wg-iface&gt;
      </code></pre>
-<p>Step by 20–40 bytes around the failure point until you have the largest success.</p>
-<p>- <strong>Expected:</strong> A clear max payload. Failure is <code>message too long</code> or 100% loss with DF set; success is a reply. - <strong>On failure:</strong> If even 500-byte DF fails, check routing and whether DF is stripped. Try without <code>-M do</code> to see if the host is reachable at all.</p>
-<ol><li><strong>P3 — Compare paths, not just sizes.</strong><br>
-- <strong>Action:</strong> Repeat P2 toward (a) the cloud VPS <strong>public</strong> address, (b) the <strong>overlay</strong> address of <code>&lt;cloud-vps&gt;</code>, (c) a general internet target <strong>while traffic uses</strong> <code>&lt;wg-iface&gt;</code>.<br>
-- <strong>Expected:</strong> Double encapsulation (<a href="../networking/01-overlay-ssh-byte-cliff.html">OEN-01</a>) shows public-address DF via the tunnel stuck ~100 bytes under tunnel MTU, while clear WAN to the same public address is larger.<br>
-- <strong>On failure:</strong> If all three ladders match, the bottleneck is elsewhere (MSS, not underlay).</li><li><strong>P4 — Do not stop at ICMP.</strong><br>
-- <strong>Action:</strong> After a successful mid-size ping, retry the <strong>TCP</strong> symptom (overlay SSH 3 KB, or a browser vs curl).<br>
+<p>- <strong>Expected:</strong> LAN often 1500; commercial WireGuard often ~1320; overlay tun in the same neighborhood. Record <code>&lt;wg-mtu&gt;</code> as an integer. - <strong>On failure:</strong> If you cannot see the tunnel iface, you are not measuring the path you think you are.</p>
+<ol><li><strong>P2 — IPv4 DF ladder to the target.</strong><br>
+- <strong>Action:</strong> From the client (replace <code>&lt;target&gt;</code> with one bound address). <code>-M do</code> is don&#x27;t-fragment.</li></ol>
+<pre><code class="language-bash">     ping -c1 -W2 -M do -s 1472 &lt;target&gt;   # ~1500 IPv4 IP — often fails via a tunnel
+     ping -c1 -W2 -M do -s 1292 &lt;target&gt;   # ~1320 IPv4 IP
+     ping -c1 -W2 -M do -s 1172 &lt;target&gt;   # safer under 1320 plus extra overhead
+     ping -c1 -W2 -M do -s 56 &lt;target&gt;     # tiny — MUST NOT be the only sample
+     </code></pre>
+<p>Step by 20–40 bytes around the failure point until you have the largest success. Implied IPv4 IP size ≈ payload + 28. - <strong>Expected:</strong> A clear max payload. Failure is <code>message too long</code> or 100% loss with DF set; success is a reply. - <strong>On failure:</strong> If even 500-byte DF fails, check routing and whether DF is stripped. Try without <code>-M do</code> to see if the host is reachable at all.</p>
+<ol><li><strong>P3 — IPv6 DF ladder to the target.</strong><br>
+- <strong>Action:</strong> Same idea with ICMPv6. Payload 1452 ≈ 1500 IPv6 IP.</li></ol>
+<pre><code class="language-bash">     ping -6 -c1 -W2 -M do -s 1452 &lt;target&gt;
+     ping -6 -c1 -W2 -M do -s 1272 &lt;target&gt;   # ~1320 IPv6 IP
+     ping -6 -c1 -W2 -M do -s 1152 &lt;target&gt;
+     ping -6 -c1 -W2 -M do -s 56 &lt;target&gt;
+     </code></pre>
+<p>Implied IPv6 IP size ≈ payload + 48. If the target has no AAAA, skip IPv6 for <strong>that</strong> target and say so; do not invent v6 success. - <strong>Expected:</strong> A max payload for IPv6, or a documented skip (no AAAA / no v6 route). - <strong>On failure:</strong> <code>ping: unknown host</code> or <code>Network is unreachable</code> means this ladder does not apply to that family — record it; do not call it a PMTUD cliff.</p>
+<ol><li><strong>P4 — Compare paths, not just sizes.</strong><br>
+- <strong>Action:</strong> Repeat P2 and P3 toward (a) <code>&lt;vps-public-v4&gt;</code> / <code>&lt;vps-public-v6&gt;</code>, (b) <code>&lt;overlay-v4&gt;</code> / <code>&lt;overlay-v6&gt;</code>, (c) <code>&lt;https-v4&gt;</code> <strong>while traffic uses</strong> <code>&lt;wg-iface&gt;</code>.<br>
+- <strong>Expected:</strong> Double encapsulation (<a href="../networking/01-overlay-ssh-byte-cliff.html">OEN-01</a>) shows public-address DF via the tunnel stuck ~100 bytes under <code>&lt;wg-mtu&gt;</code>, while clear WAN to the same public address is larger.<br>
+- <strong>On failure:</strong> If all three ladders match, the bottleneck is elsewhere (MSS, not underlay).</li><li><strong>P5 — Do not stop at ICMP.</strong><br>
+- <strong>Action:</strong> After a successful mid-size ping, retry the <strong>TCP</strong> symptom (overlay SSH 3 KB with <code>ControlPath=none</code>, or curl vs Chromium).<br>
 - <strong>Expected:</strong> You now know whether ICMP size predicts TCP. Often it does not: TLS ClientHello or SSH output is larger than the ping you tried.<br>
-- <strong>On failure:</strong> If ping is large and TCP still dies, look at TCPMSS scope (OEN-01 P6) or ICMP-blackholed PMTUD (forthcoming OEN-S02).</li></ol>
+- <strong>On failure:</strong> If ping is large and TCP still dies, look at TCPMSS scope (<a href="../networking/01-overlay-ssh-byte-cliff.html">OEN-01</a> P6) or ICMP-blackholed PMTUD (<a href="s02-clamp-mss-to-pmtu-noop.html">OEN-S02</a>).</li></ol>
+<h2 id="expected-samples">Expected samples</h2>
+<pre><code class="language-text"># IPv4 DF fail (payload too large)
+PING 203.0.113.10 (203.0.113.10) 1472(1500) bytes of data.
+ping: local error: message too long, mtu=1320
+
+# IPv4 DF success (example payload 1292 → ~1320 IP)
+PING 203.0.113.10 (203.0.113.10) 1292(1320) bytes of data.
+1300 bytes from 203.0.113.10: icmp_seq=1 ttl=54 time=17.4 ms
+--- 203.0.113.10 ping statistics ---
+1 packets transmitted, 1 received, 0% packet loss
+
+# IPv6 DF fail
+ping: local error: message too long, mtu=1320
+
+# Tiny ping success — NOT a path-MTU pass
+64 bytes from 203.0.113.10: icmp_seq=1 ttl=54 time=16.1 ms</code></pre>
+<p>Documentation samples use <code>TEST-NET-3</code> <code>203.0.113.10</code> (RFC 5737). Operators MUST ping their bound targets, never publish those targets.</p>
 <h2 id="verify">Verify</h2>
-<ul><li>You recorded max DF payload for each path with the command and target class (public vs overlay vs through-tunnel).</li><li>LAN MTU was not changed as part of the measurement.</li><li>A tiny ping success was not used as “path MTU is fine.”</li></ul>
+<ul><li>You recorded max DF payload <strong>and</strong> implied IP size for IPv4 and (if present) IPv6, for each path class (public vs overlay vs through-tunnel).</li><li>LAN MTU was not changed as part of the measurement.</li><li>A tiny ping success was not used as “path MTU is fine.”</li><li>The calling spec’s TCP/SSH/HTTPS check was re-run.</li></ul>
 <h2 id="must-not" class="must-not">MUST NOT</h2>
-<ul><li>MUST NOT treat working small ping/DNS/curl as proof “not MTU.”</li><li>MUST NOT shrink the LAN bridge to the tunnel MTU in order to make this ladder green.</li><li>MUST NOT publish the real addresses you pinged; write <code>&lt;cloud-vps&gt;</code> / “VPS public address.”</li><li>MUST NOT skip the TCP retest after ICMP succeeds.</li></ul>
+<ul><li>MUST NOT treat working small ping/DNS/curl as proof “not MTU.”</li><li>MUST NOT shrink the LAN bridge to the tunnel MTU in order to make this ladder green.</li><li>MUST NOT publish the real addresses you pinged; write <code>&lt;cloud-vps&gt;</code> / “VPS public address.”</li><li>MUST NOT skip the TCP retest after ICMP succeeds.</li><li>MUST NOT skip IPv6 when the path under test is dual-stack.</li></ul>
 <h2 id="related-specs">Related specs</h2>
-<ul><li><a href="../networking/01-overlay-ssh-byte-cliff.html">OEN-01 Overlay SSH byte cliff</a> (built)</li><li>OEN-02 Chromium TLS vs curl (forthcoming)</li><li>OEN-04 exit-node TCPMSS (forthcoming)</li><li>OEN-S02 clamp-mss-to-pmtu no-op (forthcoming)</li></ul>
+<ul><li><a href="../networking/01-overlay-ssh-byte-cliff.html">OEN-01 Overlay SSH byte cliff</a></li><li><a href="../networking/02-chromium-tls-pmtu.html">OEN-02 Chromium TLS vs curl</a></li><li><a href="../networking/04-exit-tcpmss-after-ts-forward.html">OEN-04 Exit-node TCPMSS</a></li><li><a href="s02-clamp-mss-to-pmtu-noop.html">OEN-S02 clamp-mss-to-pmtu no-op</a></li></ul>
 <h2 id="prior-art-not-novel">Prior art (Not novel)</h2>
-<p>Don&#x27;t-fragment ping ladders are standard path MTU discovery (PMTUD) practice. This note exists so agents <strong>run it on the right addresses</strong> (public vs overlay vs through-tunnel) and then <strong>retest TCP</strong>, which is the step most runbooks omit.</p>
+<p>Don&#x27;t-fragment ping ladders are standard path MTU discovery (PMTUD) practice. This note exists so agents <strong>run IPv4 and IPv6 on the right addresses</strong> (public vs overlay vs through-tunnel) and then <strong>retest TCP</strong>, which is the step most runbooks omit.</p>
       </article>
     </main>
     <footer class="site-footer">

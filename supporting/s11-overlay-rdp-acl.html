@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>OEN-S11: Overlay session-mirror remote desktop and access-control list without deny — Overlay and Edge Notes</title>
+    <meta name="description" content="The overlay is an access plane, not only SSH. Session-mirror remote desktop plus a locked-screen extension. Coordination ACLs with no deny action need port-range allow holes. Generic peers only.">
+    <link rel="canonical" href="https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s11-overlay-rdp-acl.html">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Source+Sans+3:wght@400;500;600&amp;display=swap">
+    <link rel="stylesheet" href="../assets/spec.css">
+    <link rel="describedby" href="../llms.txt">
+    <meta name="author" content="Eugene Armstead">
+    <meta name="citation_author" content="Eugene Armstead">
+    <meta name="dcterms.creator" content="Eugene Armstead">
+    <link rel="author" href="https://www.armsteadent.com/">
+    <meta property="article:author" content="Eugene Armstead">
+    <meta property="og:see_also" content="https://www.armsteadent.com/">
+    <meta property="og:title" content="OEN-S11: Overlay session-mirror remote desktop and access-control list without deny — Overlay and Edge Notes">
+    <meta property="og:description" content="The overlay is an access plane, not only SSH. Session-mirror remote desktop plus a locked-screen extension. Coordination ACLs with no deny action need port-range allow holes. Generic peers only.">
+    <meta property="og:url" content="https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s11-overlay-rdp-acl.html">
+    <meta property="og:type" content="article">
+    <meta property="article:published_time" content="2026-09-08">
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "TechArticle",
+      "@id": "https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s11-overlay-rdp-acl.html#article",
+      "headline": "Overlay session-mirror remote desktop and access-control list without deny",
+      "description": "The overlay is an access plane, not only SSH. Session-mirror remote desktop plus a locked-screen extension. Coordination ACLs with no deny action need port-range allow holes. Generic peers only.",
+      "datePublished": "2026-09-08",
+      "author": {
+        "@type": "Person",
+        "name": "Eugene Armstead",
+        "url": "https://www.armsteadent.com/",
+        "sameAs": [
+          "https://github.com/eugenearmstead"
+        ]
+      },
+      "url": "https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s11-overlay-rdp-acl.html",
+      "identifier": "OEN-S11",
+      "license": "https://creativecommons.org/licenses/by/4.0/",
+      "inLanguage": "en"
+    },
+    {
+      "@type": "HowTo",
+      "name": "Overlay session-mirror remote desktop and access-control list without deny",
+      "description": "The overlay is an access plane, not only SSH. Session-mirror remote desktop plus a locked-screen extension. Coordination ACLs with no deny action need port-range allow holes. Generic peers only.",
+      "author": {
+        "@type": "Person",
+        "name": "Eugene Armstead",
+        "url": "https://www.armsteadent.com/",
+        "sameAs": [
+          "https://github.com/eugenearmstead"
+        ]
+      },
+      "step": [
+        {
+          "@type": "HowToStep",
+          "position": 1,
+          "name": "P1 \u2014 Session mirror + locked screen.",
+          "text": "Action: Use the desktop\u2019s remote-desktop stack that mirrors the session. Enable locked-screen remote if required. Expected: A phone client can attach to the existing session. On failure: xrdp-style new sessions are a different product."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 2,
+          "name": "P2 \u2014 Overlay bind, not WAN.",
+          "text": "Action: Listen on overlay addresses. Firewall: overlay prefix only. Expected: WAN RDP closed. On failure: Do not publish the overlay address."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 3,
+          "name": "P3 \u2014 ACL without deny.",
+          "text": "Action: If the coordinator has no deny action, punch allow port ranges for the peer class that must RDP. Expected: Intended peer can connect; others cannot. On failure: Generic peers only in public text."
+        }
+      ]
+    }
+  ]
+}
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <div class="site-header-inner">
+        <p class="site-title"><a href="../index.html">Overlay and Edge Notes</a></p>
+        <p class="site-tag">Public field notes by Eugene Armstead</p>
+    <nav class="site-nav" aria-label="Site">
+      <a href="../index.html">Home</a>
+      <a href="../DISCLOSURE.html">Disclosure</a>
+      <a href="../changelog.html">Changelog</a>
+      <a href="../editions/2026.html">2026</a>
+      <a href="../AGENTS.md">AGENTS.md</a>
+      <a href="../index.html#networking">Networking</a>
+      <a href="../index.html#web">Web</a>
+      <a href="../index.html#supporting">Supporting</a>
+    </nav>
+      </div>
+    </header>
+    <nav class="breadcrumb" aria-label="Breadcrumb"><ol><li><a href="../index.html">Home</a></li><li><a href="../index.html#supporting">Supporting</a></li><li>OEN-S11</li></ol></nav>
+    <main id="main">
+      <article>
+        <h1>Overlay session-mirror remote desktop and access-control list without deny</h1>
+        <p class="meta-line"><span>OEN-S11</span> · supporting · edition 1 · 2026-09-08</p>
+        <h2 id="context">Context</h2>
+<p>Remote Desktop Protocol (RDP) over overlay: session mirror, locked-screen extension. Self-hosted coordination with no <code>&quot;deny&quot;</code> action needs allow holes by port range. MUST NOT paste real access-control lists (ACL) or peer names.</p>
+
+<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>VPS</dt><dd>Virtual Private Server</dd><dt>LAN</dt><dd>Local Area Network</dd><dt>WAN</dt><dd>Wide Area Network</dd><dt>VPN</dt><dd>Virtual Private Network</dd><dt>TCP</dt><dd>Transmission Control Protocol</dd><dt>MSS</dt><dd>Maximum Segment Size</dd><dt>MTU</dt><dd>Maximum Transmission Unit</dd><dt>ICMP</dt><dd>Internet Control Message Protocol</dd><dt>HTTPS</dt><dd>Hypertext Transfer Protocol Secure</dd><dt>WireGuard</dt><dd>UDP-based VPN protocol</dd><dt>nft</dt><dd>nftables (Linux packet filter)</dd><dt>ACL</dt><dd>access-control list</dd><dt>RDP</dt><dd>Remote Desktop Protocol</dd><dt>Pi</dt><dd>single-board computer (Raspberry Pi class)</dd><dt>LISTEN</dt><dd>ss(8) listening socket state</dd></dl></section>
+<h2 id="topology">Topology</h2>
+<pre><code class="language-text">[workstation] overlay RDP :3389  session mirror + locked-screen extension
+Coordination ACL without a deny action needs port-range ALLOW holes
+Generic peers only</code></pre>
+<h2 id="bind">Bind</h2>
+<p>Fill this table <strong>before</strong> any live change. Do <strong>not</strong> paste real values back into public notes.</p>
+<table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><code>&lt;cloud-vps&gt;</code></td><td>Overlay SSH target</td><td>Cloud VPS</td></tr><tr><td><code>&lt;lan-pi&gt;</code></td><td>Overlay SSH target</td><td>LAN Pi</td></tr><tr><td><code>&lt;user&gt;</code></td><td>SSH user</td><td>Guest account</td></tr><tr><td><code>&lt;wg-iface&gt;</code></td><td>Commercial WireGuard iface</td><td>Router or VPS client</td></tr><tr><td><code>&lt;wan-iface&gt;</code></td><td>WAN iface</td><td>Router</td></tr><tr><td><code>&lt;lan-bridge&gt;</code></td><td>LAN bridge</td><td>Router (MTU 1500)</td></tr><tr><td><code>&lt;overlay-tun&gt;</code></td><td>Overlay tun iface</td><td>Node under test</td></tr><tr><td><code>&lt;wg-mtu&gt;</code></td><td>MTU integer from <code>ip link</code></td><td>Measured</td></tr><tr><td><code>&lt;mss4&gt;</code> / <code>&lt;mss6&gt;</code></td><td>Computed MSS</td><td>Formulas</td></tr><tr><td><code>&lt;vps-public-v4&gt;</code> / <code>&lt;vps-public-v6&gt;</code></td><td>VPS public addresses</td><td>WAN; never publish</td></tr><tr><td><code>&lt;overlay-v4&gt;</code> / <code>&lt;overlay-v6&gt;</code></td><td>Overlay addresses</td><td>Overlay; never publish</td></tr></tbody></table>
+<h2 id="formulas">Formulas</h2>
+<p>Overlay is an access plane, not only SSH. MUST NOT publish real ACL peers.</p>
+<h2 id="method">Method</h2>
+<p>Document RDP as overlay, not a second VPN. ACL: allow the needed port range for the intended peer class. No real inventory.</p>
+<h2 id="consequences">Consequences</h2>
+<p>Operators stop thinking overlay is SSH-only. ACL holes are explicit.</p>
+<h2 id="agent-stop-rule">Agent stop rule</h2>
+<blockquote><p>A coding agent MUST emit a <strong>bound runbook</strong> (placeholders replaced from Bind). MUST NOT apply live <code>ip rule</code>, nft, iptables, ip6tables, sysctl, <code>wg set</code>, daemon restart, or deploy until a <strong>human</strong> filled Bind. MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS. MUST NOT file an upstream bug from this page. MUST NOT publish real addresses, hostnames, or custom ports.</p></blockquote>
+<h2 id="procedure">Procedure</h2>
+<p>Placeholders only until Bind is filled: <code>&lt;cloud-vps&gt;</code>, <code>&lt;lan-pi&gt;</code>, <code>&lt;overlay-peer&gt;</code>, <code>&lt;exit-node&gt;</code>, <code>&lt;wg-iface&gt;</code>, <code>&lt;gcp-nic&gt;</code>, plus the Bind extras on this page.</p>
+<h3>Copy-paste commands (after Bind)</h3>
+<pre><code class="language-bash">ss -lntp | grep 3389 || true
+# Confirm overlay ACL allows the session-mirror port range; a product with no deny still needs allow holes.</code></pre>
+<ol><li><strong>P1 — Session mirror + locked screen.</strong><br>
+- <strong>Action:</strong> Use the desktop’s remote-desktop stack that mirrors the session. Enable locked-screen remote if required.<br>
+- <strong>Expected:</strong> A phone client can attach to the existing session.<br>
+- <strong>On failure:</strong> xrdp-style new sessions are a different product.</li><li><strong>P2 — Overlay bind, not WAN.</strong><br>
+- <strong>Action:</strong> Listen on overlay addresses. Firewall: overlay prefix only.<br>
+- <strong>Expected:</strong> WAN RDP closed.<br>
+- <strong>On failure:</strong> Do not publish the overlay address.</li><li><strong>P3 — ACL without deny.</strong><br>
+- <strong>Action:</strong> If the coordinator has no deny action, punch allow port ranges for the peer class that must RDP.<br>
+- <strong>Expected:</strong> Intended peer can connect; others cannot.<br>
+- <strong>On failure:</strong> Generic peers only in public text.</li></ol>
+<h2 id="expected-samples">Expected samples</h2>
+<pre><code class="language-text">LISTEN 0  ... *:3389</code></pre>
+<h2 id="verify">Verify</h2>
+<ul><li>RDP works over overlay while WAN is closed.</li><li>ACL text in public has no real peers.</li><li>ICMP / small ping success was <strong>not</strong> used as the pass criterion when this spec names TCP, SSH, or HTTPS.</li><li>Bind table was filled by a human before any live <code>ip</code> / nft / iptables change.</li></ul>
+<h2 id="must-not" class="must-not">MUST NOT</h2>
+<ul><li>MUST NOT paste real ACL peer lists.</li><li>MUST NOT expose RDP on WAN.</li><li>MUST NOT publish hostnames.</li><li>MUST NOT apply live network or firewall changes until Bind is filled by a human.</li><li>MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.</li><li>MUST NOT publish hostnames, addresses, ULAs, or custom ports.</li></ul>
+<h2 id="related-specs">Related specs</h2>
+<ul><li><a href="../networking/01-overlay-ssh-byte-cliff.html">OEN-01</a></li><li><a href="../networking/13-overlay-underlay-ula-layers.html">OEN-13</a></li></ul>
+<h2 id="prior-art-not-novel">Prior art (Not novel)</h2>
+<p>RDP and Tailscale ACLs are documented. This note is session-mirror + no-deny ACL holes as overlay access, not SSH-only.</p>
+      </article>
+    </main>
+    <footer class="site-footer">
+      <div class="site-footer-inner">
+    <p class="byline">Written by <a href="https://www.armsteadent.com/">Eugene Armstead</a> · <a href="https://www.armsteadent.com/">https://www.armsteadent.com/</a> · <a rel="license" href="https://creativecommons.org/licenses/by/4.0/">CC-BY-4.0</a></p>
+    <p class="license-line">Living field notes. Stable IDs. Do not copy private inventory into public text.</p>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -80,7 +80,7 @@
           "@type": "HowToStep",
           "position": 4,
           "name": "P4 \u2014 Hash both sides.",
-          "text": "Action: `sha256sum <repo-changelog> <on-device-changelog>` (or `sha256` on the remote). Expected: Digests match. On failure: Recopy. Never report success on a mismatched hash."
+          "text": "Action: "
         },
         {
           "@type": "HowToStep",
@@ -103,11 +103,12 @@
     <nav class="site-nav" aria-label="Site">
       <a href="../index.html">Home</a>
       <a href="../DISCLOSURE.html">Disclosure</a>
+      <a href="../changelog.html">Changelog</a>
+      <a href="../editions/2026.html">2026</a>
       <a href="../AGENTS.md">AGENTS.md</a>
       <a href="../index.html#networking">Networking</a>
       <a href="../index.html#web">Web</a>
       <a href="../index.html#supporting">Supporting</a>
-      <a href="../index.html#editions">Editions</a>
     </nav>
       </div>
     </header>
@@ -115,7 +116,7 @@
     <main id="main">
       <article>
         <h1>Per-node changelog contract (repo + hashed on-device copy)</h1>
-        <p class="meta-line"><span>OEN-18</span> · original · edition 1 · 2026-09-07</p>
+        <p class="meta-line"><span>OEN-18</span> · original · edition 2 · 2026-09-07</p>
         <h2 id="context">Context</h2>
 <p>Fleet changes (Maximum Segment Size (MSS), sysctl, tunnel client, exit advertise, Secure Shell (SSH) doors) are easy to lose in chat transcripts. A <strong>per-node changelog</strong> is the “at a glance” ops surface: what changed, on which class of device, how to verify.</p>
 <p>The contract is the <strong>pattern</strong>, not anyone’s private log bodies.</p>
@@ -124,7 +125,19 @@
 <table><thead><tr><th>Node class</th><th>On-device copy (class, not an inventory)</th></tr></thead><tbody><tr><td>Consumer router</td><td>Firmware persistent overlay such as a <strong>jffs-class</strong> path under the router’s writable store</td></tr><tr><td>Cloud Virtual Private Server (VPS)</td><td>A project tree under <strong><code>/opt</code></strong>, for example <code>/opt/&lt;project&gt;/docs/CHANGELOG.md</code></td></tr><tr><td>Local Area Network (LAN) Pi</td><td>Distro-style <strong><code>/usr/local/share/&lt;project&gt;/CHANGELOG.md</code></strong></td></tr><tr><td>Workstation</td><td><strong>User-writable home</strong>, for example <code>~/.local/share/&lt;project&gt;/CHANGELOG.md</code> — not a sudo path assumed to exist</td></tr></tbody></table>
 <p>Agents MUST NOT claim an on-device path exists without <code>ls</code> and a <strong>hash match</strong> against the repo file. Workstations in particular often <strong>lack</strong> a sudo tree such as <code>/usr/local/share/&lt;project&gt;</code> when passwordless sudo is off. Canonical remains the repo file.</p>
 
-<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>MSS</dt><dd>Maximum Segment Size</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>UTC</dt><dd>Coordinated Universal Time</dd><dt>TZ</dt><dd>timezone abbreviation in a changelog heading</dd><dt>VPS</dt><dd>Virtual Private Server</dd><dt>LAN</dt><dd>Local Area Network</dd><dt>Pi</dt><dd>single-board computer (Raspberry Pi class)</dd><dt>GCP</dt><dd>Google Cloud Platform</dd><dt>WG</dt><dd>WireGuard</dd><dt>WireGuard</dt><dd>UDP-based VPN protocol</dd><dt>URL</dt><dd>Uniform Resource Locator</dd><dt>IP</dt><dd>Internet Protocol</dd></dl></section>
+<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>MSS</dt><dd>Maximum Segment Size</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>UTC</dt><dd>Coordinated Universal Time</dd><dt>TZ</dt><dd>timezone abbreviation in a changelog heading</dd><dt>VPS</dt><dd>Virtual Private Server</dd><dt>LAN</dt><dd>Local Area Network</dd><dt>Pi</dt><dd>single-board computer (Raspberry Pi class)</dd><dt>ControlPath</dt><dd>OpenSSH multiplexing socket path option</dd><dt>TZ</dt><dd>timezone abbreviation in a changelog heading</dd><dt>WG</dt><dd>WireGuard</dd><dt>WireGuard</dt><dd>UDP-based VPN protocol</dd><dt>URL</dt><dd>Uniform Resource Locator</dd><dt>IP</dt><dd>Internet Protocol</dd><dt>ControlPath</dt><dd>OpenSSH multiplexing socket path option</dd></dl></section>
+<h2 id="topology">Topology</h2>
+<pre><code class="language-text">[private ops repo]  &lt;repo-changelog&gt;     CANONICAL
+        |
+        |  same session as the change
+        v
+[on-device copy]    &lt;on-device-changelog&gt;   class path by node type
+        |
+        +-- ls + sha256sum MUST match</code></pre>
+<h2 id="bind">Bind</h2>
+<table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><code>&lt;repo-changelog&gt;</code></td><td>Canonical Markdown in the private ops repo</td><td>Path class</td></tr><tr><td><code>&lt;on-device-changelog&gt;</code></td><td>On-device copy</td><td>Path class from the table</td></tr><tr><td><code>&lt;node&gt;</code></td><td>Role (cloud VPS, LAN Pi, router, workstation)</td><td>Role, not hostname</td></tr><tr><td><code>&lt;user&gt;</code></td><td>Account used to copy</td><td>Guest or workstation user</td></tr></tbody></table>
+<h2 id="parameters">Parameters</h2>
+<p>Each entry MUST include Date + labeled timezone, Change, Paths, Verify. No secrets. Agents MUST NOT invent fake precision.</p>
 <h2 id="decision">Decision</h2>
 <p>Same session as the change:</p>
 <ol><li>Append to the repo changelog (newest first).</li><li>Sync the on-device copy for that node class.</li><li>Prove the copy with <code>ls</code> + <code>sha256sum</code> (or equivalent) vs the repo file.</li></ol>
@@ -133,6 +146,8 @@
 <p>No secrets, tokens, or passwords. Agents MUST NOT invent fake precision: if the time of day is unknown, write a date with <code>time approximate</code> or <code>~YYYY-MM-DD</code>.</p>
 <h2 id="consequences">Consequences</h2>
 <ul><li>Future sessions do not rediscover last month’s MSS clamp.</li><li>On-device copies cannot silently diverge if the hash check is required.</li><li>Public discussion of the <strong>pattern</strong> does not require publishing anyone’s hostnames or real paths.</li></ul>
+<h2 id="agent-stop-rule">Agent stop rule</h2>
+<blockquote><p>MUST emit the class path table with <code>&lt;repo-changelog&gt;</code> filled.   MUST NOT claim an on-device path exists without <code>ls</code> + <code>sha256sum</code>.   MUST NOT copy secrets into the log.</p></blockquote>
 <h2 id="procedure">Procedure</h2>
 <p>Placeholders: <code>&lt;node&gt;</code> is a role, not a hostname. <code>&lt;repo-changelog&gt;</code> is the canonical Markdown file. <code>&lt;on-device-changelog&gt;</code> is the class path from the table.</p>
 <ol><li><strong>P1 — Edit the repo file first.</strong><br>
@@ -145,18 +160,25 @@
 - <strong>Action:</strong> Copy <code>&lt;repo-changelog&gt;</code> to <code>&lt;on-device-changelog&gt;</code> (install, scp, or a small sync helper). Preserve mode so a non-root workstation copy stays user-owned.<br>
 - <strong>Expected:</strong> File exists at the destination.<br>
 - <strong>On failure:</strong> Do not claim “synced.” Leave the repo entry noting the copy failed.</li><li><strong>P4 — Hash both sides.</strong><br>
-- <strong>Action:</strong> <code>sha256sum &lt;repo-changelog&gt; &lt;on-device-changelog&gt;</code> (or <code>sha256</code> on the remote).<br>
-- <strong>Expected:</strong> Digests match.<br>
-- <strong>On failure:</strong> Recopy. Never report success on a mismatched hash.</li><li><strong>P5 — Redact secrets before they land.</strong><br>
+- <strong>Action:</strong></li></ol>
+<pre><code class="language-bash">     sha256sum &lt;repo-changelog&gt;
+     ssh -o ControlPath=none &lt;user&gt;@&lt;node&gt; &#x27;sha256sum &lt;on-device-changelog&gt;&#x27;
+     </code></pre>
+<p>- <strong>Expected:</strong> Digests match. - <strong>On failure:</strong> Recopy. Never report success on a mismatched hash.</p>
+<ol><li><strong>P5 — Redact secrets before they land.</strong><br>
 - <strong>Action:</strong> Read the new bullets. Strip tokens, passwords, private URLs, and inventory.<br>
 - <strong>Expected:</strong> A stranger could read the entry and learn the <strong>class</strong> of change, not the lab map.<br>
 - <strong>On failure:</strong> Edit the repo file and resync.</li></ol>
 <h2 id="verify">Verify</h2>
 <ul><li>Repo file has a newest-first entry with date, timezone label, Change, Paths, Verify.</li><li><code>ls</code> shows the on-device file <strong>or</strong> the repo explicitly says the copy was skipped.</li><li><code>sha256sum</code> matches when a copy was made.</li><li>No secrets in the text.</li></ul>
+<h2 id="expected-samples">Expected samples</h2>
+<pre><code class="language-text">&lt;hash&gt;  docs/changelogs/&lt;role&gt;/CHANGELOG.md
+&lt;hash&gt;  /opt/&lt;project&gt;/docs/CHANGELOG.md
+# hashes equal</code></pre>
 <h2 id="must-not" class="must-not">MUST NOT</h2>
 <ul><li>MUST NOT claim a path exists without <code>ls</code> + hash vs repo.</li><li>MUST NOT write unlabeled UTC in operator-facing changelog prose.</li><li>MUST NOT invent a precise clock time when it was not recorded.</li><li>MUST NOT put secrets, overlay addresses, or custom admin ports in the log.</li><li>MUST NOT publish real on-device paths from a private fleet as if they were universal; use the <strong>class</strong> table.</li></ul>
 <h2 id="related-specs">Related specs</h2>
-<ul><li><a href="01-overlay-ssh-byte-cliff.html">OEN-01 Overlay SSH byte cliff</a> (built) — MSS and underlay changes belong in the node log</li><li><a href="16-commercial-wg-endpoint-rotation.html">OEN-16 Commercial WireGuard endpoint rotation</a> (built)</li><li><a href="17-gcp-overlay-exit.html">OEN-17 Google Cloud overlay exit</a> (built)</li></ul>
+<ul><li><a href="01-overlay-ssh-byte-cliff.html">OEN-01 Overlay SSH byte cliff</a> — MSS and underlay changes belong in the node log</li><li><a href="16-commercial-wg-endpoint-rotation.html">OEN-16 Commercial WireGuard endpoint rotation</a></li><li><a href="17-gcp-overlay-exit.html">OEN-17 Google Cloud overlay exit</a></li></ul>
 <h2 id="prior-art-not-novel">Prior art (Not novel)</h2>
 <p>Dated changelogs and “docs next to the code” are ordinary. This spec’s claim is the <strong>two-copy contract</strong> with class-specific on-device paths, mandatory hash, timezone labeling, and a ban on fake precision.</p>
       </article>

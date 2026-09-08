@@ -3,7 +3,7 @@ id: OEN-16
 title: Commercial WireGuard endpoint rotation (IPv6, shuffle bag, hub watch)
 kind: original
 status: active
-edition: 1
+edition: 2
 date_published: 2026-09-07
 author: Eugene Armstead
 author_url: https://www.armsteadent.com/
@@ -69,6 +69,8 @@ terms:
     expansion: Uniform Resource Locator
   - abbr: PATH
     expansion: Unix executable search path
+  - abbr: CrowdSec
+    expansion: open-source IDS/IPS with a Central API
 ---
 
 # Commercial WireGuard endpoint rotation (IPv6, shuffle bag, hub watch)
@@ -89,6 +91,33 @@ This note is the unpublished combo:
 
 Do not name the commercial provider. Do not name server nicknames. Public wording: allowlisted IPv6 endpoints, boot-default region, hub watch on an always-on Pi.
 
+## Topology
+
+```text
+[<cloud-vps> WG client]  Endpoint = [IPv6]:port only
+[<consumer router WG client>]  same contract
+[<lan-pi> hub watch]  freshness of both rotators — NOT the workstation
+
+Health: curl -6 --interface <wan-iface>     (ISP vs VPN split)
+Egress: curl -6 --interface <tunnel-ula>    MUST match that endpoint's site prefix
+```
+
+## Bind
+
+| Placeholder | Operator fills | Class |
+|-------------|----------------|-------|
+| `<cloud-vps>` | VPS running a commercial WG client | Cloud VPS |
+| `<lan-pi>` | Always-on hub watch | LAN Pi |
+| `<wg-iface>` | Tunnel iface | Router or VPS |
+| `<wan-iface>` | WAN iface | Same host as the client |
+| `<user>` | SSH user | Guest |
+| `<endpoint-gua>` | Allowlisted peer IPv6 | GUA; never publish |
+| `<tunnel-ula>` | Tunnel address used to bind egress verify | ULA class; never publish |
+
+## Formulas
+
+Handshake stale / hop interval / cooldown are operator-tuned. `PersistentKeepalive = 25` is the usual NAT keepalive. Endpoint MUST be an IPv6 **literal**, never FQDN.
+
 ## Decision
 
 A commercial WireGuard client that must stay up across endpoint failure MUST implement all of:
@@ -107,6 +136,12 @@ Example timers operators MAY use: handshake stale after a few minutes; hop on th
 - A peer that handshakes but egresses the wrong prefix is rejected.
 - The LAN Pi notices a silent rotator (no fresh status) and can tick it. The workstation is not a watchdog host.
 
+## Agent stop rule
+
+> MUST emit bound `curl --interface` and `wg set` commands.  
+> MUST NOT hop or restart WireGuard until Bind is filled.  
+> MUST NOT restart the WG interface from a watchdog on every tick ([OEN-22](22-delayed-wg-forward-wipe.md)).
+
 ## Procedure
 
 Placeholders: `<cloud-vps>`, `<lan-pi>`, `<wg-iface>`, WAN interface on that host.
@@ -117,7 +152,12 @@ Placeholders: `<cloud-vps>`, `<lan-pi>`, `<wg-iface>`, WAN interface on that hos
    - **On failure:** Rewrite the peer to an allowlisted IPv6 global unicast address (GUA) and restart the client once. Do not leave FQDN in production.
 
 2. **P2 — Health-check the provider over WAN IPv6, not the tunnel.**
-   - **Action:** `curl -6 --interface <wan-iface> --max-time 20` to the provider status URL (or any WAN-only v6 canary you control). Do **not** bind `<wg-iface>`.
+   - **Action:** `curl -6 --interface <wan-iface> --max-time 20 https://<isp-v6-canary>` (or any WAN-only v6 canary you control). Do **not** bind `<wg-iface>`.
+
+     ```bash
+     curl -6 --interface <wan-iface> --max-time 20 -sS -o /dev/null -w '%{http_code}\n' https://<isp-v6-canary>
+     curl -6 --interface <wg-iface> --max-time 20 -sS -o /dev/null -w '%{http_code}\n' https://<isp-v6-canary>
+     ```
    - **Expected:** Success means the ISP v6 path is up. Failure means do not hop; fix WAN first.
    - **On failure:** Stop rotation. Investigate WAN IPv6. Hopping cannot repair an ISP outage.
 
@@ -132,7 +172,12 @@ Placeholders: `<cloud-vps>`, `<lan-pi>`, `<wg-iface>`, WAN interface on that hos
    - **On failure:** Restore previous GUA. Do not loop `--force` without a bag.
 
 5. **P5 — Verify egress on the tunnel address.**
-   - **Action:** `curl -6 --interface <tunnel-ula> --max-time 15` to a public “what is my IP” over HTTPS. Compare the returned IPv6 with the **site prefix** documented for that endpoint.
+   - **Action:** `curl -6 --interface <tunnel-ula> --max-time 15 https://<what-is-my-ip>` over HTTPS. Compare the returned IPv6 with the **site prefix** documented for that endpoint.
+
+     ```bash
+     curl -6 --interface <tunnel-ula> --max-time 15 -sS https://<what-is-my-ip>
+     wg show <wg-iface>
+     ```
    - **Expected:** Prefix matches the peer you just selected.
    - **On failure:** Treat as failed hop. Restore previous endpoint. Drop or cooldown the bad peer.
 
@@ -161,15 +206,25 @@ Placeholders: `<cloud-vps>`, `<lan-pi>`, `<wg-iface>`, WAN interface on that hos
 - MUST NOT health-check through `<wg-iface>` and treat failure as “time to hop.”
 - MUST NOT accept a handshake without site-prefix egress verify.
 - MUST NOT run the hub watch on the agent workstation.
-- MUST NOT restart the WireGuard interface from a watchdog on every tick (use `wg set` / firmware set when possible; a full restart can wipe FORWARD — forthcoming OEN-22).
+- MUST NOT restart the WireGuard interface from a watchdog on every tick (use `wg set` / firmware set when possible; a full restart can wipe FORWARD — [OEN-22](22-delayed-wg-forward-wipe.md)).
+
+## Expected samples
+
+```text
+# WAN health independent of tunnel
+200
+# Endpoint after hop
+endpoint: [2001:db8::1]:<port>   # documentation prefix only; operator uses allowlist
+persistent keepalive: every 25 seconds
+```
 
 ## Related specs
 
-- [OEN-01 Overlay SSH byte cliff](01-overlay-ssh-byte-cliff.md) (built) — hub watch rides overlay SSH
-- OEN-21 shared VPN NAT and CrowdSec (forthcoming)
-- OEN-22 delayed WG FORWARD wipe (forthcoming)
-- OEN-S26 Wi-Fi vs cellular underlay (forthcoming)
-- OEN-S33 consumer-router cron PATH (forthcoming)
+- [OEN-01 Overlay SSH byte cliff](01-overlay-ssh-byte-cliff.md) — hub watch rides overlay SSH
+- [OEN-21 Shared commercial-VPN NAT and CrowdSec](21-shared-vpn-nat-crowdsec-ban.md)
+- [OEN-22 Delayed WG FORWARD wipe](22-delayed-wg-forward-wipe.md)
+- [OEN-S26 Wi-Fi vs cellular underlay](../supporting/s26-wifi-vs-cellular-underlay.md)
+- [OEN-S33 Consumer-router cron PATH](../supporting/s33-router-cron-path-set-e.md)
 
 ## Prior art (Not novel)
 

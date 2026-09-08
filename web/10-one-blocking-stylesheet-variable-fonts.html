@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>OEN-10: One generated blocking stylesheet and variable fonts — Overlay and Edge Notes</title>
+    <meta name="description" content="A new render-blocking stylesheet dropped mobile PageSpeed. Per-weight variable font filenames made Chrome re-download the same woff2. Generate one chrome.css; preload at most two matching variable files.">
+    <link rel="canonical" href="https://eugenearmstead.github.io/overlay-and-edge-notes/web/10-one-blocking-stylesheet-variable-fonts.html">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Source+Sans+3:wght@400;500;600&amp;display=swap">
+    <link rel="stylesheet" href="../assets/spec.css">
+    <link rel="describedby" href="../llms.txt">
+    <meta name="author" content="Eugene Armstead">
+    <meta name="citation_author" content="Eugene Armstead">
+    <meta name="dcterms.creator" content="Eugene Armstead">
+    <link rel="author" href="https://www.armsteadent.com/">
+    <meta property="article:author" content="Eugene Armstead">
+    <meta property="og:see_also" content="https://www.armsteadent.com/">
+    <meta property="og:title" content="OEN-10: One generated blocking stylesheet and variable fonts — Overlay and Edge Notes">
+    <meta property="og:description" content="A new render-blocking stylesheet dropped mobile PageSpeed. Per-weight variable font filenames made Chrome re-download the same woff2. Generate one chrome.css; preload at most two matching variable files.">
+    <meta property="og:url" content="https://eugenearmstead.github.io/overlay-and-edge-notes/web/10-one-blocking-stylesheet-variable-fonts.html">
+    <meta property="og:type" content="article">
+    <meta property="article:published_time" content="2026-09-08">
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "TechArticle",
+      "@id": "https://eugenearmstead.github.io/overlay-and-edge-notes/web/10-one-blocking-stylesheet-variable-fonts.html#article",
+      "headline": "One generated blocking stylesheet and variable fonts",
+      "description": "A new render-blocking stylesheet dropped mobile PageSpeed. Per-weight variable font filenames made Chrome re-download the same woff2. Generate one chrome.css; preload at most two matching variable files.",
+      "datePublished": "2026-09-08",
+      "author": {
+        "@type": "Person",
+        "name": "Eugene Armstead",
+        "url": "https://www.armsteadent.com/",
+        "sameAs": [
+          "https://github.com/eugenearmstead"
+        ]
+      },
+      "url": "https://eugenearmstead.github.io/overlay-and-edge-notes/web/10-one-blocking-stylesheet-variable-fonts.html",
+      "identifier": "OEN-10",
+      "license": "https://creativecommons.org/licenses/by/4.0/",
+      "inLanguage": "en"
+    },
+    {
+      "@type": "HowTo",
+      "name": "One generated blocking stylesheet and variable fonts",
+      "description": "A new render-blocking stylesheet dropped mobile PageSpeed. Per-weight variable font filenames made Chrome re-download the same woff2. Generate one chrome.css; preload at most two matching variable files.",
+      "author": {
+        "@type": "Person",
+        "name": "Eugene Armstead",
+        "url": "https://www.armsteadent.com/",
+        "sameAs": [
+          "https://github.com/eugenearmstead"
+        ]
+      },
+      "step": [
+        {
+          "@type": "HowToStep",
+          "position": 1,
+          "name": "P1 \u2014 Count render-blocking CSS.",
+          "text": "Action: View-source the home HTML. Count blocking `<link rel=stylesheet>` without media=print trick. Expected: At most one generated chrome stylesheet plus any required third-party you already accepted. On failure: If a new home-only CSS link appeared, remove it and concat into chrome.css."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 2,
+          "name": "P2 \u2014 Match preload href to @font-face src.",
+          "text": "Action: Preload at most two variable woff2 URLs. They MUST equal the `src` in CSS. No per-weight duplicate filenames for the same bytes. Expected: Network panel: each variable file once. On failure: If Chrome fetches the same bytes under four URLs, collapse to one filename."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 3,
+          "name": "P3 \u2014 LCP portrait preload media-split.",
+          "text": "Action: Preload the LCP portrait immediately after viewport: 300w vs 480w media split. Defer decorative hero background until the portrait `load`. Expected: LCP element is the portrait, not the background. On failure: Do not preload both portrait and huge background."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 4,
+          "name": "P4 \u2014 Do not ship HTML-only; file(1) images.",
+          "text": "Action: CSS/JS/images 200 ([OEN-S06](../supporting/s06-do-not-ship-html-only.md)). `file` before image deploy ([OEN-S10](../supporting/s10-file-before-image-deploy.md)). Playwright Desktop + iPhone + Pixel ([OEN-S09](../supporting/s09-playwright-desktop-iphone-pixel.md)). Expected: No layout-destroying 404. Image bytes match the extension\u2019s real type. On failure: A CSS \u201cbug\u201d that is a 404 is S06, not a rewrite of chrome.css."
+        }
+      ]
+    }
+  ]
+}
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <div class="site-header-inner">
+        <p class="site-title"><a href="../index.html">Overlay and Edge Notes</a></p>
+        <p class="site-tag">Public field notes by Eugene Armstead</p>
+    <nav class="site-nav" aria-label="Site">
+      <a href="../index.html">Home</a>
+      <a href="../DISCLOSURE.html">Disclosure</a>
+      <a href="../changelog.html">Changelog</a>
+      <a href="../editions/2026.html">2026</a>
+      <a href="../AGENTS.md">AGENTS.md</a>
+      <a href="../index.html#networking">Networking</a>
+      <a href="../index.html#web">Web</a>
+      <a href="../index.html#supporting">Supporting</a>
+    </nav>
+      </div>
+    </header>
+    <nav class="breadcrumb" aria-label="Breadcrumb"><ol><li><a href="../index.html">Home</a></li><li><a href="../index.html#web">Web</a></li><li>OEN-10</li></ol></nav>
+    <main id="main">
+      <article>
+        <h1>One generated blocking stylesheet and variable fonts</h1>
+        <p class="meta-line"><span>OEN-10</span> · original · edition 1 · 2026-09-08</p>
+        <h2 id="context">Context</h2>
+<p>Static marketing Core Web Vitals (CWV): extracting home Cascading Style Sheets (CSS) into a <strong>new</strong> render-blocking <code>&lt;link&gt;</code> dropped mobile PageSpeed Insights (PSI) <strong>77 → 72</strong>. Self-hosting variable Inter/Playfair as <strong>per-weight filenames</strong> (identical bytes, different URLs) made Chrome re-download the same woff2 three to four times.</p>
+<p>The live public example MAY cite <code>frontrangedoula.com</code>. MUST NOT describe the origin Pi, Access, or lead pipeline.</p>
+<p>Largest Contentful Paint (LCP) portrait preload belongs immediately after viewport with <strong>media-split</strong> 300w vs 480w. Defer decorative hero background until the portrait has loaded. <a href="../supporting/s09-playwright-desktop-iphone-pixel.html">OEN-S09</a> for layout gates. <a href="../supporting/s10-file-before-image-deploy.html">OEN-S10</a> before image ship. <a href="../supporting/s06-do-not-ship-html-only.html">OEN-S06</a>.</p>
+
+<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>TCP</dt><dd>Transmission Control Protocol</dd><dt>ICMP</dt><dd>Internet Control Message Protocol</dd><dt>HTTPS</dt><dd>Hypertext Transfer Protocol Secure</dd><dt>HTML</dt><dd>HyperText Markup Language</dd><dt>CSS</dt><dd>Cascading Style Sheets</dd><dt>JS</dt><dd>JavaScript</dd><dt>nft</dt><dd>nftables (Linux packet filter)</dd><dt>LCP</dt><dd>Largest Contentful Paint</dd><dt>CWV</dt><dd>Core Web Vitals</dd><dt>PSI</dt><dd>PageSpeed Insights</dd><dt>URL</dt><dd>Uniform Resource Locator</dd><dt>UI</dt><dd>user interface</dd><dt>Pi</dt><dd>single-board computer (Raspberry Pi class)</dd><dt>Playwright</dt><dd>browser automation and test runner</dd><dt>Inter</dt><dd>variable sans-serif font family</dd><dt>Playfair</dt><dd>variable serif font family</dd><dt>Rocket</dt><dd>Cloudflare Rocket Loader</dd></dl></section>
+<h2 id="topology">Topology</h2>
+<pre><code class="language-text">[HTML] --blocking &lt;link stylesheet&gt;--&gt; extra round trip  (PSI drop when a NEW blocking sheet is added)
+[variable font] one woff2 file, many @font-face URLs  --&gt; Chrome re-downloads the same bytes
+Contract: one generated chrome.css; preload at most two variable files; LCP portrait media-split</code></pre>
+<h2 id="bind">Bind</h2>
+<p>Fill this table <strong>before</strong> any live change. Do <strong>not</strong> paste real values back into public notes.</p>
+<table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><code>&lt;worker-root&gt;</code></td><td>Worker / UI source tree</td><td>Directory on the workstation</td></tr><tr><td><code>&lt;live-url&gt;</code></td><td>Public HTTPS origin</td><td>URL the browser loads</td></tr><tr><td><code>&lt;preview-url&gt;</code></td><td>Preview origin if used</td><td>URL</td></tr><tr><td><code>&lt;html-path&gt;</code></td><td>Path that becomes a Response body</td><td>File glob</td></tr></tbody></table>
+<h2 id="formulas">Formulas</h2>
+<p>Proven failure: extra blocking stylesheet dropped mobile PSI 77→72. Self-hosting Inter/Playfair as per-weight filenames (identical bytes) caused 3–4 downloads. Public example site URL MAY be cited; do not describe origin Pi or Access.</p>
+<h2 id="decision">Decision</h2>
+<p>Generate <code>chrome.css</code> as concat of four <strong>source</strong> files (do not hand-merge). Defer decorative font and non-critical CSS with <code>media=&quot;print&quot; onload</code>. Preload <strong>at most two</strong> variable files whose <code>href</code> matches <code>@font-face src</code>; latin + latin-ext only.</p>
+<p>MUST NOT add a second blocking stylesheet to “clean up” home CSS.</p>
+<h2 id="consequences">Consequences</h2>
+<ul><li>Mobile PSI stops regressing from an extra blocking link.</li><li>Variable fonts download once.</li><li>LCP portrait wins over decorative background.</li></ul>
+<h2 id="agent-stop-rule">Agent stop rule</h2>
+<blockquote><p>A coding agent MUST emit a <strong>bound runbook</strong> (placeholders replaced from Bind). MUST NOT apply live <code>ip rule</code>, nft, iptables, ip6tables, sysctl, <code>wg set</code>, daemon restart, or deploy until a <strong>human</strong> filled Bind. MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS. MUST NOT file an upstream bug from this page. MUST NOT publish real addresses, hostnames, or custom ports.</p></blockquote>
+<h2 id="procedure">Procedure</h2>
+<p>Placeholders only until Bind is filled: <code>&lt;cloud-vps&gt;</code>, <code>&lt;lan-pi&gt;</code>, <code>&lt;overlay-peer&gt;</code>, <code>&lt;exit-node&gt;</code>, <code>&lt;wg-iface&gt;</code>, <code>&lt;gcp-nic&gt;</code>, plus the Bind extras on this page.</p>
+<h3>Copy-paste commands (after Bind)</h3>
+<pre><code class="language-bash"># From the site tree after Bind:
+grep -n &#x27;rel=&quot;stylesheet&quot;&#x27; &lt;html-path&gt;
+# Count distinct woff2 hrefs vs files on disk. Preload href MUST match @font-face src.
+curl -sS -o /dev/null -w &#x27;%{http_code} %{url_effective}\n&#x27; --max-time 15 &lt;live-url&gt;/chrome.css</code></pre>
+<p>CSS/JS/images MUST 200 (<a href="../supporting/s06-do-not-ship-html-only.html">OEN-S06</a>). Playwright three devices (<a href="../supporting/s09-playwright-desktop-iphone-pixel.html">OEN-S09</a>).</p>
+<ol><li><strong>P1 — Count render-blocking CSS.</strong><br>
+- <strong>Action:</strong> View-source the home HTML. Count blocking <code>&lt;link rel=stylesheet&gt;</code> without media=print trick.<br>
+- <strong>Expected:</strong> At most one generated chrome stylesheet plus any required third-party you already accepted.<br>
+- <strong>On failure:</strong> If a new home-only CSS link appeared, remove it and concat into chrome.css.</li><li><strong>P2 — Match preload href to @font-face src.</strong><br>
+- <strong>Action:</strong> Preload at most two variable woff2 URLs. They MUST equal the <code>src</code> in CSS. No per-weight duplicate filenames for the same bytes.<br>
+- <strong>Expected:</strong> Network panel: each variable file once.<br>
+- <strong>On failure:</strong> If Chrome fetches the same bytes under four URLs, collapse to one filename.</li><li><strong>P3 — LCP portrait preload media-split.</strong><br>
+- <strong>Action:</strong> Preload the LCP portrait immediately after viewport: 300w vs 480w media split. Defer decorative hero background until the portrait <code>load</code>.<br>
+- <strong>Expected:</strong> LCP element is the portrait, not the background.<br>
+- <strong>On failure:</strong> Do not preload both portrait and huge background.</li><li><strong>P4 — Do not ship HTML-only; file(1) images.</strong><br>
+- <strong>Action:</strong> CSS/JS/images 200 (<a href="../supporting/s06-do-not-ship-html-only.html">OEN-S06</a>). <code>file</code> before image deploy (<a href="../supporting/s10-file-before-image-deploy.html">OEN-S10</a>). Playwright Desktop + iPhone + Pixel (<a href="../supporting/s09-playwright-desktop-iphone-pixel.html">OEN-S09</a>).<br>
+- <strong>Expected:</strong> No layout-destroying 404. Image bytes match the extension’s real type.<br>
+- <strong>On failure:</strong> A CSS “bug” that is a 404 is S06, not a rewrite of chrome.css.</li></ol>
+<h2 id="expected-samples">Expected samples</h2>
+<pre><code class="language-text"># Extra blocking stylesheet: LCP/PSI worse than inlined concat</code></pre>
+<h2 id="verify">Verify</h2>
+<ul><li>One generated blocking chrome.css.</li><li>At most two variable font preloads, href matches @font-face.</li><li>Mobile PSI did not drop from an extra blocking link.</li><li>Playwright three-device layout gate green for nav/hero changes.</li><li>ICMP / small ping success was <strong>not</strong> used as the pass criterion when this spec names TCP, SSH, or HTTPS.</li><li>Bind table was filled by a human before any live <code>ip</code> / nft / iptables change.</li></ul>
+<h2 id="must-not" class="must-not">MUST NOT</h2>
+<ul><li>MUST NOT add a new render-blocking stylesheet to extract home CSS.</li><li>MUST NOT ship per-weight filenames that are identical variable files.</li><li>MUST NOT describe origin Pi, Access, or lead pipeline.</li><li>MUST NOT skip file(1) on images.</li><li>MUST NOT apply live network or firewall changes until Bind is filled by a human.</li><li>MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.</li><li>MUST NOT publish hostnames, addresses, ULAs, or custom ports.</li></ul>
+<h2 id="related-specs">Related specs</h2>
+<ul><li><a href="../supporting/s06-do-not-ship-html-only.html">OEN-S06 Do not ship HTML-only</a></li><li><a href="../supporting/s09-playwright-desktop-iphone-pixel.html">OEN-S09 Playwright Desktop + iPhone + Pixel</a></li><li><a href="../supporting/s10-file-before-image-deploy.html">OEN-S10 file before image deploy</a></li><li><a href="../supporting/s12-rocket-loader-off.html">OEN-S12 Rocket Loader Off</a></li><li><a href="09-git-merge-is-not-a-live-worker.html">OEN-09 Git merge is not a live Worker</a></li></ul>
+<h2 id="prior-art-not-novel">Prior art (Not novel)</h2>
+<p>CWV and variable fonts are heavily blogged. This spec’s claim is the measured 77→72 extra link plus duplicate variable URLs plus LCP media-split contract.</p>
+      </article>
+    </main>
+    <footer class="site-footer">
+      <div class="site-footer-inner">
+    <p class="byline">Written by <a href="https://www.armsteadent.com/">Eugene Armstead</a> · <a href="https://www.armsteadent.com/">https://www.armsteadent.com/</a> · <a rel="license" href="https://creativecommons.org/licenses/by/4.0/">CC-BY-4.0</a></p>
+    <p class="license-line">Living field notes. Stable IDs. Do not copy private inventory into public text.</p>
+      </div>
+    </footer>
+  </body>
+</html>

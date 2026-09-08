@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>OEN-20: LAN unique-local + remote exit: IPv4 takes the exit, IPv6 leaks — Overlay and Edge Notes</title>
+    <meta name="description" content="On home Wi-Fi a remote exit can carry IPv4 while browsers prefer IPv6 via the LAN unique-local default into the commercial VPN. Cellular without that unique-local looks fully on the exit.">
+    <link rel="canonical" href="https://eugenearmstead.github.io/overlay-and-edge-notes/networking/20-lan-ula-happy-eyeballs-leak.html">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Source+Sans+3:wght@400;500;600&amp;display=swap">
+    <link rel="stylesheet" href="../assets/spec.css">
+    <link rel="describedby" href="../llms.txt">
+    <meta name="author" content="Eugene Armstead">
+    <meta name="citation_author" content="Eugene Armstead">
+    <meta name="dcterms.creator" content="Eugene Armstead">
+    <link rel="author" href="https://www.armsteadent.com/">
+    <meta property="article:author" content="Eugene Armstead">
+    <meta property="og:see_also" content="https://www.armsteadent.com/">
+    <meta property="og:title" content="OEN-20: LAN unique-local + remote exit: IPv4 takes the exit, IPv6 leaks — Overlay and Edge Notes">
+    <meta property="og:description" content="On home Wi-Fi a remote exit can carry IPv4 while browsers prefer IPv6 via the LAN unique-local default into the commercial VPN. Cellular without that unique-local looks fully on the exit.">
+    <meta property="og:url" content="https://eugenearmstead.github.io/overlay-and-edge-notes/networking/20-lan-ula-happy-eyeballs-leak.html">
+    <meta property="og:type" content="article">
+    <meta property="article:published_time" content="2026-09-08">
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "TechArticle",
+      "@id": "https://eugenearmstead.github.io/overlay-and-edge-notes/networking/20-lan-ula-happy-eyeballs-leak.html#article",
+      "headline": "LAN unique-local + remote exit: IPv4 takes the exit, IPv6 leaks",
+      "description": "On home Wi-Fi a remote exit can carry IPv4 while browsers prefer IPv6 via the LAN unique-local default into the commercial VPN. Cellular without that unique-local looks fully on the exit.",
+      "datePublished": "2026-09-08",
+      "author": {
+        "@type": "Person",
+        "name": "Eugene Armstead",
+        "url": "https://www.armsteadent.com/",
+        "sameAs": [
+          "https://github.com/eugenearmstead"
+        ]
+      },
+      "url": "https://eugenearmstead.github.io/overlay-and-edge-notes/networking/20-lan-ula-happy-eyeballs-leak.html",
+      "identifier": "OEN-20",
+      "license": "https://creativecommons.org/licenses/by/4.0/",
+      "inLanguage": "en"
+    },
+    {
+      "@type": "HowTo",
+      "name": "LAN unique-local + remote exit: IPv4 takes the exit, IPv6 leaks",
+      "description": "On home Wi-Fi a remote exit can carry IPv4 while browsers prefer IPv6 via the LAN unique-local default into the commercial VPN. Cellular without that unique-local looks fully on the exit.",
+      "author": {
+        "@type": "Person",
+        "name": "Eugene Armstead",
+        "url": "https://www.armsteadent.com/",
+        "sameAs": [
+          "https://github.com/eugenearmstead"
+        ]
+      },
+      "step": [
+        {
+          "@type": "HowToStep",
+          "position": 1,
+          "name": "P1 \u2014 Dual-stack fetch on Wi-Fi with exit selected.",
+          "text": "Action: On a LAN client (not the agent workstation): select `<exit-node>`. `curl -4` and `curl -6` to a \u201cwhat is my IP\u201d over HTTPS. Then a browser to the same family-sensitive site. Expected: v4 shows the exit; v6 shows home-tunnel or LAN VPN egress. Browser follows v6. On failure: If both show the exit, this spec does not apply."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 2,
+          "name": "P2 \u2014 Route get for a public IPv6.",
+          "text": "Action: `ip -6 route get <public-v6>`. Note the LAN NIC vs overlay. Check table 52 for `::/0`. Expected: v6 default still via LAN/router; table 52 missing `::/0` for the selected exit. On failure: Do not treat this as GCP MASQUERADE until this check is done."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 3,
+          "name": "P3 \u2014 Cellular A/B.",
+          "text": "Action: Same exit, same client class, cellular underlay (no LAN ULA). Repeat curl -4/-6. Expected: Both families show the exit (or fail together for another reason). On failure: If cellular also splits, look at [OEN-S26](../supporting/s26-wifi-vs-cellular-underlay.md) / [OEN-06](06-netfilter-off-v6-return.md)."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 4,
+          "name": "P4 \u2014 Clear the exit; confirm LAN v6 is the home path.",
+          "text": "Action: Clear exit-node. v6 via LAN VPN is expected at home. Document Allow LAN Access behavior privately; do not paste routes. Expected: Without exit, v6 is home. With exit, v4 is cloud, v6 may still be home. On failure: Do not disable IPv6 globally as the daily fix without operator consent."
+        }
+      ]
+    }
+  ]
+}
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <div class="site-header-inner">
+        <p class="site-title"><a href="../index.html">Overlay and Edge Notes</a></p>
+        <p class="site-tag">Public field notes by Eugene Armstead</p>
+    <nav class="site-nav" aria-label="Site">
+      <a href="../index.html">Home</a>
+      <a href="../DISCLOSURE.html">Disclosure</a>
+      <a href="../changelog.html">Changelog</a>
+      <a href="../editions/2026.html">2026</a>
+      <a href="../AGENTS.md">AGENTS.md</a>
+      <a href="../index.html#networking">Networking</a>
+      <a href="../index.html#web">Web</a>
+      <a href="../index.html#supporting">Supporting</a>
+    </nav>
+      </div>
+    </header>
+    <nav class="breadcrumb" aria-label="Breadcrumb"><ol><li><a href="../index.html">Home</a></li><li><a href="../index.html#networking">Networking</a></li><li>OEN-20</li></ol></nav>
+    <main id="main">
+      <article>
+        <h1>LAN unique-local + remote exit: IPv4 takes the exit, IPv6 leaks</h1>
+        <p class="meta-line"><span>OEN-20</span> · original · edition 1 · 2026-09-08</p>
+        <h2 id="context">Context</h2>
+<p>A client on the home Local Area Network (LAN) has a LAN unique-local address (ULA) and an IPv6 default via the router (commercial VPN underlay). Select a <strong>remote</strong> <code>&lt;exit-node&gt;</code>: <code>curl -4</code> shows the exit; browsers prefer IPv6 (Happy-Eyeballs) → LAN VPN egress. Cellular (no LAN ULA) looks fully on the exit. It looks like “the cloud exit is half-broken.”</p>
+<p>Distinct from <a href="13-overlay-underlay-ula-layers.html">OEN-13</a> (naming the four layers), <a href="17-gcp-overlay-exit.html">OEN-17</a> (cloud plumbing), and <a href="../supporting/s26-wifi-vs-cellular-underlay.html">OEN-S26</a> (Wi-Fi vs cellular <strong>underlay</strong> to the same exit without a selected-exit ULA default). This is <strong>Allow LAN Access / ULA default vs selected exit</strong>.</p>
+
+<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>LAN</dt><dd>Local Area Network</dd><dt>WAN</dt><dd>Wide Area Network</dd><dt>VPN</dt><dd>Virtual Private Network</dd><dt>TCP</dt><dd>Transmission Control Protocol</dd><dt>MTU</dt><dd>Maximum Transmission Unit</dd><dt>ICMP</dt><dd>Internet Control Message Protocol</dd><dt>HTTPS</dt><dd>Hypertext Transfer Protocol Secure</dd><dt>IP</dt><dd>Internet Protocol</dd><dt>IPv4</dt><dd>Internet Protocol version 4</dd><dt>IPv6</dt><dd>Internet Protocol version 6</dd><dt>NAT</dt><dd>network address translation</dd><dt>ULA</dt><dd>unique-local address (IPv6)</dd><dt>GCP</dt><dd>Google Cloud Platform</dd><dt>VM</dt><dd>virtual machine</dd><dt>NIC</dt><dd>network interface card</dd><dt>nft</dt><dd>nftables (Linux packet filter)</dd><dt>MASQUERADE</dt><dd>iptables masquerade (source NAT)</dd><dt>Pi</dt><dd>single-board computer (Raspberry Pi class)</dd><dt>Happy-Eyeballs</dt><dd>dual-stack connection racing (RFC 8305)</dd></dl></section>
+<h2 id="topology">Topology</h2>
+<pre><code class="language-text">[home LAN client] has LAN ULA + v6 default via router (commercial underlay)
+Select remote &lt;exit-node&gt;:
+    curl -4  --&gt;  exit egress     (good)
+    browser Happy-Eyeballs v6 --&gt; LAN VPN egress  (LEAK)
+Cellular (no LAN ULA) looks fully on the exit
+Distinct from [OEN-S26](../supporting/s26-wifi-vs-cellular-underlay.html)</code></pre>
+<h2 id="bind">Bind</h2>
+<p>Fill this table <strong>before</strong> any live change. Do <strong>not</strong> paste real values back into public notes.</p>
+<table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><code>&lt;exit-node&gt;</code></td><td>Overlay exit node</td><td>Cloud VM or LAN Pi used as exit</td></tr><tr><td><code>&lt;overlay-peer&gt;</code></td><td>Soak client (<strong>not</strong> the agent workstation)</td><td>LAN Pi</td></tr><tr><td><code>&lt;user&gt;</code></td><td>SSH user</td><td>Guest</td></tr><tr><td><code>&lt;overlay-tun&gt;</code></td><td>Overlay tun on the exit</td><td>Iface</td></tr><tr><td><code>&lt;gcp-nic&gt;</code></td><td>Public NIC on a Google Cloud guest</td><td>Iface; omit on non-GCP exits</td></tr><tr><td><code>&lt;wan-iface&gt;</code></td><td>WAN / public NIC</td><td>Iface</td></tr><tr><td><code>&lt;mss4&gt;</code> / <code>&lt;mss6&gt;</code></td><td>Computed from underlay or overlay tun MTU</td><td>Formulas</td></tr></tbody></table>
+<h2 id="formulas">Formulas</h2>
+<p>Allow LAN Access / ULA default vs selected exit. Table 52 missing <code>::/0</code> is a common proof.</p>
+<h2 id="decision">Decision</h2>
+<p>Operators MUST verify <code>ip -6 route get &lt;public-v6&gt;</code> via the LAN NIC and whether table 52 is missing <code>::/0</code> while an exit is selected. MUST compare Wi-Fi vs cellular. MUST NOT keep changing Google Cloud MTU for this signature.</p>
+<h2 id="consequences">Consequences</h2>
+<ul><li>Operators stop tearing down a working cloud exit.</li><li>IPv6 leak is understood as LAN ULA + Happy-Eyeballs.</li><li>Cellular remains the clean dual-stack check.</li></ul>
+<h2 id="agent-stop-rule">Agent stop rule</h2>
+<blockquote><p>A coding agent MUST emit a <strong>bound runbook</strong> (placeholders replaced from Bind). MUST NOT apply live <code>ip rule</code>, nft, iptables, ip6tables, sysctl, <code>wg set</code>, daemon restart, or deploy until a <strong>human</strong> filled Bind. MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS. MUST NOT file an upstream bug from this page. MUST NOT publish real addresses, hostnames, or custom ports.</p></blockquote>
+<h2 id="procedure">Procedure</h2>
+<p>Placeholders only until Bind is filled: <code>&lt;cloud-vps&gt;</code>, <code>&lt;lan-pi&gt;</code>, <code>&lt;overlay-peer&gt;</code>, <code>&lt;exit-node&gt;</code>, <code>&lt;wg-iface&gt;</code>, <code>&lt;gcp-nic&gt;</code>, plus the Bind extras on this page.</p>
+<h3>Copy-paste commands (after Bind)</h3>
+<pre><code class="language-bash"># On the LAN client (not the agent workstation if that would hairpin)
+ip -6 route get 2001:4860:4860::8888
+curl -4 --max-time 8 https://example.com
+curl -6 --max-time 8 https://example.com</code></pre>
+<p>MUST NOT keep changing GCP MTU for this split (<a href="17-gcp-overlay-exit.html">OEN-17</a>).</p>
+<ol><li><strong>P1 — Dual-stack fetch on Wi-Fi with exit selected.</strong><br>
+- <strong>Action:</strong> On a LAN client (not the agent workstation): select <code>&lt;exit-node&gt;</code>. <code>curl -4</code> and <code>curl -6</code> to a “what is my IP” over HTTPS. Then a browser to the same family-sensitive site.<br>
+- <strong>Expected:</strong> v4 shows the exit; v6 shows home-tunnel or LAN VPN egress. Browser follows v6.<br>
+- <strong>On failure:</strong> If both show the exit, this spec does not apply.</li><li><strong>P2 — Route get for a public IPv6.</strong><br>
+- <strong>Action:</strong> <code>ip -6 route get &lt;public-v6&gt;</code>. Note the LAN NIC vs overlay. Check table 52 for <code>::/0</code>.<br>
+- <strong>Expected:</strong> v6 default still via LAN/router; table 52 missing <code>::/0</code> for the selected exit.<br>
+- <strong>On failure:</strong> Do not treat this as GCP MASQUERADE until this check is done.</li><li><strong>P3 — Cellular A/B.</strong><br>
+- <strong>Action:</strong> Same exit, same client class, cellular underlay (no LAN ULA). Repeat curl -4/-6.<br>
+- <strong>Expected:</strong> Both families show the exit (or fail together for another reason).<br>
+- <strong>On failure:</strong> If cellular also splits, look at <a href="../supporting/s26-wifi-vs-cellular-underlay.html">OEN-S26</a> / <a href="06-netfilter-off-v6-return.html">OEN-06</a>.</li><li><strong>P4 — Clear the exit; confirm LAN v6 is the home path.</strong><br>
+- <strong>Action:</strong> Clear exit-node. v6 via LAN VPN is expected at home. Document Allow LAN Access behavior privately; do not paste routes.<br>
+- <strong>Expected:</strong> Without exit, v6 is home. With exit, v4 is cloud, v6 may still be home.<br>
+- <strong>On failure:</strong> Do not disable IPv6 globally as the daily fix without operator consent.</li></ol>
+<h2 id="expected-samples">Expected samples</h2>
+<pre><code class="language-text"># v6 still via LAN router, not overlay exit
+2001:4860:4860::8888 from &lt;lan-ula&gt; via &lt;router-lla&gt; dev &lt;lan-iface&gt;</code></pre>
+<h2 id="verify">Verify</h2>
+<ul><li>Wi-Fi + exit: curl -4 exit, curl -6 home (this trap).</li><li>Cellular + exit: both families exit, or a different spec applies.</li><li>table 52 ::/0 absence is recorded.</li><li>Agent workstation was not used as the soak client.</li><li>ICMP / small ping success was <strong>not</strong> used as the pass criterion when this spec names TCP, SSH, or HTTPS.</li><li>Bind table was filled by a human before any live <code>ip</code> / nft / iptables change.</li></ul>
+<h2 id="must-not" class="must-not">MUST NOT</h2>
+<ul><li>MUST NOT publish LAN ULA or public v6 test addresses that identify the lab.</li><li>MUST NOT blame Google Cloud NAT first for a Wi-Fi-only v6 leak.</li><li>MUST NOT disable IPv6 as an undocumented default.</li><li>MUST NOT set exit on the agent workstation to reproduce.</li><li>MUST NOT apply live network or firewall changes until Bind is filled by a human.</li><li>MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.</li><li>MUST NOT publish hostnames, addresses, ULAs, or custom ports.</li></ul>
+<h2 id="related-specs">Related specs</h2>
+<ul><li><a href="13-overlay-underlay-ula-layers.html">OEN-13 Overlay vs underlay vs unique-local</a></li><li><a href="17-gcp-overlay-exit.html">OEN-17 Google Cloud overlay exit</a></li><li><a href="../supporting/s26-wifi-vs-cellular-underlay.html">OEN-S26 Wi-Fi vs cellular underlay</a></li><li><a href="../supporting/s18-do-not-set-exit-on-agent-workstation.html">OEN-S18 Do not set exit on the agent workstation</a></li></ul>
+<h2 id="prior-art-not-novel">Prior art (Not novel)</h2>
+<p>Happy-Eyeballs v6 preference is documented. This spec’s claim is LAN ULA default versus a selected remote exit as a false “cloud exit is half-broken.”</p>
+      </article>
+    </main>
+    <footer class="site-footer">
+      <div class="site-footer-inner">
+    <p class="byline">Written by <a href="https://www.armsteadent.com/">Eugene Armstead</a> · <a href="https://www.armsteadent.com/">https://www.armsteadent.com/</a> · <a rel="license" href="https://creativecommons.org/licenses/by/4.0/">CC-BY-4.0</a></p>
+    <p class="license-line">Living field notes. Stable IDs. Do not copy private inventory into public text.</p>
+      </div>
+    </footer>
+  </body>
+</html>

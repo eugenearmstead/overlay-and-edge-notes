@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>OEN-06: Netfilter-off IPv6 return-path blackhole — Overlay and Edge Notes</title>
+    <meta name="description" content="With overlay netfilter off, an nft prerouting mark does not win the first IPv6 route lookup. Use one ip6tables path and install the overlay unique-local /48 on table 52 and main.">
+    <link rel="canonical" href="https://eugenearmstead.github.io/overlay-and-edge-notes/networking/06-netfilter-off-v6-return.html">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Source+Sans+3:wght@400;500;600&amp;display=swap">
+    <link rel="stylesheet" href="../assets/spec.css">
+    <link rel="describedby" href="../llms.txt">
+    <meta name="author" content="Eugene Armstead">
+    <meta name="citation_author" content="Eugene Armstead">
+    <meta name="dcterms.creator" content="Eugene Armstead">
+    <link rel="author" href="https://www.armsteadent.com/">
+    <meta property="article:author" content="Eugene Armstead">
+    <meta property="og:see_also" content="https://www.armsteadent.com/">
+    <meta property="og:title" content="OEN-06: Netfilter-off IPv6 return-path blackhole — Overlay and Edge Notes">
+    <meta property="og:description" content="With overlay netfilter off, an nft prerouting mark does not win the first IPv6 route lookup. Use one ip6tables path and install the overlay unique-local /48 on table 52 and main.">
+    <meta property="og:url" content="https://eugenearmstead.github.io/overlay-and-edge-notes/networking/06-netfilter-off-v6-return.html">
+    <meta property="og:type" content="article">
+    <meta property="article:published_time" content="2026-09-08">
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "TechArticle",
+      "@id": "https://eugenearmstead.github.io/overlay-and-edge-notes/networking/06-netfilter-off-v6-return.html#article",
+      "headline": "Netfilter-off IPv6 return-path blackhole",
+      "description": "With overlay netfilter off, an nft prerouting mark does not win the first IPv6 route lookup. Use one ip6tables path and install the overlay unique-local /48 on table 52 and main.",
+      "datePublished": "2026-09-08",
+      "author": {
+        "@type": "Person",
+        "name": "Eugene Armstead",
+        "url": "https://www.armsteadent.com/",
+        "sameAs": [
+          "https://github.com/eugenearmstead"
+        ]
+      },
+      "url": "https://eugenearmstead.github.io/overlay-and-edge-notes/networking/06-netfilter-off-v6-return.html",
+      "identifier": "OEN-06",
+      "license": "https://creativecommons.org/licenses/by/4.0/",
+      "inLanguage": "en"
+    },
+    {
+      "@type": "HowTo",
+      "name": "Netfilter-off IPv6 return-path blackhole",
+      "description": "With overlay netfilter off, an nft prerouting mark does not win the first IPv6 route lookup. Use one ip6tables path and install the overlay unique-local /48 on table 52 and main.",
+      "author": {
+        "@type": "Person",
+        "name": "Eugene Armstead",
+        "url": "https://www.armsteadent.com/",
+        "sameAs": [
+          "https://github.com/eugenearmstead"
+        ]
+      },
+      "step": [
+        {
+          "@type": "HowToStep",
+          "position": 1,
+          "name": "P1 \u2014 Capture the blackhole signature.",
+          "text": "Action: On `<exit-node>`, attempt exit-client `curl -6`. Watch ip6tables SNAT/MASQUERADE counters vs FORWARD `<tunnel>\u2192overlay`. `ip -6 route get <overlay-ula> iif <tunnel>`. Expected: SNAT increments; FORWARD overlay is 0; route get shows the public NIC. On failure: If FORWARD already carries return, this spec does not apply."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 2,
+          "name": "P2 \u2014 One ip6tables path.",
+          "text": "Action: Remove extra nft MASQUERADE on `<gcp-nic>` or the VPS NIC. Keep mangle PREROUTING MARK and MASQUERADE on the **tunnel** in ip6tables only ([OEN-S27](../supporting/s27-iptables-nft-mark-before-fib.md)). Expected: No duplicate masquerade. One tool family. On failure: Do not add more NAT to \u201chelp.\u201d"
+        },
+        {
+          "@type": "HowToStep",
+          "position": 3,
+          "name": "P3 \u2014 Install overlay ULA /48 on table 52 and main.",
+          "text": "Action: `ip -6 route` in table 52 and main. Add the overlay ULA `/48` via the overlay iface on **both** if missing. Expected: `ip -6 route get <overlay-ula> iif <tunnel>` now enters overlay, not the public NIC. On failure: Restarting overlay alone does not install the prefix \u2014 add the route."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 4,
+          "name": "P4 \u2014 Soak IPv6 from a LAN Pi.",
+          "text": "Action: On `<overlay-peer>`, select `<exit-node>`, `curl -6 https://example.com`, then clear the exit. Expected: HTTP 200. Egress is the cloud, not the home tunnel. On failure: If v4 works and v6 leaks home on Wi-Fi, see [OEN-20](20-lan-ula-happy-eyeballs-leak.md) / [OEN-S26](../supporting/s26-wifi-vs-cellular-underlay.md)."
+        }
+      ]
+    }
+  ]
+}
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <div class="site-header-inner">
+        <p class="site-title"><a href="../index.html">Overlay and Edge Notes</a></p>
+        <p class="site-tag">Public field notes by Eugene Armstead</p>
+    <nav class="site-nav" aria-label="Site">
+      <a href="../index.html">Home</a>
+      <a href="../DISCLOSURE.html">Disclosure</a>
+      <a href="../changelog.html">Changelog</a>
+      <a href="../editions/2026.html">2026</a>
+      <a href="../AGENTS.md">AGENTS.md</a>
+      <a href="../index.html#networking">Networking</a>
+      <a href="../index.html#web">Web</a>
+      <a href="../index.html#supporting">Supporting</a>
+    </nav>
+      </div>
+    </header>
+    <nav class="breadcrumb" aria-label="Breadcrumb"><ol><li><a href="../index.html">Home</a></li><li><a href="../index.html#networking">Networking</a></li><li>OEN-06</li></ol></nav>
+    <main id="main">
+      <article>
+        <h1>Netfilter-off IPv6 return-path blackhole</h1>
+        <p class="meta-line"><span>OEN-06</span> · original · edition 1 · 2026-09-08</p>
+        <h2 id="context">Context</h2>
+<p>On a cloud Virtual Private Server (VPS) <code>&lt;exit-node&gt;</code> with overlay <strong>NetfilterMode=off</strong>, IPv6 exit can egress while return dies. Source network address translation (SNAT) / MASQUERADE counters increment; <code>FORWARD</code> from the commercial tunnel toward the overlay stays 0. <code>ip -6 route get &lt;overlay-ula&gt; iif &lt;tunnel&gt;</code> points at the <strong>public NIC</strong>, not back into overlay.</p>
+<p>nft prerouting MARK on the overlay iface did <strong>not</strong> apply before the first forwarding information base (FIB) lookup when the backend was iptables-nft. Unmarked IPv6 went out the VPS public NIC. Splitting nft mark plus a separate ip6tables MASQUERADE broke conntrack return.</p>
+<p>IPv4 often already has /32 overlays on table 52 and main. The IPv6 unique-local address (ULA) <strong>/48</strong> was missing with netfilter off.</p>
+
+<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>VPS</dt><dd>Virtual Private Server</dd><dt>LAN</dt><dd>Local Area Network</dd><dt>WAN</dt><dd>Wide Area Network</dd><dt>TCP</dt><dd>Transmission Control Protocol</dd><dt>MTU</dt><dd>Maximum Transmission Unit</dd><dt>ICMP</dt><dd>Internet Control Message Protocol</dd><dt>HTTP</dt><dd>Hypertext Transfer Protocol</dd><dt>HTTPS</dt><dd>Hypertext Transfer Protocol Secure</dd><dt>IPv4</dt><dd>Internet Protocol version 4</dd><dt>IPv6</dt><dd>Internet Protocol version 6</dd><dt>DNS</dt><dd>Domain Name System</dd><dt>NAT</dt><dd>network address translation</dd><dt>SNAT</dt><dd>source network address translation</dd><dt>ULA</dt><dd>unique-local address (IPv6)</dd><dt>GCP</dt><dd>Google Cloud Platform</dd><dt>VM</dt><dd>virtual machine</dd><dt>NIC</dt><dd>network interface card</dd><dt>FIB</dt><dd>forwarding information base</dd><dt>nft</dt><dd>nftables (Linux packet filter)</dd><dt>FORWARD</dt><dd>netfilter/iptables forward chain</dd><dt>MASQUERADE</dt><dd>iptables masquerade (source NAT)</dd><dt>PREROUTING</dt><dd>netfilter prerouting chain</dd><dt>MARK</dt><dd>netfilter packet mark</dd><dt>ControlPath</dt><dd>OpenSSH multiplexing socket path option</dd><dt>Pi</dt><dd>single-board computer (Raspberry Pi class)</dd><dt>POSTROUTING</dt><dd>netfilter postrouting chain</dd></dl></section>
+<h2 id="topology">Topology</h2>
+<pre><code class="language-text">[exit client] --v6--&gt; [&lt;exit-node&gt; overlay]
+    mark in PREROUTING (iptables-nft)  --X--&gt;  first FIB lookup still uses WAN NIC  (TRAP)
+    ip -6 route get &lt;overlay-ula&gt; iif &lt;tunnel&gt;  shows &lt;wan-iface&gt;   (proof)
+    FIX: overlay ULA /48 on table 52 AND main; one ip6tables MASQUERADE path</code></pre>
+<h2 id="bind">Bind</h2>
+<p>Fill this table <strong>before</strong> any live change. Do <strong>not</strong> paste real values back into public notes.</p>
+<table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><code>&lt;exit-node&gt;</code></td><td>Overlay exit node</td><td>Cloud VM or LAN Pi used as exit</td></tr><tr><td><code>&lt;overlay-peer&gt;</code></td><td>Soak client (<strong>not</strong> the agent workstation)</td><td>LAN Pi</td></tr><tr><td><code>&lt;user&gt;</code></td><td>SSH user</td><td>Guest</td></tr><tr><td><code>&lt;overlay-tun&gt;</code></td><td>Overlay tun on the exit</td><td>Iface</td></tr><tr><td><code>&lt;gcp-nic&gt;</code></td><td>Public NIC on a Google Cloud guest</td><td>Iface; omit on non-GCP exits</td></tr><tr><td><code>&lt;wan-iface&gt;</code></td><td>WAN / public NIC</td><td>Iface</td></tr><tr><td><code>&lt;mss4&gt;</code> / <code>&lt;mss6&gt;</code></td><td>Computed from underlay or overlay tun MTU</td><td>Formulas</td></tr></tbody></table>
+<h2 id="formulas">Formulas</h2>
+<p>Do not publish a real ULA. Use <code>&lt;overlay-ula&gt;</code> as a prefix class (<code>/48</code>). Measure, do not invent table numbers if this guest uses another policy table — list <code>ip -6 rule</code> first.</p>
+<h2 id="decision">Decision</h2>
+<p>Use <strong>one</strong> ip6tables path: mangle PREROUTING MARK plus source-based MASQUERADE on the tunnel. Install the overlay ULA <code>/48</code> on <strong>table 52 and main</strong>.</p>
+<p>MUST NOT split nft + ip6tables MASQUERADE. MUST NOT paste a real node ULA in public text — write <code>&lt;overlay-ula&gt;</code> / “overlay ULA /48”.</p>
+<h2 id="consequences">Consequences</h2>
+<ul><li>Exit-client IPv6 HTTPS returns.</li><li>FORWARD tunnel→overlay counters increment.</li><li>Conntrack stays on one family of tools.</li></ul>
+<h2 id="agent-stop-rule">Agent stop rule</h2>
+<blockquote><p>A coding agent MUST emit a <strong>bound runbook</strong> (placeholders replaced from Bind). MUST NOT apply live <code>ip rule</code>, nft, iptables, ip6tables, sysctl, <code>wg set</code>, daemon restart, or deploy until a <strong>human</strong> filled Bind. MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS. MUST NOT file an upstream bug from this page. MUST NOT publish real addresses, hostnames, or custom ports.</p></blockquote>
+<h2 id="procedure">Procedure</h2>
+<p>Placeholders only until Bind is filled: <code>&lt;cloud-vps&gt;</code>, <code>&lt;lan-pi&gt;</code>, <code>&lt;overlay-peer&gt;</code>, <code>&lt;exit-node&gt;</code>, <code>&lt;wg-iface&gt;</code>, <code>&lt;gcp-nic&gt;</code>, plus the Bind extras on this page.</p>
+<h3>Copy-paste commands (after Bind)</h3>
+<pre><code class="language-bash">ssh -o ControlPath=none &lt;user&gt;@&lt;exit-node&gt; &#x27;ip -6 rule; ip -6 route show table 52; ip -6 route show table main | head&#x27;
+ip -6 route get &lt;overlay-ula&gt; iif &lt;wg-iface&gt;
+# Want: via overlay, not dev &lt;wan-iface&gt; / &lt;gcp-nic&gt;
+
+ip6tables -t mangle -S PREROUTING
+ip6tables -t nat -S POSTROUTING
+nft list ruleset | grep -i masquerade || true</code></pre>
+<p>MUST NOT split nft MASQUERADE and ip6tables MASQUERADE. MUST NOT add a second <code>-o &lt;gcp-nic&gt;</code> MASQUERADE (<a href="17-gcp-overlay-exit.html">OEN-17</a>).</p>
+<ol><li><strong>P1 — Capture the blackhole signature.</strong><br>
+- <strong>Action:</strong> On <code>&lt;exit-node&gt;</code>, attempt exit-client <code>curl -6</code>. Watch ip6tables SNAT/MASQUERADE counters vs FORWARD <code>&lt;tunnel&gt;→overlay</code>. <code>ip -6 route get &lt;overlay-ula&gt; iif &lt;tunnel&gt;</code>.<br>
+- <strong>Expected:</strong> SNAT increments; FORWARD overlay is 0; route get shows the public NIC.<br>
+- <strong>On failure:</strong> If FORWARD already carries return, this spec does not apply.</li><li><strong>P2 — One ip6tables path.</strong><br>
+- <strong>Action:</strong> Remove extra nft MASQUERADE on <code>&lt;gcp-nic&gt;</code> or the VPS NIC. Keep mangle PREROUTING MARK and MASQUERADE on the <strong>tunnel</strong> in ip6tables only (<a href="../supporting/s27-iptables-nft-mark-before-fib.html">OEN-S27</a>).<br>
+- <strong>Expected:</strong> No duplicate masquerade. One tool family.<br>
+- <strong>On failure:</strong> Do not add more NAT to “help.”</li><li><strong>P3 — Install overlay ULA /48 on table 52 and main.</strong><br>
+- <strong>Action:</strong> <code>ip -6 route</code> in table 52 and main. Add the overlay ULA <code>/48</code> via the overlay iface on <strong>both</strong> if missing.<br>
+- <strong>Expected:</strong> <code>ip -6 route get &lt;overlay-ula&gt; iif &lt;tunnel&gt;</code> now enters overlay, not the public NIC.<br>
+- <strong>On failure:</strong> Restarting overlay alone does not install the prefix — add the route.</li><li><strong>P4 — Soak IPv6 from a LAN Pi.</strong><br>
+- <strong>Action:</strong> On <code>&lt;overlay-peer&gt;</code>, select <code>&lt;exit-node&gt;</code>, <code>curl -6 https://example.com</code>, then clear the exit.<br>
+- <strong>Expected:</strong> HTTP 200. Egress is the cloud, not the home tunnel.<br>
+- <strong>On failure:</strong> If v4 works and v6 leaks home on Wi-Fi, see <a href="20-lan-ula-happy-eyeballs-leak.html">OEN-20</a> / <a href="../supporting/s26-wifi-vs-cellular-underlay.html">OEN-S26</a>.</li></ol>
+<h2 id="expected-samples">Expected samples</h2>
+<pre><code class="language-text"># Trap: mark counters up, route still WAN
+&lt;overlay-ula&gt; from :: via &lt;link-local&gt; dev &lt;wan-iface&gt; src &lt;gua&gt;
+
+# After /48 on table 52 and main
+&lt;overlay-ula&gt; from :: dev &lt;overlay-tun&gt; src &lt;overlay-v6&gt;</code></pre>
+<h2 id="verify">Verify</h2>
+<ul><li>FORWARD tunnel→overlay increments on v6 return.</li><li>ULA /48 exists on table 52 and main.</li><li>No split nft+ip6tables MASQUERADE.</li><li>example.com 200 over IPv6 through the exit from a non-workstation client.</li><li>ICMP / small ping success was <strong>not</strong> used as the pass criterion when this spec names TCP, SSH, or HTTPS.</li><li>Bind table was filled by a human before any live <code>ip</code> / nft / iptables change.</li></ul>
+<h2 id="must-not" class="must-not">MUST NOT</h2>
+<ul><li>MUST NOT publish real overlay ULA node addresses.</li><li>MUST NOT split nft mark and ip6tables MASQUERADE.</li><li>MUST NOT add a second IPv6 MASQUERADE on the public NIC (<a href="17-gcp-overlay-exit.html">OEN-17</a>).</li><li>MUST NOT test from the agent workstation (<a href="../supporting/s18-do-not-set-exit-on-agent-workstation.html">OEN-S18</a>).</li><li>MUST NOT apply live network or firewall changes until Bind is filled by a human.</li><li>MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.</li><li>MUST NOT publish hostnames, addresses, ULAs, or custom ports.</li></ul>
+<h2 id="related-specs">Related specs</h2>
+<ul><li><a href="17-gcp-overlay-exit.html">OEN-17 Google Cloud overlay exit</a></li><li><a href="../supporting/s27-iptables-nft-mark-before-fib.html">OEN-S27 iptables-nft MARK before FIB</a></li><li><a href="../supporting/s32-dns-leak-test-not-v6-dataplane.html">OEN-S32 DNS leak-test vs data plane</a></li><li><a href="13-overlay-underlay-ula-layers.html">OEN-13 Overlay vs underlay vs unique-local</a></li></ul>
+<h2 id="prior-art-not-novel">Prior art (Not novel)</h2>
+<p>Policy routing and table 52 appear in overlay exit docs. This spec’s claim is netfilter-off + nft mark missing the first FIB lookup + missing v6 /48 + split MASQUERADE as one failure cluster.</p>
+      </article>
+    </main>
+    <footer class="site-footer">
+      <div class="site-footer-inner">
+    <p class="byline">Written by <a href="https://www.armsteadent.com/">Eugene Armstead</a> · <a href="https://www.armsteadent.com/">https://www.armsteadent.com/</a> · <a rel="license" href="https://creativecommons.org/licenses/by/4.0/">CC-BY-4.0</a></p>
+    <p class="license-line">Living field notes. Stable IDs. Do not copy private inventory into public text.</p>
+      </div>
+    </footer>
+  </body>
+</html>
