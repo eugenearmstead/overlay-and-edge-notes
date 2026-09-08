@@ -1,13 +1,13 @@
 ---
-id: OEN-S30
+id: "OEN-S30"
 title: "TS_DEBUG_MTU below 1280 disables overlay IPv6"
-kind: supporting
-status: active
-edition: 1
-date_published: 2026-09-08
-author: Eugene Armstead
-author_url: https://www.armsteadent.com/
-canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s30-ts-debug-mtu-below-1280.html
+kind: "supporting"
+status: "active"
+edition: 2
+date_published: "2026-09-08"
+author: "Eugene Armstead"
+author_url: "https://www.armsteadent.com/"
+canonical: "https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s30-ts-debug-mtu-below-1280.html"
 keywords:
   - "TS_DEBUG_MTU below 1280"
   - "overlay IPv6 disabled MTU"
@@ -24,41 +24,42 @@ keywords:
 backs:
   - OEN-13
   - OEN-17
-backed_by: []
+backed_by:
+  []
 description: "TS_DEBUG_MTU below 1280 makes the kernel drop IPv6 on the overlay tun. Do not use it as a production clamp."
 terms:
-  - abbr: OEN
-    expansion: Overlay and Edge Notes
-  - abbr: SSH
-    expansion: Secure Shell
-  - abbr: VPS
-    expansion: Virtual Private Server
+  - abbr: CLI
+    expansion: command-line interface
+  - abbr: ControlPath
+    expansion: OpenSSH multiplexing socket path option
+  - abbr: HTTPS
+    expansion: Hypertext Transfer Protocol Secure
+  - abbr: ICMP
+    expansion: Internet Control Message Protocol
+  - abbr: IPv6
+    expansion: Internet Protocol version 6
   - abbr: LAN
     expansion: Local Area Network
-  - abbr: WAN
-    expansion: Wide Area Network
-  - abbr: TCP
-    expansion: Transmission Control Protocol
   - abbr: MSS
     expansion: Maximum Segment Size
   - abbr: MTU
     expansion: Maximum Transmission Unit
-  - abbr: ICMP
-    expansion: Internet Control Message Protocol
-  - abbr: HTTPS
-    expansion: Hypertext Transfer Protocol Secure
-  - abbr: IPv6
-    expansion: Internet Protocol version 6
-  - abbr: WireGuard
-    expansion: UDP-based VPN protocol
   - abbr: nft
     expansion: nftables (Linux packet filter)
-  - abbr: ControlPath
-    expansion: OpenSSH multiplexing socket path option
+  - abbr: OEN
+    expansion: Overlay and Edge Notes
   - abbr: Pi
     expansion: single-board computer (Raspberry Pi class)
   - abbr: RFC
     expansion: Request for Comments
+  - abbr: SSH
+    expansion: Secure Shell
+  - abbr: TCP
+    expansion: Transmission Control Protocol
+  - abbr: VPS
+    expansion: Virtual Private Server
+  - abbr: WAN
+    expansion: Wide Area Network
 ---
 
 # TS_DEBUG_MTU below 1280 disables overlay IPv6
@@ -76,10 +77,12 @@ Not a production clamp
 
 ## Bind
 
+
 Fill this table **before** any live change. Do **not** paste real values back into public notes.
 
 | Placeholder | Operator fills | Class |
 |-------------|----------------|-------|
+| `<overlay-impl>` | Overlay implementation class | `tailscale-compatible` or other — stop and translate CLI |
 | `<cloud-vps>` | Overlay SSH target | Cloud VPS |
 | `<lan-pi>` | Overlay SSH target | LAN Pi |
 | `<user>` | SSH user | Guest account |
@@ -91,7 +94,6 @@ Fill this table **before** any live change. Do **not** paste real values back in
 | `<mss4>` / `<mss6>` | Computed MSS | Formulas |
 | `<vps-public-v4>` / `<vps-public-v6>` | VPS public addresses | WAN; never publish |
 | `<overlay-v4>` / `<overlay-v6>` | Overlay addresses | Overlay; never publish |
-
 
 ## Formulas
 
@@ -114,6 +116,8 @@ overlay `ip -6` can exist; tun accepts v6.
 > MUST NOT publish real addresses, hostnames, or custom ports.
 
 ## Procedure
+
+This spec does not apply if `<overlay-impl>` is not tailscale-compatible.
 
 Placeholders only until Bind is filled: `<cloud-vps>`, `<lan-pi>`, `<overlay-peer>`, `<exit-node>`, `<wg-iface>`, `<gcp-nic>`, plus the Bind extras on this page.
 
@@ -156,6 +160,10 @@ TS_DEBUG_MTU=1000   # disables overlay v6
 - MUST NOT apply live network or firewall changes until Bind is filled by a human.
 - MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
 - MUST NOT publish hostnames, addresses, ULAs, or custom ports.
+
+## Page changelog
+
+- Edition 2 (8 Sep 2026, Mountain Time): Added overlay-impl Bind and trap-specific terms (review cleanup).
 
 ## Related specs
 

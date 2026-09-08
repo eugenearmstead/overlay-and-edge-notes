@@ -1,13 +1,13 @@
 ---
-id: OEN-20
+id: "OEN-20"
 title: "LAN unique-local + remote exit: IPv4 takes the exit, IPv6 leaks"
-kind: original
-status: active
-edition: 1
-date_published: 2026-09-08
-author: Eugene Armstead
-author_url: https://www.armsteadent.com/
-canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/networking/20-lan-ula-happy-eyeballs-leak.html
+kind: "original"
+status: "active"
+edition: 2
+date_published: "2026-09-08"
+author: "Eugene Armstead"
+author_url: "https://www.armsteadent.com/"
+canonical: "https://eugenearmstead.github.io/overlay-and-edge-notes/networking/20-lan-ula-happy-eyeballs-leak.html"
 keywords:
   - "LAN ULA Happy-Eyeballs leak"
   - "IPv4 takes exit IPv6 leaks"
@@ -21,27 +21,16 @@ keywords:
   - "home LAN ULA vs selected exit"
   - "curl -4 exit curl -6 leak"
   - "Wi-Fi vs cellular exit matrix"
-backs: []
+backs:
+  []
 backed_by:
   - OEN-S26
 description: "On home Wi-Fi a remote exit can carry IPv4 while browsers prefer IPv6 via the LAN unique-local default into the commercial VPN. Cellular without that unique-local looks fully on the exit."
 terms:
-  - abbr: OEN
-    expansion: Overlay and Edge Notes
-  - abbr: SSH
-    expansion: Secure Shell
-  - abbr: LAN
-    expansion: Local Area Network
-  - abbr: WAN
-    expansion: Wide Area Network
-  - abbr: VPN
-    expansion: Virtual Private Network
-  - abbr: TCP
-    expansion: Transmission Control Protocol
-  - abbr: MTU
-    expansion: Maximum Transmission Unit
-  - abbr: ICMP
-    expansion: Internet Control Message Protocol
+  - abbr: GCP
+    expansion: Google Cloud Platform
+  - abbr: Happy-Eyeballs
+    expansion: dual-stack connection racing (RFC 8305)
   - abbr: HTTPS
     expansion: Hypertext Transfer Protocol Secure
   - abbr: IP
@@ -50,24 +39,28 @@ terms:
     expansion: Internet Protocol version 4
   - abbr: IPv6
     expansion: Internet Protocol version 6
-  - abbr: NAT
-    expansion: network address translation
-  - abbr: ULA
-    expansion: unique-local address (IPv6)
-  - abbr: GCP
-    expansion: Google Cloud Platform
-  - abbr: VM
-    expansion: virtual machine
-  - abbr: NIC
-    expansion: network interface card
-  - abbr: nft
-    expansion: nftables (Linux packet filter)
+  - abbr: LAN
+    expansion: Local Area Network
   - abbr: MASQUERADE
     expansion: iptables masquerade (source NAT)
+  - abbr: MTU
+    expansion: Maximum Transmission Unit
+  - abbr: NAT
+    expansion: network address translation
+  - abbr: NIC
+    expansion: network interface card
+  - abbr: OEN
+    expansion: Overlay and Edge Notes
   - abbr: Pi
     expansion: single-board computer (Raspberry Pi class)
-  - abbr: Happy-Eyeballs
-    expansion: dual-stack connection racing (RFC 8305)
+  - abbr: ULA
+    expansion: unique-local address (IPv6)
+  - abbr: VM
+    expansion: virtual machine
+  - abbr: VPN
+    expansion: Virtual Private Network
+  - abbr: WAN
+    expansion: Wide Area Network
 ---
 
 # LAN unique-local + remote exit: IPv4 takes the exit, IPv6 leaks
@@ -95,14 +88,8 @@ Fill this table **before** any live change. Do **not** paste real values back in
 
 | Placeholder | Operator fills | Class |
 |-------------|----------------|-------|
-| `<exit-node>` | Overlay exit node | Cloud VM or LAN Pi used as exit |
-| `<overlay-peer>` | Soak client (**not** the agent workstation) | LAN Pi |
-| `<user>` | SSH user | Guest |
-| `<overlay-tun>` | Overlay tun on the exit | Iface |
-| `<gcp-nic>` | Public NIC on a Google Cloud guest | Iface; omit on non-GCP exits |
-| `<wan-iface>` | WAN / public NIC | Iface |
-| `<mss4>` / `<mss6>` | Computed from underlay or overlay tun MTU | Formulas |
-
+| `<exit-node>` | Overlay exit node | Cloud VM or LAN Pi |
+| `<public-v6>` | Public IPv6 of the remote exit | WAN; never publish |
 
 ## Formulas
 
@@ -120,15 +107,13 @@ Operators MUST verify `ip -6 route get <public-v6>` via the LAN NIC and whether 
 
 ## Agent stop rule
 
-> A coding agent MUST emit a **bound runbook** (placeholders replaced from Bind).
-> MUST NOT apply live `ip rule`, nft, iptables, ip6tables, sysctl, `wg set`, daemon restart, or deploy until a **human** filled Bind.
-> MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
-> MUST NOT file an upstream bug from this page.
-> MUST NOT publish real addresses, hostnames, or custom ports.
+> MUST emit bound Happy-Eyeballs / LAN ULA vs exit checks after Bind is filled.
+> MUST NOT disable IPv6 on the LAN to “fix” the leak.
+> MUST NOT apply netfilter until Bind is filled.
+> MUST NOT publish LAN unique-local addresses.
 
 ## Procedure
 
-Placeholders only until Bind is filled: `<cloud-vps>`, `<lan-pi>`, `<overlay-peer>`, `<exit-node>`, `<wg-iface>`, `<gcp-nic>`, plus the Bind extras on this page.
 
 ### Copy-paste commands (after Bind)
 
@@ -171,8 +156,6 @@ MUST NOT keep changing GCP MTU for this split ([OEN-17](17-gcp-overlay-exit.md))
 - Cellular + exit: both families exit, or a different spec applies.
 - table 52 ::/0 absence is recorded.
 - Agent workstation was not used as the soak client.
-- ICMP / small ping success was **not** used as the pass criterion when this spec names TCP, SSH, or HTTPS.
-- Bind table was filled by a human before any live `ip` / nft / iptables change.
 
 ## MUST NOT
 
@@ -180,9 +163,11 @@ MUST NOT keep changing GCP MTU for this split ([OEN-17](17-gcp-overlay-exit.md))
 - MUST NOT blame Google Cloud NAT first for a Wi-Fi-only v6 leak.
 - MUST NOT disable IPv6 as an undocumented default.
 - MUST NOT set exit on the agent workstation to reproduce.
-- MUST NOT apply live network or firewall changes until Bind is filled by a human.
-- MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
 - MUST NOT publish hostnames, addresses, ULAs, or custom ports.
+
+## Page changelog
+
+- Edition 2 (8 Sep 2026, Mountain Time): Trap-specific Bind and agent stop rule (review cleanup).
 
 ## Related specs
 

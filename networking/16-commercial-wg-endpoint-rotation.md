@@ -1,13 +1,13 @@
 ---
-id: OEN-16
-title: Commercial WireGuard endpoint rotation (IPv6, shuffle bag, hub watch)
-kind: original
-status: active
+id: "OEN-16"
+title: "Commercial WireGuard endpoint rotation (IPv6, shuffle bag, hub watch)"
+kind: "original"
+status: "active"
 edition: 2
-date_published: 2026-09-07
-author: Eugene Armstead
-author_url: https://www.armsteadent.com/
-canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/networking/16-commercial-wg-endpoint-rotation.html
+date_published: "2026-09-07"
+author: "Eugene Armstead"
+author_url: "https://www.armsteadent.com/"
+canonical: "https://eugenearmstead.github.io/overlay-and-edge-notes/networking/16-commercial-wg-endpoint-rotation.html"
 keywords:
   - "WireGuard endpoint rotation"
   - "IPv6-only WireGuard endpoint"
@@ -22,22 +22,20 @@ keywords:
   - "WireGuard hop cooldown"
   - "ISP down vs VPN down"
   - "allowlisted IPv6 endpoints"
-backs: []
-backed_by: []
+backs:
+  []
+backed_by:
+  []
 description: "IPv6-only WireGuard rotation fails when health checks ride the tunnel: use WAN curl -6, ULA egress verify, a shuffle bag, and a hub watch."
 terms:
   - abbr: OEN
     expansion: Overlay and Edge Notes
   - abbr: WG
     expansion: WireGuard
-  - abbr: WireGuard
-    expansion: UDP-based VPN protocol
   - abbr: IPv6
     expansion: Internet Protocol version 6
   - abbr: IPv4
     expansion: Internet Protocol version 4
-  - abbr: IP
-    expansion: Internet Protocol
   - abbr: FQDN
     expansion: fully qualified domain name
   - abbr: DNS
@@ -60,10 +58,6 @@ terms:
     expansion: Secure Shell
   - abbr: HTTPS
     expansion: Hypertext Transfer Protocol Secure
-  - abbr: HTTP
-    expansion: Hypertext Transfer Protocol
-  - abbr: UDP
-    expansion: User Datagram Protocol
   - abbr: LAN
     expansion: Local Area Network
   - abbr: VPS
@@ -74,8 +68,6 @@ terms:
     expansion: WireGuard peer option that sends periodic keepalive packets
   - abbr: FORWARD
     expansion: netfilter/iptables forward chain
-  - abbr: URL
-    expansion: Uniform Resource Locator
   - abbr: PATH
     expansion: Unix executable search path
   - abbr: CrowdSec

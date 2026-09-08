@@ -1,13 +1,13 @@
 ---
-id: OEN-19
+id: "OEN-19"
 title: "Local Unbound REFUSES overlay peer-API queries with Recursion Desired off"
-kind: original
-status: active
-edition: 1
-date_published: 2026-09-08
-author: Eugene Armstead
-author_url: https://www.armsteadent.com/
-canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/networking/19-unbound-refuses-rd0.html
+kind: "original"
+status: "active"
+edition: 2
+date_published: "2026-09-08"
+author: "Eugene Armstead"
+author_url: "https://www.armsteadent.com/"
+canonical: "https://eugenearmstead.github.io/overlay-and-edge-notes/networking/19-unbound-refuses-rd0.html"
 keywords:
   - "Unbound REFUSES RD=0"
   - "PeerAPI Recursion Desired off"
@@ -21,60 +21,49 @@ keywords:
   - "force RD=1 stub"
   - "dnsmasq remote RD=0 works"
   - "PeerAPI DNS REFUSED"
-backs: []
+backs:
+  []
 backed_by:
   - OEN-05
   - OEN-14
 description: "Exit peer-API DNS over HTTPS sends Recursion Desired off. dnsmasq pointed at loopback Unbound returns REFUSED, which looks like Unbound is down."
 terms:
-  - abbr: OEN
-    expansion: Overlay and Edge Notes
-  - abbr: SSH
-    expansion: Secure Shell
-  - abbr: LAN
-    expansion: Local Area Network
-  - abbr: WAN
-    expansion: Wide Area Network
-  - abbr: TCP
-    expansion: Transmission Control Protocol
-  - abbr: MTU
-    expansion: Maximum Transmission Unit
-  - abbr: ICMP
-    expansion: Internet Control Message Protocol
-  - abbr: HTTPS
-    expansion: Hypertext Transfer Protocol Secure
-  - abbr: DNS
-    expansion: Domain Name System
-  - abbr: DoH
-    expansion: DNS over HTTPS
-  - abbr: GCP
-    expansion: Google Cloud Platform
-  - abbr: VM
-    expansion: virtual machine
-  - abbr: NIC
-    expansion: network interface card
   - abbr: API
     expansion: application programming interface
-  - abbr: PeerAPI
-    expansion: overlay peer application-programming interface (exit DNS over HTTPS)
-  - abbr: RD
-    expansion: Recursion Desired (DNS flag)
-  - abbr: nft
-    expansion: nftables (Linux packet filter)
+  - abbr: CLI
+    expansion: command-line interface
   - abbr: ControlPath
     expansion: OpenSSH multiplexing socket path option
-  - abbr: Pi
-    expansion: single-board computer (Raspberry Pi class)
-  - abbr: REFUSES
-    expansion: DNS response code meaning the server will not answer
-  - abbr: REFUSED
-    expansion: DNS response code meaning the server will not answer
-  - abbr: Unbound
-    expansion: validating recursive DNS resolver
+  - abbr: DNS
+    expansion: Domain Name System
   - abbr: dnsmasq
     expansion: lightweight DNS forwarder and DHCP server
+  - abbr: DoH
+    expansion: DNS over HTTPS
+  - abbr: HTTPS
+    expansion: Hypertext Transfer Protocol Secure
+  - abbr: LAN
+    expansion: Local Area Network
   - abbr: NOERROR
     expansion: DNS response code meaning the query succeeded
+  - abbr: OEN
+    expansion: Overlay and Edge Notes
+  - abbr: PeerAPI
+    expansion: overlay peer application-programming interface (exit DNS over HTTPS)
+  - abbr: Pi
+    expansion: single-board computer (Raspberry Pi class)
+  - abbr: RD
+    expansion: Recursion Desired (DNS flag)
+  - abbr: REFUSED
+    expansion: DNS response code meaning the server will not answer
+  - abbr: REFUSES
+    expansion: DNS response code meaning the server will not answer
+  - abbr: SSH
+    expansion: Secure Shell
+  - abbr: Unbound
+    expansion: validating recursive DNS resolver
+  - abbr: VM
+    expansion: virtual machine
 ---
 
 # Local Unbound REFUSES overlay peer-API queries with Recursion Desired off
@@ -100,14 +89,10 @@ Fill this table **before** any live change. Do **not** paste real values back in
 
 | Placeholder | Operator fills | Class |
 |-------------|----------------|-------|
-| `<exit-node>` | Overlay exit node | Cloud VM or LAN Pi used as exit |
-| `<overlay-peer>` | Soak client (**not** the agent workstation) | LAN Pi |
-| `<user>` | SSH user | Guest |
-| `<overlay-tun>` | Overlay tun on the exit | Iface |
-| `<gcp-nic>` | Public NIC on a Google Cloud guest | Iface; omit on non-GCP exits |
-| `<wan-iface>` | WAN / public NIC | Iface |
-| `<mss4>` / `<mss6>` | Computed from underlay or overlay tun MTU | Formulas |
-
+| `<overlay-impl>` | Overlay implementation class | `tailscale-compatible` or other — stop and translate CLI |
+| `<user>` | SSH user | Guest account |
+| `<exit-node>` | Overlay exit node | Cloud VM or LAN Pi |
+| `<overlay-peer>` | Soak client (not the agent workstation) | LAN Pi or phone |
 
 ## Formulas
 
@@ -125,15 +110,13 @@ An RD-stub MUST force RD=1 **before** Unbound ([OEN-05](05-exit-peerapi-dns-stub
 
 ## Agent stop rule
 
-> A coding agent MUST emit a **bound runbook** (placeholders replaced from Bind).
-> MUST NOT apply live `ip rule`, nft, iptables, ip6tables, sysctl, `wg set`, daemon restart, or deploy until a **human** filled Bind.
-> MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
-> MUST NOT file an upstream bug from this page.
-> MUST NOT publish real addresses, hostnames, or custom ports.
+> MUST emit bound Unbound/dnsmasq RD=0 queries after Bind is filled.
+> MUST NOT set `accept-dns=true` on a cloud exit to hide REFUSED.
+> MUST NOT apply netfilter from this page.
 
 ## Procedure
 
-Placeholders only until Bind is filled: `<cloud-vps>`, `<lan-pi>`, `<overlay-peer>`, `<exit-node>`, `<wg-iface>`, `<gcp-nic>`, plus the Bind extras on this page.
+This spec does not apply if `<overlay-impl>` is not tailscale-compatible.
 
 ### Copy-paste commands (after Bind)
 
@@ -170,8 +153,6 @@ ssh -o ControlPath=none <user>@<exit-node> 'dig +time=2 +norecurse @127.0.0.1 ex
 - Through stub / PeerAPI, queries answer.
 - Stub is loopback-only.
 - Unbound process was up the whole time.
-- ICMP / small ping success was **not** used as the pass criterion when this spec names TCP, SSH, or HTTPS.
-- Bind table was filled by a human before any live `ip` / nft / iptables change.
 
 ## MUST NOT
 
@@ -179,9 +160,11 @@ ssh -o ControlPath=none <user>@<exit-node> 'dig +time=2 +norecurse @127.0.0.1 ex
 - MUST NOT send PeerAPI at overlay :53.
 - MUST NOT set accept-dns=true on the exit VM to hide this.
 - MUST NOT publish PeerAPI URLs with real overlay addresses.
-- MUST NOT apply live network or firewall changes until Bind is filled by a human.
-- MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
 - MUST NOT publish hostnames, addresses, ULAs, or custom ports.
+
+## Page changelog
+
+- Edition 2 (8 Sep 2026, Mountain Time): Trap-specific Bind and agent stop rule (review cleanup).
 
 ## Related specs
 

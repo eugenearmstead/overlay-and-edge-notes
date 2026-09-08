@@ -1,13 +1,13 @@
 ---
-id: OEN-S13
+id: "OEN-S13"
 title: "Restart=always on a missing unit hung the workstation"
-kind: supporting
-status: active
-edition: 1
-date_published: 2026-09-08
-author: Eugene Armstead
-author_url: https://www.armsteadent.com/
-canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s13-restart-always-missing-unit.html
+kind: "supporting"
+status: "active"
+edition: 2
+date_published: "2026-09-08"
+author: "Eugene Armstead"
+author_url: "https://www.armsteadent.com/"
+canonical: "https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s13-restart-always-missing-unit.html"
 keywords:
   - "Restart=always missing ExecStart"
   - "systemd crash-loop hung workstation"
@@ -21,30 +21,22 @@ keywords:
   - "ExecStart path gone"
   - "audit crash-loop units"
   - "systemd StartLimit"
-backs: []
-backed_by: []
+backs:
+  []
+backed_by:
+  []
 description: "Restart=always on a missing ExecStart produced 150k+ failed restarts plus leftover units binding another host’s addresses on a 2-core box."
 terms:
+  - abbr: API
+    expansion: application programming interface
   - abbr: OEN
     expansion: Overlay and Edge Notes
-  - abbr: SSH
-    expansion: Secure Shell
-  - abbr: VPS
-    expansion: Virtual Private Server
-  - abbr: LAN
-    expansion: Local Area Network
-  - abbr: TCP
-    expansion: Transmission Control Protocol
-  - abbr: ICMP
-    expansion: Internet Control Message Protocol
-  - abbr: HTTPS
-    expansion: Hypertext Transfer Protocol Secure
-  - abbr: nft
-    expansion: nftables (Linux packet filter)
   - abbr: Pi
     expansion: single-board computer (Raspberry Pi class)
   - abbr: systemd
     expansion: Linux service manager
+  - abbr: VPS
+    expansion: Virtual Private Server
 ---
 
 # Restart=always on a missing unit hung the workstation
@@ -55,11 +47,7 @@ Always-on jobs belong on an always-on host. A user systemd unit with Restart=alw
 
 ## Topology
 
-```text
-systemd --user Restart=always + missing ExecStart
---> 150k+ failed restarts on a 2-core workstation
-Leftover units may bind another host's addresses
-```
+N/A — deploy
 
 ## Bind
 
@@ -67,10 +55,7 @@ Fill this table **before** any live change. Do **not** paste real values back in
 
 | Placeholder | Operator fills | Class |
 |-------------|----------------|-------|
-| `<repo-changelog>` | Canonical Markdown file in the private ops repo | Path class, not inventory |
-| `<on-device-changelog>` | On-device copy for that node class | Path class |
-| `<node>` | Role name (cloud VPS, LAN Pi, router, workstation) | Role, not hostname |
-
+| *(none)* | No packet-path Bind for this trap | Use the git host, origin, or API the operator already has |
 
 ## Formulas
 
@@ -86,15 +71,12 @@ Workstation load returns to normal. Foreign binds go away.
 
 ## Agent stop rule
 
-> A coding agent MUST emit a **bound runbook** (placeholders replaced from Bind).
-> MUST NOT apply live `ip rule`, nft, iptables, ip6tables, sysctl, `wg set`, daemon restart, or deploy until a **human** filled Bind.
-> MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
-> MUST NOT file an upstream bug from this page.
-> MUST NOT publish real addresses, hostnames, or custom ports.
+> MUST emit the `systemctl --user` crash-loop audit after Bind is filled.
+> MUST NOT set `Restart=always` on a unit whose binary may be missing.
+> MUST NOT apply netfilter from this page.
 
 ## Procedure
 
-Placeholders only until Bind is filled: `<cloud-vps>`, `<lan-pi>`, `<overlay-peer>`, `<exit-node>`, `<wg-iface>`, `<gcp-nic>`, plus the Bind extras on this page.
 
 ### Copy-paste commands (after Bind)
 
@@ -127,16 +109,16 @@ N failed
 
 - No crash-loop user units.
 - Always-on jobs not on the interactive workstation.
-- ICMP / small ping success was **not** used as the pass criterion when this spec names TCP, SSH, or HTTPS.
-- Bind table was filled by a human before any live `ip` / nft / iptables change.
 
 ## MUST NOT
 
 - MUST NOT Restart=always a missing binary.
 - MUST NOT publish timer unit names that identify the lab.
-- MUST NOT apply live network or firewall changes until Bind is filled by a human.
-- MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
 - MUST NOT publish hostnames, addresses, ULAs, or custom ports.
+
+## Page changelog
+
+- Edition 2 (8 Sep 2026, Mountain Time): Trap-specific Bind and agent stop rule (review cleanup).
 
 ## Related specs
 

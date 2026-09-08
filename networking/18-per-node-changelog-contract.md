@@ -1,13 +1,13 @@
 ---
-id: OEN-18
-title: Per-node changelog contract (repo + hashed on-device copy)
-kind: original
-status: active
+id: "OEN-18"
+title: "Per-node changelog contract (repo + hashed on-device copy)"
+kind: "original"
+status: "active"
 edition: 2
-date_published: 2026-09-07
-author: Eugene Armstead
-author_url: https://www.armsteadent.com/
-canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/networking/18-per-node-changelog-contract.html
+date_published: "2026-09-07"
+author: "Eugene Armstead"
+author_url: "https://www.armsteadent.com/"
+canonical: "https://eugenearmstead.github.io/overlay-and-edge-notes/networking/18-per-node-changelog-contract.html"
 keywords:
   - "per-node changelog hash mismatch"
   - "on-device CHANGELOG sync"
@@ -21,8 +21,10 @@ keywords:
   - "homelab changelog contract"
   - "hashed on-device copy"
   - "Change Paths Verify entry"
-backs: []
-backed_by: []
+backs:
+  []
+backed_by:
+  []
 description: "Per-node changelog hash mismatch: the ops-repo file is canonical; sync a hashed on-device copy the same session, with path class by node type."
 terms:
   - abbr: OEN
@@ -41,18 +43,6 @@ terms:
     expansion: Local Area Network
   - abbr: Pi
     expansion: single-board computer (Raspberry Pi class)
-  - abbr: ControlPath
-    expansion: OpenSSH multiplexing socket path option
-  - abbr: TZ
-    expansion: timezone abbreviation in a changelog heading
-  - abbr: WG
-    expansion: WireGuard
-  - abbr: WireGuard
-    expansion: UDP-based VPN protocol
-  - abbr: URL
-    expansion: Uniform Resource Locator
-  - abbr: IP
-    expansion: Internet Protocol
   - abbr: ControlPath
     expansion: OpenSSH multiplexing socket path option
 ---

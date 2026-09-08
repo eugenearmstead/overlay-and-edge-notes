@@ -1,13 +1,13 @@
 ---
-id: OEN-S16
+id: "OEN-S16"
 title: "Never nft flush / never start stock nftables.service"
-kind: supporting
-status: active
-edition: 1
-date_published: 2026-09-08
-author: Eugene Armstead
-author_url: https://www.armsteadent.com/
-canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s16-never-nft-flush.html
+kind: "supporting"
+status: "active"
+edition: 2
+date_published: "2026-09-08"
+author: "Eugene Armstead"
+author_url: "https://www.armsteadent.com/"
+canonical: "https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s16-never-nft-flush.html"
 keywords:
   - "never nft flush ruleset"
   - "never start nftables.service"
@@ -24,43 +24,30 @@ keywords:
 backs:
   - OEN-06
   - OEN-17
-backed_by: []
+backed_by:
+  []
 description: "Never nft flush ruleset and never start stock nftables.service on a host that also runs UFW, CrowdSec, and custom exit tables. Tunnel predown MUST delete only named custom tables."
 terms:
+  - abbr: CrowdSec
+    expansion: open-source IDS/IPS with a Central API
+  - abbr: HTTPS
+    expansion: Hypertext Transfer Protocol Secure
+  - abbr: ICMP
+    expansion: Internet Control Message Protocol
+  - abbr: NAT
+    expansion: network address translation
+  - abbr: nft
+    expansion: nftables (Linux packet filter)
+  - abbr: nftables
+    expansion: Linux packet-filter framework
   - abbr: OEN
     expansion: Overlay and Edge Notes
   - abbr: SSH
     expansion: Secure Shell
-  - abbr: LAN
-    expansion: Local Area Network
-  - abbr: WAN
-    expansion: Wide Area Network
   - abbr: TCP
     expansion: Transmission Control Protocol
-  - abbr: MTU
-    expansion: Maximum Transmission Unit
-  - abbr: ICMP
-    expansion: Internet Control Message Protocol
-  - abbr: HTTPS
-    expansion: Hypertext Transfer Protocol Secure
-  - abbr: NAT
-    expansion: network address translation
-  - abbr: GCP
-    expansion: Google Cloud Platform
-  - abbr: VM
-    expansion: virtual machine
-  - abbr: NIC
-    expansion: network interface card
-  - abbr: nft
-    expansion: nftables (Linux packet filter)
-  - abbr: Pi
-    expansion: single-board computer (Raspberry Pi class)
   - abbr: UFW
     expansion: Uncomplicated Firewall
-  - abbr: nftables
-    expansion: Linux packet-filter framework
-  - abbr: CrowdSec
-    expansion: open-source IDS/IPS with a Central API
 ---
 
 # Never nft flush / never start stock nftables.service
@@ -83,14 +70,8 @@ Fill this table **before** any live change. Do **not** paste real values back in
 
 | Placeholder | Operator fills | Class |
 |-------------|----------------|-------|
-| `<exit-node>` | Overlay exit node | Cloud VM or LAN Pi used as exit |
-| `<overlay-peer>` | Soak client (**not** the agent workstation) | LAN Pi |
-| `<user>` | SSH user | Guest |
-| `<overlay-tun>` | Overlay tun on the exit | Iface |
-| `<gcp-nic>` | Public NIC on a Google Cloud guest | Iface; omit on non-GCP exits |
-| `<wan-iface>` | WAN / public NIC | Iface |
-| `<mss4>` / `<mss6>` | Computed from underlay or overlay tun MTU | Formulas |
-
+| `<custom-table>` | Named nft table this host owns | Table name |
+| `<custom>` | Operator fills from this procedure | Local |
 
 ## Formulas
 
@@ -106,15 +87,13 @@ Exit and UFW rules survive tunnel hops.
 
 ## Agent stop rule
 
-> A coding agent MUST emit a **bound runbook** (placeholders replaced from Bind).
-> MUST NOT apply live `ip rule`, nft, iptables, ip6tables, sysctl, `wg set`, daemon restart, or deploy until a **human** filled Bind.
-> MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
-> MUST NOT file an upstream bug from this page.
-> MUST NOT publish real addresses, hostnames, or custom ports.
+> MUST emit bound `nft list` / delete-named-table commands after Bind is filled.
+> MUST NOT `nft flush` or start stock nftables.service on a mixed UFW/CrowdSec/exit host.
+> MUST NOT claim ICMP ping as a firewall-restore fix.
+> MUST NOT file an upstream nftables bug from this page.
 
 ## Procedure
 
-Placeholders only until Bind is filled: `<cloud-vps>`, `<lan-pi>`, `<overlay-peer>`, `<exit-node>`, `<wg-iface>`, `<gcp-nic>`, plus the Bind extras on this page.
 
 ### Copy-paste commands (after Bind)
 
@@ -158,6 +137,10 @@ systemctl is-enabled nftables.service || true
 - MUST NOT apply live network or firewall changes until Bind is filled by a human.
 - MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
 - MUST NOT publish hostnames, addresses, ULAs, or custom ports.
+
+## Page changelog
+
+- Edition 2 (8 Sep 2026, Mountain Time): Trap-specific Bind and agent stop rule (review cleanup).
 
 ## Related specs
 

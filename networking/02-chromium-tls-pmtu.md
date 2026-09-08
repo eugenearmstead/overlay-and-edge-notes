@@ -1,13 +1,13 @@
 ---
-id: OEN-02
+id: "OEN-02"
 title: "Chromium TLS fails while curl returns 200"
-kind: original
-status: active
-edition: 1
-date_published: 2026-09-08
-author: Eugene Armstead
-author_url: https://www.armsteadent.com/
-canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/networking/02-chromium-tls-pmtu.html
+kind: "original"
+status: "active"
+edition: 2
+date_published: "2026-09-08"
+author: "Eugene Armstead"
+author_url: "https://www.armsteadent.com/"
+canonical: "https://eugenearmstead.github.io/overlay-and-edge-notes/networking/02-chromium-tls-pmtu.html"
 keywords:
   - "curl 200 chrome ERR_CONNECTION_CLOSED"
   - "ERR_CONNECTION_CLOSED"
@@ -23,78 +23,75 @@ keywords:
   - "ICMP fragmentation needed"
   - "ERR_TIMED_OUT HTTPS"
   - "PMTUD blackhole"
-backs: []
+backs:
+  []
 backed_by:
   - OEN-S01
   - OEN-S02
 description: "Chromium HTTPS can close during handshake while curl still returns 200 because the browser ClientHello is larger than curl and path MTU discovery is blackholed."
 terms:
-  - abbr: OEN
-    expansion: Overlay and Edge Notes
-  - abbr: SSH
-    expansion: Secure Shell
-  - abbr: VPS
-    expansion: Virtual Private Server
-  - abbr: LAN
-    expansion: Local Area Network
-  - abbr: WAN
-    expansion: Wide Area Network
-  - abbr: VPN
-    expansion: Virtual Private Network
-  - abbr: KB
-    expansion: kilobyte
-  - abbr: TCP
-    expansion: Transmission Control Protocol
-  - abbr: UDP
-    expansion: User Datagram Protocol
-  - abbr: MSS
-    expansion: Maximum Segment Size
-  - abbr: TCPMSS
-    expansion: iptables/nft target that sets TCP Maximum Segment Size
-  - abbr: MTU
-    expansion: Maximum Transmission Unit
-  - abbr: ICMP
-    expansion: Internet Control Message Protocol
-  - abbr: PMTU
-    expansion: path Maximum Transmission Unit
-  - abbr: PMTUD
-    expansion: path MTU discovery
+  - abbr: Chromium
+    expansion: open-source browser engine
+  - abbr: ClientHello
+    expansion: TLS handshake message sent by the client
   - abbr: DF
     expansion: don't-fragment (IP flag)
-  - abbr: TLS
-    expansion: Transport Layer Security
+  - abbr: DNS
+    expansion: Domain Name System
+  - abbr: FORWARD
+    expansion: netfilter/iptables forward chain
   - abbr: HTTPS
     expansion: Hypertext Transfer Protocol Secure
+  - abbr: ICMP
+    expansion: Internet Control Message Protocol
   - abbr: IP
     expansion: Internet Protocol
   - abbr: IPv4
     expansion: Internet Protocol version 4
   - abbr: IPv6
     expansion: Internet Protocol version 6
-  - abbr: WireGuard
-    expansion: UDP-based VPN protocol
-  - abbr: DNS
-    expansion: Domain Name System
+  - abbr: KB
+    expansion: kilobyte
+  - abbr: LAN
+    expansion: Local Area Network
+  - abbr: MSS
+    expansion: Maximum Segment Size
+  - abbr: MTU
+    expansion: Maximum Transmission Unit
   - abbr: nft
     expansion: nftables (Linux packet filter)
-  - abbr: FORWARD
-    expansion: netfilter/iptables forward chain
-  - abbr: ClientHello
-    expansion: TLS handshake message sent by the client
-  - abbr: URL
-    expansion: Uniform Resource Locator
+  - abbr: OEN
+    expansion: Overlay and Edge Notes
   - abbr: Pi
     expansion: single-board computer (Raspberry Pi class)
+  - abbr: PMTU
+    expansion: path Maximum Transmission Unit
+  - abbr: PMTUD
+    expansion: path MTU discovery
   - abbr: QUIC
     expansion: Quick UDP Internet Connections
-  - abbr: SYN
-    expansion: TCP synchronize packet
-  - abbr: Chromium
-    expansion: open-source browser engine
-  - abbr: Inter
-    expansion: variable sans-serif font family
   - abbr: RST
     expansion: TCP reset flag
+  - abbr: SSH
+    expansion: Secure Shell
+  - abbr: SYN
+    expansion: TCP synchronize packet
+  - abbr: TCP
+    expansion: Transmission Control Protocol
+  - abbr: TCPMSS
+    expansion: iptables/nft target that sets TCP Maximum Segment Size
+  - abbr: TLS
+    expansion: Transport Layer Security
+  - abbr: UDP
+    expansion: User Datagram Protocol
+  - abbr: URL
+    expansion: Uniform Resource Locator
+  - abbr: VPN
+    expansion: Virtual Private Network
+  - abbr: VPS
+    expansion: Virtual Private Server
+  - abbr: WAN
+    expansion: Wide Area Network
 ---
 
 # Chromium TLS fails while curl returns 200
@@ -249,6 +246,10 @@ ping: local error: message too long, mtu=1320
 - MUST NOT apply live network or firewall changes until Bind is filled by a human.
 - MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
 - MUST NOT publish hostnames, addresses, ULAs, or custom ports.
+
+## Page changelog
+
+- Edition 2 (8 Sep 2026, Mountain Time): Added overlay-impl Bind and trap-specific terms (review cleanup).
 
 ## Related specs
 

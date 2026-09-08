@@ -1,13 +1,13 @@
 ---
-id: OEN-S31
+id: "OEN-S31"
 title: "prefixes.v6 needs nodes backfillips, not restart alone"
-kind: supporting
-status: active
-edition: 1
-date_published: 2026-09-08
-author: Eugene Armstead
-author_url: https://www.armsteadent.com/
-canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s31-prefixes-v6-needs-backfillips.html
+kind: "supporting"
+status: "active"
+edition: 2
+date_published: "2026-09-08"
+author: "Eugene Armstead"
+author_url: "https://www.armsteadent.com/"
+canonical: "https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s31-prefixes-v6-needs-backfillips.html"
 keywords:
   - "prefixes.v6 needs backfillips"
   - "nodes backfillips --force"
@@ -23,41 +23,26 @@ keywords:
   - "enable IPv6 overlay nodes"
 backs:
   - OEN-13
-backed_by: []
+backed_by:
+  []
 description: "Enabling prefixes.v6 on existing nodes needs nodes backfillips --force then restart. Restart alone leaves tailscale ip -6 empty."
 terms:
-  - abbr: OEN
-    expansion: Overlay and Edge Notes
-  - abbr: SSH
-    expansion: Secure Shell
-  - abbr: VPS
-    expansion: Virtual Private Server
-  - abbr: LAN
-    expansion: Local Area Network
-  - abbr: WAN
-    expansion: Wide Area Network
-  - abbr: TCP
-    expansion: Transmission Control Protocol
-  - abbr: MSS
-    expansion: Maximum Segment Size
-  - abbr: MTU
-    expansion: Maximum Transmission Unit
-  - abbr: ICMP
-    expansion: Internet Control Message Protocol
+  - abbr: CLI
+    expansion: command-line interface
+  - abbr: ControlPath
+    expansion: OpenSSH multiplexing socket path option
   - abbr: HTTPS
     expansion: Hypertext Transfer Protocol Secure
   - abbr: IPv6
     expansion: Internet Protocol version 6
-  - abbr: WireGuard
-    expansion: UDP-based VPN protocol
+  - abbr: OEN
+    expansion: Overlay and Edge Notes
+  - abbr: SSH
+    expansion: Secure Shell
   - abbr: ULA
     expansion: unique-local address (IPv6)
-  - abbr: nft
-    expansion: nftables (Linux packet filter)
-  - abbr: ControlPath
-    expansion: OpenSSH multiplexing socket path option
-  - abbr: Pi
-    expansion: single-board computer (Raspberry Pi class)
+  - abbr: VPS
+    expansion: Virtual Private Server
 ---
 
 # prefixes.v6 needs nodes backfillips, not restart alone
@@ -79,18 +64,9 @@ Fill this table **before** any live change. Do **not** paste real values back in
 
 | Placeholder | Operator fills | Class |
 |-------------|----------------|-------|
-| `<cloud-vps>` | Overlay SSH target | Cloud VPS |
-| `<lan-pi>` | Overlay SSH target | LAN Pi |
+| `<overlay-impl>` | Overlay implementation class | `tailscale-compatible` or other — stop and translate CLI |
 | `<user>` | SSH user | Guest account |
-| `<wg-iface>` | Commercial WireGuard iface | Router or VPS client |
-| `<wan-iface>` | WAN iface | Router |
-| `<lan-bridge>` | LAN bridge | Router (MTU 1500) |
-| `<overlay-tun>` | Overlay tun iface | Node under test |
-| `<wg-mtu>` | MTU integer from `ip link` | Measured |
-| `<mss4>` / `<mss6>` | Computed MSS | Formulas |
-| `<vps-public-v4>` / `<vps-public-v6>` | VPS public addresses | WAN; never publish |
-| `<overlay-v4>` / `<overlay-v6>` | Overlay addresses | Overlay; never publish |
-
+| `<cloud-vps>` | Cloud VPS under test | Cloud VPS |
 
 ## Formulas
 
@@ -106,15 +82,13 @@ Existing nodes get overlay IPv6. Binds that waited for ULA can start.
 
 ## Agent stop rule
 
-> A coding agent MUST emit a **bound runbook** (placeholders replaced from Bind).
-> MUST NOT apply live `ip rule`, nft, iptables, ip6tables, sysctl, `wg set`, daemon restart, or deploy until a **human** filled Bind.
-> MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
-> MUST NOT file an upstream bug from this page.
-> MUST NOT publish real addresses, hostnames, or custom ports.
+> MUST emit bound `nodes backfillips` after `<overlay-impl>` is `tailscale-compatible`.
+> MUST NOT expect `tailscale ip -6` on existing nodes from prefixes.v6 + restart alone.
+> MUST NOT apply netfilter from this page.
 
 ## Procedure
 
-Placeholders only until Bind is filled: `<cloud-vps>`, `<lan-pi>`, `<overlay-peer>`, `<exit-node>`, `<wg-iface>`, `<gcp-nic>`, plus the Bind extras on this page.
+This spec does not apply if `<overlay-impl>` is not tailscale-compatible.
 
 ### Copy-paste commands (after Bind)
 
@@ -146,16 +120,16 @@ ssh -o ControlPath=none <user>@<cloud-vps> 'tailscale ip -6 || true'
 
 - Existing node has overlay v6 after backfill+restart.
 - Restart-only was not enough.
-- ICMP / small ping success was **not** used as the pass criterion when this spec names TCP, SSH, or HTTPS.
-- Bind table was filled by a human before any live `ip` / nft / iptables change.
 
 ## MUST NOT
 
 - MUST NOT claim restart alone backfills prefixes.v6.
 - MUST NOT publish node IDs or ULAs.
-- MUST NOT apply live network or firewall changes until Bind is filled by a human.
-- MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
 - MUST NOT publish hostnames, addresses, ULAs, or custom ports.
+
+## Page changelog
+
+- Edition 2 (8 Sep 2026, Mountain Time): Trap-specific Bind and agent stop rule (review cleanup).
 
 ## Related specs
 

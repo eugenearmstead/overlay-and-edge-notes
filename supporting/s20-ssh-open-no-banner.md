@@ -1,13 +1,13 @@
 ---
-id: OEN-S20
+id: "OEN-S20"
 title: "SSH TCP-open with no banner is userspace-sick"
-kind: supporting
-status: active
-edition: 1
-date_published: 2026-09-08
-author: Eugene Armstead
-author_url: https://www.armsteadent.com/
-canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s20-ssh-open-no-banner.html
+kind: "supporting"
+status: "active"
+edition: 2
+date_published: "2026-09-08"
+author: "Eugene Armstead"
+author_url: "https://www.armsteadent.com/"
+canonical: "https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s20-ssh-open-no-banner.html"
 keywords:
   - "SSH TCP-open with no banner"
   - "nmap open userspace sick"
@@ -24,39 +24,30 @@ keywords:
 backs:
   - OEN-12
   - OEN-14
-backed_by: []
+backed_by:
+  []
 description: "Overlay SSH TCP-open with no banner means userspace on the router is sick. nmap open is not enough. Reboot restores banner and PeerAPI together."
 terms:
-  - abbr: OEN
-    expansion: Overlay and Edge Notes
-  - abbr: SSH
-    expansion: Secure Shell
-  - abbr: OpenSSH
-    expansion: OpenBSD Secure Shell
-  - abbr: LAN
-    expansion: Local Area Network
-  - abbr: WAN
-    expansion: Wide Area Network
-  - abbr: TCP
-    expansion: Transmission Control Protocol
-  - abbr: MTU
-    expansion: Maximum Transmission Unit
-  - abbr: ICMP
-    expansion: Internet Control Message Protocol
-  - abbr: HTTPS
-    expansion: Hypertext Transfer Protocol Secure
-  - abbr: WireGuard
-    expansion: UDP-based VPN protocol
-  - abbr: DNS
-    expansion: Domain Name System
-  - abbr: PeerAPI
-    expansion: overlay peer application-programming interface (exit DNS over HTTPS)
-  - abbr: nft
-    expansion: nftables (Linux packet filter)
-  - abbr: FORWARD
-    expansion: netfilter/iptables forward chain
   - abbr: ControlPath
     expansion: OpenSSH multiplexing socket path option
+  - abbr: DNS
+    expansion: Domain Name System
+  - abbr: FORWARD
+    expansion: netfilter/iptables forward chain
+  - abbr: LAN
+    expansion: Local Area Network
+  - abbr: MTU
+    expansion: Maximum Transmission Unit
+  - abbr: OEN
+    expansion: Overlay and Edge Notes
+  - abbr: OpenSSH
+    expansion: OpenBSD Secure Shell
+  - abbr: PeerAPI
+    expansion: overlay peer application-programming interface (exit DNS over HTTPS)
+  - abbr: SSH
+    expansion: Secure Shell
+  - abbr: TCP
+    expansion: Transmission Control Protocol
 ---
 
 # SSH TCP-open with no banner is userspace-sick
@@ -79,11 +70,8 @@ Fill this table **before** any live change. Do **not** paste real values back in
 
 | Placeholder | Operator fills | Class |
 |-------------|----------------|-------|
-| `<wg-iface>` | Consumer-router WireGuard client iface | Iface |
-| `<lan-bridge>` | LAN bridge | Iface; MTU 1500 |
-| `<wan-iface>` | WAN iface | Iface |
-| `<lan-resolver>` | Intended LAN DNS | Address; never publish |
-
+| `<user>` | SSH user | Guest account |
+| `<router-overlay>` | Consumer-router overlay address | Overlay; never publish |
 
 ## Formulas
 
@@ -99,15 +87,12 @@ Operators stop waiting on a banner that will never come until reboot.
 
 ## Agent stop rule
 
-> A coding agent MUST emit a **bound runbook** (placeholders replaced from Bind).
-> MUST NOT apply live `ip rule`, nft, iptables, ip6tables, sysctl, `wg set`, daemon restart, or deploy until a **human** filled Bind.
-> MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
-> MUST NOT file an upstream bug from this page.
-> MUST NOT publish real addresses, hostnames, or custom ports.
+> MUST treat TCP-open with no SSH banner as userspace-sick, not a path-MTU trap.
+> MUST NOT publish custom SSH ports.
+> MUST NOT apply netfilter from this page until Bind is filled.
 
 ## Procedure
 
-Placeholders only until Bind is filled: `<cloud-vps>`, `<lan-pi>`, `<overlay-peer>`, `<exit-node>`, `<wg-iface>`, `<gcp-nic>`, plus the Bind extras on this page.
 
 ### Copy-paste commands (after Bind)
 
@@ -139,16 +124,16 @@ ssh -o ControlPath=none -o ConnectTimeout=8 <user>@<router-overlay> 'echo banner
 
 - Banner present after recovery.
 - nmap open was not trusted alone.
-- ICMP / small ping success was **not** used as the pass criterion when this spec names TCP, SSH, or HTTPS.
-- Bind table was filled by a human before any live `ip` / nft / iptables change.
 
 ## MUST NOT
 
 - MUST NOT treat nmap open as SSH healthy.
 - MUST NOT publish custom SSH ports.
-- MUST NOT apply live network or firewall changes until Bind is filled by a human.
-- MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
 - MUST NOT publish hostnames, addresses, ULAs, or custom ports.
+
+## Page changelog
+
+- Edition 2 (8 Sep 2026, Mountain Time): Trap-specific Bind and agent stop rule (review cleanup).
 
 ## Related specs
 

@@ -1,13 +1,13 @@
 ---
-id: OEN-S32
+id: "OEN-S32"
 title: "DNS leak-test green is not IPv6 data-plane green"
-kind: supporting
-status: active
-edition: 1
-date_published: 2026-09-08
-author: Eugene Armstead
-author_url: https://www.armsteadent.com/
-canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s32-dns-leak-test-not-v6-dataplane.html
+kind: "supporting"
+status: "active"
+edition: 2
+date_published: "2026-09-08"
+author: "Eugene Armstead"
+author_url: "https://www.armsteadent.com/"
+canonical: "https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s32-dns-leak-test-not-v6-dataplane.html"
 keywords:
   - "DNS leak-test green not IPv6 data-plane"
   - "ipleak DNS ok TCP timeout"
@@ -25,25 +25,18 @@ backs:
   - OEN-04
   - OEN-06
   - OEN-14
-backed_by: []
+backed_by:
+  []
 description: "A leak-test resolver name can look OK while ::/0 TCP times out. DNS and IPv6 data are different paths."
 terms:
-  - abbr: OEN
-    expansion: Overlay and Edge Notes
-  - abbr: SSH
-    expansion: Secure Shell
-  - abbr: LAN
-    expansion: Local Area Network
-  - abbr: WAN
-    expansion: Wide Area Network
-  - abbr: TCP
-    expansion: Transmission Control Protocol
-  - abbr: TCPMSS
-    expansion: iptables/nft target that sets TCP Maximum Segment Size
-  - abbr: MTU
-    expansion: Maximum Transmission Unit
-  - abbr: ICMP
-    expansion: Internet Control Message Protocol
+  - abbr: CLI
+    expansion: command-line interface
+  - abbr: DNS
+    expansion: Domain Name System
+  - abbr: FORWARD
+    expansion: netfilter/iptables forward chain
+  - abbr: GCP
+    expansion: Google Cloud Platform
   - abbr: HTTP
     expansion: Hypertext Transfer Protocol
   - abbr: HTTPS
@@ -52,26 +45,18 @@ terms:
     expansion: Internet Protocol
   - abbr: IPv6
     expansion: Internet Protocol version 6
-  - abbr: DNS
-    expansion: Domain Name System
   - abbr: NAT
     expansion: network address translation
-  - abbr: GCP
-    expansion: Google Cloud Platform
-  - abbr: VM
-    expansion: virtual machine
-  - abbr: NIC
-    expansion: network interface card
+  - abbr: OEN
+    expansion: Overlay and Edge Notes
   - abbr: PeerAPI
     expansion: overlay peer application-programming interface (exit DNS over HTTPS)
-  - abbr: nft
-    expansion: nftables (Linux packet filter)
-  - abbr: FORWARD
-    expansion: netfilter/iptables forward chain
+  - abbr: TCP
+    expansion: Transmission Control Protocol
+  - abbr: TCPMSS
+    expansion: iptables/nft target that sets TCP Maximum Segment Size
   - abbr: URL
     expansion: Uniform Resource Locator
-  - abbr: Pi
-    expansion: single-board computer (Raspberry Pi class)
 ---
 
 # DNS leak-test green is not IPv6 data-plane green
@@ -93,14 +78,7 @@ Fill this table **before** any live change. Do **not** paste real values back in
 
 | Placeholder | Operator fills | Class |
 |-------------|----------------|-------|
-| `<exit-node>` | Overlay exit node | Cloud VM or LAN Pi used as exit |
-| `<overlay-peer>` | Soak client (**not** the agent workstation) | LAN Pi |
-| `<user>` | SSH user | Guest |
-| `<overlay-tun>` | Overlay tun on the exit | Iface |
-| `<gcp-nic>` | Public NIC on a Google Cloud guest | Iface; omit on non-GCP exits |
-| `<wan-iface>` | WAN / public NIC | Iface |
-| `<mss4>` / `<mss6>` | Computed from underlay or overlay tun MTU | Formulas |
-
+| `<overlay-impl>` | Overlay implementation class | `tailscale-compatible` or other — stop and translate CLI |
 
 ## Formulas
 
@@ -116,15 +94,14 @@ v6 FORWARD/NAT bugs get found. Leak-test 502 from some clouds is ignored ([OEN-1
 
 ## Agent stop rule
 
-> A coding agent MUST emit a **bound runbook** (placeholders replaced from Bind).
-> MUST NOT apply live `ip rule`, nft, iptables, ip6tables, sysctl, `wg set`, daemon restart, or deploy until a **human** filled Bind.
-> MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
-> MUST NOT file an upstream bug from this page.
-> MUST NOT publish real addresses, hostnames, or custom ports.
+> MUST `curl -6` a real HTTPS URL after Bind is filled.
+> MUST NOT declare the exit healthy on DNS leak-test color alone.
+> This spec does not apply if `<overlay-impl>` is not tailscale-compatible when using overlay CLI.
+> MUST NOT apply netfilter from this page.
 
 ## Procedure
 
-Placeholders only until Bind is filled: `<cloud-vps>`, `<lan-pi>`, `<overlay-peer>`, `<exit-node>`, `<wg-iface>`, `<gcp-nic>`, plus the Bind extras on this page.
+This spec does not apply if `<overlay-impl>` is not tailscale-compatible.
 
 ### Copy-paste commands (after Bind)
 
@@ -156,16 +133,16 @@ curl -6 --max-time 8 -sS -o /dev/null -w '%{http_code}\n' https://example.com
 
 - curl -6 used as the gate.
 - DNS-only never called success.
-- ICMP / small ping success was **not** used as the pass criterion when this spec names TCP, SSH, or HTTPS.
-- Bind table was filled by a human before any live `ip` / nft / iptables change.
 
 ## MUST NOT
 
 - MUST NOT treat leak-test DNS green as IPv6 HTTP green.
 - MUST NOT publish leak-test URLs as required canaries.
-- MUST NOT apply live network or firewall changes until Bind is filled by a human.
-- MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
 - MUST NOT publish hostnames, addresses, ULAs, or custom ports.
+
+## Page changelog
+
+- Edition 2 (8 Sep 2026, Mountain Time): Trap-specific Bind and agent stop rule (review cleanup).
 
 ## Related specs
 

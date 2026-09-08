@@ -1,13 +1,13 @@
 ---
-id: OEN-S05
+id: "OEN-S05"
 title: "Tunnel preview HIT with a stale body"
-kind: supporting
-status: active
-edition: 1
-date_published: 2026-09-08
-author: Eugene Armstead
-author_url: https://www.armsteadent.com/
-canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s05-tunnel-preview-stale-hit.html
+kind: "supporting"
+status: "active"
+edition: 2
+date_published: "2026-09-08"
+author: "Eugene Armstead"
+author_url: "https://www.armsteadent.com/"
+canonical: "https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s05-tunnel-preview-stale-hit.html"
 keywords:
   - "tunnel preview HIT stale body"
   - "Cloudflare Tunnel cf-cache-status HIT"
@@ -24,39 +24,26 @@ keywords:
 backs:
   - OEN-08
   - OEN-09
-backed_by: []
+backed_by:
+  []
 description: "Origin can already be new while a Cloudflare Tunnel preview still serves HIT with a stale body until the preview URL is purged."
 terms:
-  - abbr: OEN
-    expansion: Overlay and Edge Notes
-  - abbr: SSH
-    expansion: Secure Shell
-  - abbr: TCP
-    expansion: Transmission Control Protocol
-  - abbr: ICMP
-    expansion: Internet Control Message Protocol
-  - abbr: HTTPS
-    expansion: Hypertext Transfer Protocol Secure
-  - abbr: HTML
-    expansion: HyperText Markup Language
-  - abbr: CSS
-    expansion: Cascading Style Sheets
-  - abbr: JS
-    expansion: JavaScript
-  - abbr: nft
-    expansion: nftables (Linux packet filter)
   - abbr: CDN
     expansion: content delivery network
-  - abbr: URL
-    expansion: Uniform Resource Locator
-  - abbr: UI
-    expansion: user interface
-  - abbr: HIT
-    expansion: cache HIT (content still served from cache)
-  - abbr: Wrangler
-    expansion: Cloudflare Workers command-line tool
   - abbr: Cloudflare
     expansion: content delivery and Workers platform
+  - abbr: CSS
+    expansion: Cascading Style Sheets
+  - abbr: HIT
+    expansion: cache HIT (content still served from cache)
+  - abbr: HTML
+    expansion: HyperText Markup Language
+  - abbr: JS
+    expansion: JavaScript
+  - abbr: OEN
+    expansion: Overlay and Edge Notes
+  - abbr: URL
+    expansion: Uniform Resource Locator
 ---
 
 # Tunnel preview HIT with a stale body
@@ -67,11 +54,7 @@ Preview `cf-cache-status: HIT` with a stale body after origin is new. Prefer ori
 
 ## Topology
 
-```text
-[tunnel preview hostname]  cf-cache-status HIT + stale body
-[origin] already new
-Prefer CDN-Cache-Control: no-store on HTML
-```
+N/A — deploy
 
 ## Bind
 
@@ -79,20 +62,7 @@ Fill this table **before** any live change. Do **not** paste real values back in
 
 | Placeholder | Operator fills | Class |
 |-------------|----------------|-------|
-| `<worker-root>` | Worker / UI source tree | Directory on the workstation |
-| `<live-url>` | Public HTTPS origin | URL the browser loads |
 | `<preview-url>` | Preview origin if used | URL |
-| `<html-path>` | Path that becomes a Response body | File glob |
-
-
-## Formulas
-
-```text
-# Predeploy MUST fail the ship on client-executed matches:
-#   127.0.0.1:7450   localhost:7450   /ingest/   X-Debug-Session-Id
-# Merge ≠ live Worker. Wait ~10 minutes, then Wrangler if the Git build never started.
-# Cache: Workers-edit tokens often lack Cache Purge. ?v= does not replace zone purge for HTML.
-```
 
 ## Method
 
@@ -104,15 +74,13 @@ False “deploy failed” reports drop.
 
 ## Agent stop rule
 
-> A coding agent MUST emit a **bound runbook** (placeholders replaced from Bind).
-> MUST NOT apply live `ip rule`, nft, iptables, ip6tables, sysctl, `wg set`, daemon restart, or deploy until a **human** filled Bind.
-> MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
-> MUST NOT file an upstream bug from this page.
-> MUST NOT publish real addresses, hostnames, or custom ports.
+> MUST view-source `<preview-url>` and compare to origin after Bind is filled.
+> MUST NOT debug templates until preview matches origin.
+> MUST NOT treat `cf-cache-status: HIT` as a code bug.
+> MUST NOT apply netfilter from this page.
 
 ## Procedure
 
-Placeholders only until Bind is filled: `<cloud-vps>`, `<lan-pi>`, `<overlay-peer>`, `<exit-node>`, `<wg-iface>`, `<gcp-nic>`, plus the Bind extras on this page.
 
 ### Copy-paste commands (after Bind)
 
@@ -145,16 +113,16 @@ cf-cache-status: HIT
 
 - Preview view-source matches origin.
 - cf-cache-status is not HIT-stale.
-- ICMP / small ping success was **not** used as the pass criterion when this spec names TCP, SSH, or HTTPS.
-- Bind table was filled by a human before any live `ip` / nft / iptables change.
 
 ## MUST NOT
 
 - MUST NOT debug CSS for a stale HIT body.
 - MUST NOT skip preview purge.
-- MUST NOT apply live network or firewall changes until Bind is filled by a human.
-- MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
 - MUST NOT publish hostnames, addresses, ULAs, or custom ports.
+
+## Page changelog
+
+- Edition 2 (8 Sep 2026, Mountain Time): Trap-specific Bind and agent stop rule (review cleanup).
 
 ## Related specs
 

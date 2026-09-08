@@ -1,13 +1,13 @@
 ---
-id: OEN-13
+id: "OEN-13"
 title: "Overlay ≠ underlay ≠ tunnel unique-local ≠ LAN unique-local"
-kind: original
-status: active
-edition: 1
-date_published: 2026-09-08
-author: Eugene Armstead
-author_url: https://www.armsteadent.com/
-canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/networking/13-overlay-underlay-ula-layers.html
+kind: "original"
+status: "active"
+edition: 2
+date_published: "2026-09-08"
+author: "Eugene Armstead"
+author_url: "https://www.armsteadent.com/"
+canonical: "https://eugenearmstead.github.io/overlay-and-edge-notes/networking/13-overlay-underlay-ula-layers.html"
 keywords:
   - "overlay vs underlay vs ULA"
   - "tunnel ULA vs LAN ULA"
@@ -21,31 +21,22 @@ keywords:
   - "HTTP overlay v6 brackets"
   - "four address layers"
   - "TS_DEBUG_MTU overlay IPv6"
-backs: []
+backs:
+  []
 backed_by:
   - OEN-S30
   - OEN-S31
   - OEN-S26
 description: "Four address layers get conflated: WAN global, overlay unique-local, commercial-tunnel addresses, and LAN unique-local. Bind overlay services to specific overlay v4 and node unique-local, not WAN ::."
 terms:
-  - abbr: OEN
-    expansion: Overlay and Edge Notes
-  - abbr: SSH
-    expansion: Secure Shell
-  - abbr: VPS
-    expansion: Virtual Private Server
-  - abbr: LAN
-    expansion: Local Area Network
-  - abbr: WAN
-    expansion: Wide Area Network
-  - abbr: TCP
-    expansion: Transmission Control Protocol
-  - abbr: MSS
-    expansion: Maximum Segment Size
-  - abbr: MTU
-    expansion: Maximum Transmission Unit
-  - abbr: ICMP
-    expansion: Internet Control Message Protocol
+  - abbr: CLI
+    expansion: command-line interface
+  - abbr: ControlPath
+    expansion: OpenSSH multiplexing socket path option
+  - abbr: GUA
+    expansion: global unicast address (IPv6)
+  - abbr: Happy-Eyeballs
+    expansion: dual-stack connection racing (RFC 8305)
   - abbr: HTTP
     expansion: Hypertext Transfer Protocol
   - abbr: HTTPS
@@ -54,20 +45,22 @@ terms:
     expansion: Internet Protocol version 4
   - abbr: IPv6
     expansion: Internet Protocol version 6
-  - abbr: WireGuard
-    expansion: UDP-based VPN protocol
-  - abbr: ULA
-    expansion: unique-local address (IPv6)
-  - abbr: GUA
-    expansion: global unicast address (IPv6)
-  - abbr: nft
-    expansion: nftables (Linux packet filter)
-  - abbr: ControlPath
-    expansion: OpenSSH multiplexing socket path option
+  - abbr: LAN
+    expansion: Local Area Network
+  - abbr: MTU
+    expansion: Maximum Transmission Unit
+  - abbr: OEN
+    expansion: Overlay and Edge Notes
   - abbr: Pi
     expansion: single-board computer (Raspberry Pi class)
-  - abbr: Happy-Eyeballs
-    expansion: dual-stack connection racing (RFC 8305)
+  - abbr: SSH
+    expansion: Secure Shell
+  - abbr: ULA
+    expansion: unique-local address (IPv6)
+  - abbr: VPS
+    expansion: Virtual Private Server
+  - abbr: WAN
+    expansion: Wide Area Network
 ---
 
 # Overlay ≠ underlay ≠ tunnel unique-local ≠ LAN unique-local
@@ -104,18 +97,10 @@ Fill this table **before** any live change. Do **not** paste real values back in
 
 | Placeholder | Operator fills | Class |
 |-------------|----------------|-------|
-| `<cloud-vps>` | Overlay SSH target | Cloud VPS |
-| `<lan-pi>` | Overlay SSH target | LAN Pi |
+| `<overlay-impl>` | Overlay implementation class | `tailscale-compatible` or other — stop and translate CLI |
 | `<user>` | SSH user | Guest account |
-| `<wg-iface>` | Commercial WireGuard iface | Router or VPS client |
-| `<wan-iface>` | WAN iface | Router |
-| `<lan-bridge>` | LAN bridge | Router (MTU 1500) |
-| `<overlay-tun>` | Overlay tun iface | Node under test |
-| `<wg-mtu>` | MTU integer from `ip link` | Measured |
-| `<mss4>` / `<mss6>` | Computed MSS | Formulas |
-| `<vps-public-v4>` / `<vps-public-v6>` | VPS public addresses | WAN; never publish |
-| `<overlay-v4>` / `<overlay-v6>` | Overlay addresses | Overlay; never publish |
-
+| `<cloud-vps>` | Cloud VPS under test | Cloud VPS |
+| `<lan-pi>` | Always-on LAN Pi | LAN Pi |
 
 ## Formulas
 
@@ -135,15 +120,14 @@ Default ops SSH stays on overlay IPv4. HTTP overlay IPv6 needs brackets. MUST NO
 
 ## Agent stop rule
 
-> A coding agent MUST emit a **bound runbook** (placeholders replaced from Bind).
-> MUST NOT apply live `ip rule`, nft, iptables, ip6tables, sysctl, `wg set`, daemon restart, or deploy until a **human** filled Bind.
-> MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
-> MUST NOT file an upstream bug from this page.
-> MUST NOT publish real addresses, hostnames, or custom ports.
+> MUST emit bound `ip addr` / overlay vs underlay / ULA checks after Bind is filled.
+> This spec does not apply if `<overlay-impl>` is not tailscale-compatible when using overlay CLI.
+> MUST NOT apply netfilter from this page.
+> MUST NOT publish unique-local or public addresses.
 
 ## Procedure
 
-Placeholders only until Bind is filled: `<cloud-vps>`, `<lan-pi>`, `<overlay-peer>`, `<exit-node>`, `<wg-iface>`, `<gcp-nic>`, plus the Bind extras on this page.
+This spec does not apply if `<overlay-impl>` is not tailscale-compatible.
 
 ### Copy-paste commands (after Bind)
 
@@ -182,8 +166,6 @@ ssh -o ControlPath=none <user>@<cloud-vps> 'ip -4 addr; ip -6 addr; ip -6 route 
 - Login HTTPS is not bound to a missing overlay ULA.
 - Ops SSH default is overlay IPv4.
 - TS_DEBUG_MTU is not below 1280.
-- ICMP / small ping success was **not** used as the pass criterion when this spec names TCP, SSH, or HTTPS.
-- Bind table was filled by a human before any live `ip` / nft / iptables change.
 
 ## MUST NOT
 
@@ -191,9 +173,11 @@ ssh -o ControlPath=none <user>@<cloud-vps> 'ip -4 addr; ip -6 addr; ip -6 route 
 - MUST NOT bind WAN `::` for overlay-only services.
 - MUST NOT expect restart alone to backfill prefixes.v6.
 - MUST NOT treat IPv6-only overlay as the daily control plane.
-- MUST NOT apply live network or firewall changes until Bind is filled by a human.
-- MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
 - MUST NOT publish hostnames, addresses, ULAs, or custom ports.
+
+## Page changelog
+
+- Edition 2 (8 Sep 2026, Mountain Time): Trap-specific Bind and agent stop rule (review cleanup).
 
 ## Related specs
 

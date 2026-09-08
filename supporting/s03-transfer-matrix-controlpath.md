@@ -1,13 +1,13 @@
 ---
-id: OEN-S03
+id: "OEN-S03"
 title: "1 KB vs 1 MB transfer matrix + ControlPath=none"
-kind: supporting
-status: active
-edition: 1
-date_published: 2026-09-08
-author: Eugene Armstead
-author_url: https://www.armsteadent.com/
-canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s03-transfer-matrix-controlpath.html
+kind: "supporting"
+status: "active"
+edition: 2
+date_published: "2026-09-08"
+author: "Eugene Armstead"
+author_url: "https://www.armsteadent.com/"
+canonical: "https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s03-transfer-matrix-controlpath.html"
 keywords:
   - "1 KB vs 1 MB SSH matrix"
   - "ControlPath=none overlay SSH"
@@ -23,51 +23,50 @@ keywords:
   - "path MTU SSH proof"
 backs:
   - OEN-01
-backed_by: []
+backed_by:
+  []
 description: "Prove overlay SSH size: 1 KB vs about 1 MB with ControlPath=none. Mux death is a symptom. Userspace overlay SSH is less forgiving than kernel SSH on the same host."
 terms:
-  - abbr: OEN
-    expansion: Overlay and Edge Notes
-  - abbr: SSH
-    expansion: Secure Shell
-  - abbr: OpenSSH
-    expansion: OpenBSD Secure Shell
-  - abbr: VPS
-    expansion: Virtual Private Server
-  - abbr: LAN
-    expansion: Local Area Network
-  - abbr: WAN
-    expansion: Wide Area Network
-  - abbr: KB
-    expansion: kilobyte
-  - abbr: MB
-    expansion: megabyte
-  - abbr: TCP
-    expansion: Transmission Control Protocol
-  - abbr: MSS
-    expansion: Maximum Segment Size
-  - abbr: MTU
-    expansion: Maximum Transmission Unit
-  - abbr: ICMP
-    expansion: Internet Control Message Protocol
+  - abbr: ControlPath
+    expansion: OpenSSH multiplexing socket path option
   - abbr: DF
     expansion: don't-fragment (IP flag)
   - abbr: HTTPS
     expansion: Hypertext Transfer Protocol Secure
+  - abbr: ICMP
+    expansion: Internet Control Message Protocol
   - abbr: IP
     expansion: Internet Protocol
   - abbr: IPv4
     expansion: Internet Protocol version 4
   - abbr: IPv6
     expansion: Internet Protocol version 6
-  - abbr: WireGuard
-    expansion: UDP-based VPN protocol
+  - abbr: KB
+    expansion: kilobyte
+  - abbr: LAN
+    expansion: Local Area Network
+  - abbr: MB
+    expansion: megabyte
+  - abbr: MSS
+    expansion: Maximum Segment Size
+  - abbr: MTU
+    expansion: Maximum Transmission Unit
   - abbr: nft
     expansion: nftables (Linux packet filter)
-  - abbr: ControlPath
-    expansion: OpenSSH multiplexing socket path option
+  - abbr: OEN
+    expansion: Overlay and Edge Notes
+  - abbr: OpenSSH
+    expansion: OpenBSD Secure Shell
   - abbr: Pi
     expansion: single-board computer (Raspberry Pi class)
+  - abbr: SSH
+    expansion: Secure Shell
+  - abbr: TCP
+    expansion: Transmission Control Protocol
+  - abbr: VPS
+    expansion: Virtual Private Server
+  - abbr: WAN
+    expansion: Wide Area Network
 ---
 
 # 1 KB vs 1 MB transfer matrix + ControlPath=none
@@ -182,6 +181,10 @@ ssh -o ControlPath=none <user>@<lan-pi> 'dd if=/dev/zero bs=1024 count=1024 stat
 - MUST NOT apply live network or firewall changes until Bind is filled by a human.
 - MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
 - MUST NOT publish hostnames, addresses, ULAs, or custom ports.
+
+## Page changelog
+
+- Edition 2 (8 Sep 2026, Mountain Time): Added overlay-impl Bind and trap-specific terms (review cleanup).
 
 ## Related specs
 

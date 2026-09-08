@@ -1,13 +1,13 @@
 ---
-id: OEN-S33
+id: "OEN-S33"
 title: "Consumer-router cron PATH omits curl; watchdog log() + set -e exits"
-kind: supporting
-status: active
-edition: 1
-date_published: 2026-09-08
-author: Eugene Armstead
-author_url: https://www.armsteadent.com/
-canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s33-router-cron-path-set-e.html
+kind: "supporting"
+status: "active"
+edition: 2
+date_published: "2026-09-08"
+author: "Eugene Armstead"
+author_url: "https://www.armsteadent.com/"
+canonical: "https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s33-router-cron-path-set-e.html"
 keywords:
   - "router cron PATH omits curl"
   - "watchdog log() set -e exits"
@@ -25,37 +25,20 @@ backs:
   - OEN-12
   - OEN-16
   - OEN-22
-backed_by: []
+backed_by:
+  []
 description: "Consumer-router cron PATH may omit /usr/sbin and curl. A log() that returns 1 with set -e exits the watchdog every tick — silent skip, stale status."
 terms:
-  - abbr: OEN
-    expansion: Overlay and Edge Notes
-  - abbr: SSH
-    expansion: Secure Shell
-  - abbr: LAN
-    expansion: Local Area Network
-  - abbr: WAN
-    expansion: Wide Area Network
-  - abbr: TCP
-    expansion: Transmission Control Protocol
-  - abbr: MTU
-    expansion: Maximum Transmission Unit
-  - abbr: ICMP
-    expansion: Internet Control Message Protocol
-  - abbr: HTTPS
-    expansion: Hypertext Transfer Protocol Secure
-  - abbr: WG
-    expansion: WireGuard
-  - abbr: WireGuard
-    expansion: UDP-based VPN protocol
-  - abbr: DNS
-    expansion: Domain Name System
-  - abbr: nft
-    expansion: nftables (Linux packet filter)
+  - abbr: API
+    expansion: application programming interface
   - abbr: FORWARD
     expansion: netfilter/iptables forward chain
+  - abbr: OEN
+    expansion: Overlay and Edge Notes
   - abbr: PATH
     expansion: Unix executable search path
+  - abbr: WG
+    expansion: WireGuard
 ---
 
 # Consumer-router cron PATH omits curl; watchdog log() + set -e exits
@@ -78,11 +61,7 @@ Fill this table **before** any live change. Do **not** paste real values back in
 
 | Placeholder | Operator fills | Class |
 |-------------|----------------|-------|
-| `<wg-iface>` | Consumer-router WireGuard client iface | Iface |
-| `<lan-bridge>` | LAN bridge | Iface; MTU 1500 |
-| `<wan-iface>` | WAN iface | Iface |
-| `<lan-resolver>` | Intended LAN DNS | Address; never publish |
-
+| *(none)* | No packet-path Bind for this trap | Use the git host, origin, or API the operator already has |
 
 ## Formulas
 
@@ -98,15 +77,12 @@ Delayed FORWARD re-apply actually runs. Rotator hub watch ticks.
 
 ## Agent stop rule
 
-> A coding agent MUST emit a **bound runbook** (placeholders replaced from Bind).
-> MUST NOT apply live `ip rule`, nft, iptables, ip6tables, sysctl, `wg set`, daemon restart, or deploy until a **human** filled Bind.
-> MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
-> MUST NOT file an upstream bug from this page.
-> MUST NOT publish real addresses, hostnames, or custom ports.
+> MUST emit bound cron PATH / `set -e` / log() checks after Bind is filled.
+> MUST NOT restart WireGuard from the watchdog on every tick.
+> MUST NOT apply netfilter from this page.
 
 ## Procedure
 
-Placeholders only until Bind is filled: `<cloud-vps>`, `<lan-pi>`, `<overlay-peer>`, `<exit-node>`, `<wg-iface>`, `<gcp-nic>`, plus the Bind extras on this page.
 
 ### Copy-paste commands (after Bind)
 
@@ -140,16 +116,16 @@ which iptables curl wg
 - Watchdog log shows completed ticks.
 - PATH includes iptables.
 - No WG restart.
-- ICMP / small ping success was **not** used as the pass criterion when this spec names TCP, SSH, or HTTPS.
-- Bind table was filled by a human before any live `ip` / nft / iptables change.
 
 ## MUST NOT
 
 - MUST NOT restart WireGuard from the watchdog.
 - MUST NOT publish the script path as inventory.
-- MUST NOT apply live network or firewall changes until Bind is filled by a human.
-- MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
 - MUST NOT publish hostnames, addresses, ULAs, or custom ports.
+
+## Page changelog
+
+- Edition 2 (8 Sep 2026, Mountain Time): Trap-specific Bind and agent stop rule (review cleanup).
 
 ## Related specs
 

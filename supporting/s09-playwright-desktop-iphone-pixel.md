@@ -1,13 +1,13 @@
 ---
-id: OEN-S09
+id: "OEN-S09"
 title: "Playwright Desktop + iPhone + Pixel"
-kind: supporting
-status: active
-edition: 1
-date_published: 2026-09-08
-author: Eugene Armstead
-author_url: https://www.armsteadent.com/
-canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s09-playwright-desktop-iphone-pixel.html
+kind: "supporting"
+status: "active"
+edition: 2
+date_published: "2026-09-08"
+author: "Eugene Armstead"
+author_url: "https://www.armsteadent.com/"
+canonical: "https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s09-playwright-desktop-iphone-pixel.html"
 keywords:
   - "Playwright Desktop iPhone Pixel"
   - "Chromium device projects"
@@ -24,35 +24,24 @@ keywords:
 backs:
   - OEN-10
   - OEN-11
-backed_by: []
+backed_by:
+  []
 description: "Layout, nav, and hero changes need Desktop Chrome, iPhone, and Pixel device projects. WebKit binaries are not required for this gate."
 terms:
-  - abbr: OEN
-    expansion: Overlay and Edge Notes
-  - abbr: SSH
-    expansion: Secure Shell
-  - abbr: TCP
-    expansion: Transmission Control Protocol
-  - abbr: ICMP
-    expansion: Internet Control Message Protocol
-  - abbr: HTTPS
-    expansion: Hypertext Transfer Protocol Secure
-  - abbr: CSS
-    expansion: Cascading Style Sheets
-  - abbr: nft
-    expansion: nftables (Linux packet filter)
-  - abbr: URL
-    expansion: Uniform Resource Locator
-  - abbr: UI
-    expansion: user interface
-  - abbr: Playwright
-    expansion: browser automation and test runner
-  - abbr: WebKit
-    expansion: Apple browser engine
   - abbr: Android
     expansion: mobile operating system
   - abbr: Chromium
     expansion: open-source browser engine
+  - abbr: CSS
+    expansion: Cascading Style Sheets
+  - abbr: OEN
+    expansion: Overlay and Edge Notes
+  - abbr: Playwright
+    expansion: browser automation and test runner
+  - abbr: UI
+    expansion: user interface
+  - abbr: URL
+    expansion: Uniform Resource Locator
 ---
 
 # Playwright Desktop + iPhone + Pixel
@@ -63,11 +52,7 @@ A desktop-only pass misses iOS wrapping and Android overflow.
 
 ## Topology
 
-```text
-Playwright projects: Desktop Chrome + iPhone + Pixel
-Layout/nav/hero changes need all three
-WebKit binaries not required for this gate
-```
+N/A — deploy
 
 ## Bind
 
@@ -75,11 +60,7 @@ Fill this table **before** any live change. Do **not** paste real values back in
 
 | Placeholder | Operator fills | Class |
 |-------------|----------------|-------|
-| `<worker-root>` | Worker / UI source tree | Directory on the workstation |
-| `<live-url>` | Public HTTPS origin | URL the browser loads |
-| `<preview-url>` | Preview origin if used | URL |
-| `<html-path>` | Path that becomes a Response body | File glob |
-
+| `<worker-root>` | Worker / UI source tree | Directory |
 
 ## Formulas
 
@@ -95,15 +76,12 @@ Fewer “works on my monitor” ships.
 
 ## Agent stop rule
 
-> A coding agent MUST emit a **bound runbook** (placeholders replaced from Bind).
-> MUST NOT apply live `ip rule`, nft, iptables, ip6tables, sysctl, `wg set`, daemon restart, or deploy until a **human** filled Bind.
-> MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
-> MUST NOT file an upstream bug from this page.
-> MUST NOT publish real addresses, hostnames, or custom ports.
+> MUST emit the Playwright Desktop + iPhone + Pixel command with `<live-url>` or `<preview-url>` filled.
+> MUST NOT skip the three-device gate after nav/hero/CSS changes.
+> MUST NOT apply netfilter from this page.
 
 ## Procedure
 
-Placeholders only until Bind is filled: `<cloud-vps>`, `<lan-pi>`, `<overlay-peer>`, `<exit-node>`, `<wg-iface>`, `<gcp-nic>`, plus the Bind extras on this page.
 
 ### Copy-paste commands (after Bind)
 
@@ -133,16 +111,16 @@ cd <worker-root> && npx playwright test --project=desktop --project=iphone --pro
 ## Verify
 
 - Three device projects green for the change.
-- ICMP / small ping success was **not** used as the pass criterion when this spec names TCP, SSH, or HTTPS.
-- Bind table was filled by a human before any live `ip` / nft / iptables change.
 
 ## MUST NOT
 
 - MUST NOT ship hero/nav CSS with desktop-only proof.
 - MUST NOT require WebKit for this gate.
-- MUST NOT apply live network or firewall changes until Bind is filled by a human.
-- MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
 - MUST NOT publish hostnames, addresses, ULAs, or custom ports.
+
+## Page changelog
+
+- Edition 2 (8 Sep 2026, Mountain Time): Trap-specific Bind and agent stop rule (review cleanup).
 
 ## Related specs
 

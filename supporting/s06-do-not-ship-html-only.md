@@ -1,20 +1,20 @@
 ---
-id: OEN-S06
+id: "OEN-S06"
 title: "Do not ship HTML-only"
-kind: supporting
-status: active
-edition: 1
-date_published: 2026-09-08
-author: Eugene Armstead
-author_url: https://www.armsteadent.com/
-canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s06-do-not-ship-html-only.html
+kind: "supporting"
+status: "active"
+edition: 2
+date_published: "2026-09-08"
+author: "Eugene Armstead"
+author_url: "https://www.armsteadent.com/"
+canonical: "https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s06-do-not-ship-html-only.html"
 keywords:
   - "do not ship HTML-only"
   - "CSS 404 looks like CSS bug"
   - "JS images must 200"
   - "layout destroying miss"
   - "rsync HTML without assets"
-  - "static site missing chrome.css"
+  - "static site missing <site.css>"
   - "Cloudflare origin 404 CSS"
   - "deploy incomplete assets"
   - "HTML 200 CSS 404"
@@ -26,39 +26,28 @@ backs:
   - OEN-09
   - OEN-10
   - OEN-11
-backed_by: []
+backed_by:
+  []
 description: "CSS, JavaScript, and images must return 200. A layout-destroying miss looks like a CSS bug."
 terms:
-  - abbr: OEN
-    expansion: Overlay and Edge Notes
-  - abbr: SSH
-    expansion: Secure Shell
-  - abbr: TCP
-    expansion: Transmission Control Protocol
-  - abbr: ICMP
-    expansion: Internet Control Message Protocol
-  - abbr: HTTPS
-    expansion: Hypertext Transfer Protocol Secure
-  - abbr: HTML
-    expansion: HyperText Markup Language
   - abbr: CSS
     expansion: Cascading Style Sheets
+  - abbr: HTML
+    expansion: HyperText Markup Language
+  - abbr: HTTP
+    expansion: Hypertext Transfer Protocol
+  - abbr: HTTPS
+    expansion: Hypertext Transfer Protocol Secure
   - abbr: JS
     expansion: JavaScript
-  - abbr: nft
-    expansion: nftables (Linux packet filter)
-  - abbr: URL
-    expansion: Uniform Resource Locator
-  - abbr: UI
-    expansion: user interface
-  - abbr: RAM
-    expansion: random-access memory
-  - abbr: tmpfs
-    expansion: temporary file system in RAM
+  - abbr: OEN
+    expansion: Overlay and Edge Notes
   - abbr: Playwright
     expansion: browser automation and test runner
-  - abbr: Wrangler
-    expansion: Cloudflare Workers command-line tool
+  - abbr: RAM
+    expansion: random-access memory
+  - abbr: URL
+    expansion: Uniform Resource Locator
 ---
 
 # Do not ship HTML-only
@@ -69,10 +58,7 @@ HTML-only rsync to the wrong tree looks deployed. Layout explodes. Operators rew
 
 ## Topology
 
-```text
-[HTML 200] + [chrome.css 404]  looks like a "CSS bug"
-Ship HTML + CSS + JS + images together
-```
+N/A — deploy
 
 ## Bind
 
@@ -80,20 +66,8 @@ Fill this table **before** any live change. Do **not** paste real values back in
 
 | Placeholder | Operator fills | Class |
 |-------------|----------------|-------|
-| `<worker-root>` | Worker / UI source tree | Directory on the workstation |
-| `<live-url>` | Public HTTPS origin | URL the browser loads |
-| `<preview-url>` | Preview origin if used | URL |
-| `<html-path>` | Path that becomes a Response body | File glob |
-
-
-## Formulas
-
-```text
-# Predeploy MUST fail the ship on client-executed matches:
-#   127.0.0.1:7450   localhost:7450   /ingest/   X-Debug-Session-Id
-# Merge ≠ live Worker. Wait ~10 minutes, then Wrangler if the Git build never started.
-# Cache: Workers-edit tokens often lack Cache Purge. ?v= does not replace zone purge for HTML.
-```
+| `<live-url>` | Public HTTPS origin | URL |
+| `<site.css>` | Origin stylesheet filename | Asset |
 
 ## Method
 
@@ -105,20 +79,18 @@ Ship CSS/JS/images with HTML. Check 200s. Canonical disk then RAM origin is [OEN
 
 ## Agent stop rule
 
-> A coding agent MUST emit a **bound runbook** (placeholders replaced from Bind).
-> MUST NOT apply live `ip rule`, nft, iptables, ip6tables, sysctl, `wg set`, daemon restart, or deploy until a **human** filled Bind.
-> MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
-> MUST NOT file an upstream bug from this page.
-> MUST NOT publish real addresses, hostnames, or custom ports.
+> MUST emit a bound asset-curl list (`<live-url>` + every href/src) after Bind is filled.
+> MUST NOT deploy until that list is HTTP 200.
+> MUST NOT call a 404 stylesheet a CSS bug.
+> MUST NOT file an upstream CSS/browser bug from this page.
 
 ## Procedure
 
-Placeholders only until Bind is filled: `<cloud-vps>`, `<lan-pi>`, `<overlay-peer>`, `<exit-node>`, `<wg-iface>`, `<gcp-nic>`, plus the Bind extras on this page.
 
 ### Copy-paste commands (after Bind)
 
 ```bash
-for u in <live-url> <live-url>/chrome.css; do curl -sS -o /dev/null -w '%{http_code} %{url_effective}\n' --max-time 15 "$u"; done
+for u in <live-url> <live-url>/<site.css>; do curl -sS -o /dev/null -w '%{http_code} %{url_effective}\n' --max-time 15 "$u"; done
 ```
 
 1. **P1 — List assets in the new HTML.**
@@ -138,23 +110,23 @@ for u in <live-url> <live-url>/chrome.css; do curl -sS -o /dev/null -w '%{http_c
 
 ```text
 200 https://example.example/
-404 https://example.example/chrome.css
+404 https://example.example/<site.css>
 ```
 
 ## Verify
 
 - Asset URLs 200.
 - Correct tree synced.
-- ICMP / small ping success was **not** used as the pass criterion when this spec names TCP, SSH, or HTTPS.
-- Bind table was filled by a human before any live `ip` / nft / iptables change.
 
 ## MUST NOT
 
 - MUST NOT call a 404 stylesheet a CSS bug.
 - MUST NOT HTML-only rsync to the RAM tree.
-- MUST NOT apply live network or firewall changes until Bind is filled by a human.
-- MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
 - MUST NOT publish hostnames, addresses, ULAs, or custom ports.
+
+## Page changelog
+
+- Edition 2 (8 Sep 2026, Mountain Time): Trap-specific Bind and agent stop rule (review cleanup).
 
 ## Related specs
 

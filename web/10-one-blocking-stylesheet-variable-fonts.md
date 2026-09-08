@@ -1,17 +1,17 @@
 ---
-id: OEN-10
+id: "OEN-10"
 title: "One generated blocking stylesheet and variable fonts"
-kind: original
-status: active
-edition: 1
-date_published: 2026-09-08
-author: Eugene Armstead
-author_url: https://www.armsteadent.com/
-canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/web/10-one-blocking-stylesheet-variable-fonts.html
+kind: "original"
+status: "active"
+edition: 2
+date_published: "2026-09-08"
+author: "Eugene Armstead"
+author_url: "https://www.armsteadent.com/"
+canonical: "https://eugenearmstead.github.io/overlay-and-edge-notes/web/10-one-blocking-stylesheet-variable-fonts.html"
 keywords:
   - "render-blocking stylesheet PSI drop"
   - "variable font re-download woff2"
-  - "one generated chrome.css"
+  - "one generated <site.css>"
   - "LCP preload media-split"
   - "Core Web Vitals fonts"
   - "per-weight variable filenames"
@@ -21,51 +21,36 @@ keywords:
   - "defer decorative font"
   - "Cloudflare Worker CSS"
   - "LCP portrait preload"
-backs: []
+backs:
+  []
 backed_by:
   - OEN-S06
   - OEN-S09
   - OEN-S10
-description: "A new render-blocking stylesheet dropped mobile PageSpeed. Per-weight variable font filenames made Chrome re-download the same woff2. Generate one chrome.css; preload at most two matching variable files."
+description: "A new render-blocking stylesheet dropped mobile PageSpeed. Per-weight variable font filenames made Chrome re-download the same woff2. Generate one <site.css>; preload at most two matching variable files."
 terms:
-  - abbr: OEN
-    expansion: Overlay and Edge Notes
-  - abbr: SSH
-    expansion: Secure Shell
-  - abbr: TCP
-    expansion: Transmission Control Protocol
-  - abbr: ICMP
-    expansion: Internet Control Message Protocol
-  - abbr: HTTPS
-    expansion: Hypertext Transfer Protocol Secure
-  - abbr: HTML
-    expansion: HyperText Markup Language
   - abbr: CSS
     expansion: Cascading Style Sheets
-  - abbr: JS
-    expansion: JavaScript
-  - abbr: nft
-    expansion: nftables (Linux packet filter)
-  - abbr: LCP
-    expansion: Largest Contentful Paint
   - abbr: CWV
     expansion: Core Web Vitals
-  - abbr: PSI
-    expansion: PageSpeed Insights
-  - abbr: URL
-    expansion: Uniform Resource Locator
-  - abbr: UI
-    expansion: user interface
+  - abbr: HTML
+    expansion: HyperText Markup Language
+  - abbr: HTTPS
+    expansion: Hypertext Transfer Protocol Secure
+  - abbr: JS
+    expansion: JavaScript
+  - abbr: LCP
+    expansion: Largest Contentful Paint
+  - abbr: OEN
+    expansion: Overlay and Edge Notes
   - abbr: Pi
     expansion: single-board computer (Raspberry Pi class)
   - abbr: Playwright
     expansion: browser automation and test runner
-  - abbr: Inter
-    expansion: variable sans-serif font family
-  - abbr: Playfair
-    expansion: variable serif font family
-  - abbr: Rocket
-    expansion: Cloudflare Rocket Loader
+  - abbr: PSI
+    expansion: PageSpeed Insights
+  - abbr: URL
+    expansion: Uniform Resource Locator
 ---
 
 # One generated blocking stylesheet and variable fonts
@@ -80,11 +65,7 @@ Largest Contentful Paint (LCP) portrait preload belongs immediately after viewpo
 
 ## Topology
 
-```text
-[HTML] --blocking <link stylesheet>--> extra round trip  (PSI drop when a NEW blocking sheet is added)
-[variable font] one woff2 file, many @font-face URLs  --> Chrome re-downloads the same bytes
-Contract: one generated chrome.css; preload at most two variable files; LCP portrait media-split
-```
+N/A — deploy
 
 ## Bind
 
@@ -92,11 +73,9 @@ Fill this table **before** any live change. Do **not** paste real values back in
 
 | Placeholder | Operator fills | Class |
 |-------------|----------------|-------|
-| `<worker-root>` | Worker / UI source tree | Directory on the workstation |
-| `<live-url>` | Public HTTPS origin | URL the browser loads |
-| `<preview-url>` | Preview origin if used | URL |
-| `<html-path>` | Path that becomes a Response body | File glob |
-
+| `<html-path>` | Files that become a Response body | Glob |
+| `<live-url>` | Public HTTPS origin | URL |
+| `<site.css>` | Origin stylesheet filename | Asset |
 
 ## Formulas
 
@@ -104,7 +83,7 @@ Proven failure: extra blocking stylesheet dropped mobile PSI 77→72. Self-hosti
 
 ## Decision
 
-Generate `chrome.css` as concat of four **source** files (do not hand-merge). Defer decorative font and non-critical CSS with `media="print" onload`. Preload **at most two** variable files whose `href` matches `@font-face src`; latin + latin-ext only.
+Generate `<site.css>` as concat of four **source** files (do not hand-merge). Defer decorative font and non-critical CSS with `media="print" onload`. Preload **at most two** variable files whose `href` matches `@font-face src`; latin + latin-ext only.
 
 MUST NOT add a second blocking stylesheet to “clean up” home CSS.
 
@@ -116,15 +95,13 @@ MUST NOT add a second blocking stylesheet to “clean up” home CSS.
 
 ## Agent stop rule
 
-> A coding agent MUST emit a **bound runbook** (placeholders replaced from Bind).
-> MUST NOT apply live `ip rule`, nft, iptables, ip6tables, sysctl, `wg set`, daemon restart, or deploy until a **human** filled Bind.
-> MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
-> MUST NOT file an upstream bug from this page.
-> MUST NOT publish real addresses, hostnames, or custom ports.
+> MUST emit the stylesheet and font preload list with `<live-url>` / `<site.css>` filled.
+> MUST NOT deploy until those URLs return 200 ([OEN-S06](../supporting/s06-do-not-ship-html-only.md)).
+> MUST NOT add a second render-blocking stylesheet.
+> MUST NOT apply netfilter from this page.
 
 ## Procedure
 
-Placeholders only until Bind is filled: `<cloud-vps>`, `<lan-pi>`, `<overlay-peer>`, `<exit-node>`, `<wg-iface>`, `<gcp-nic>`, plus the Bind extras on this page.
 
 ### Copy-paste commands (after Bind)
 
@@ -132,7 +109,7 @@ Placeholders only until Bind is filled: `<cloud-vps>`, `<lan-pi>`, `<overlay-pee
 # From the site tree after Bind:
 grep -n 'rel="stylesheet"' <html-path>
 # Count distinct woff2 hrefs vs files on disk. Preload href MUST match @font-face src.
-curl -sS -o /dev/null -w '%{http_code} %{url_effective}\n' --max-time 15 <live-url>/chrome.css
+curl -sS -o /dev/null -w '%{http_code} %{url_effective}\n' --max-time 15 <live-url>/<site.css>
 ```
 
 CSS/JS/images MUST 200 ([OEN-S06](../supporting/s06-do-not-ship-html-only.md)). Playwright three devices ([OEN-S09](../supporting/s09-playwright-desktop-iphone-pixel.md)).
@@ -140,7 +117,7 @@ CSS/JS/images MUST 200 ([OEN-S06](../supporting/s06-do-not-ship-html-only.md)). 
 1. **P1 — Count render-blocking CSS.**
    - **Action:** View-source the home HTML. Count blocking `<link rel=stylesheet>` without media=print trick.
    - **Expected:** At most one generated chrome stylesheet plus any required third-party you already accepted.
-   - **On failure:** If a new home-only CSS link appeared, remove it and concat into chrome.css.
+   - **On failure:** If a new home-only CSS link appeared, remove it and concat into <site.css>.
 2. **P2 — Match preload href to @font-face src.**
    - **Action:** Preload at most two variable woff2 URLs. They MUST equal the `src` in CSS. No per-weight duplicate filenames for the same bytes.
    - **Expected:** Network panel: each variable file once.
@@ -152,7 +129,7 @@ CSS/JS/images MUST 200 ([OEN-S06](../supporting/s06-do-not-ship-html-only.md)). 
 4. **P4 — Do not ship HTML-only; file(1) images.**
    - **Action:** CSS/JS/images 200 ([OEN-S06](../supporting/s06-do-not-ship-html-only.md)). `file` before image deploy ([OEN-S10](../supporting/s10-file-before-image-deploy.md)). Playwright Desktop + iPhone + Pixel ([OEN-S09](../supporting/s09-playwright-desktop-iphone-pixel.md)).
    - **Expected:** No layout-destroying 404. Image bytes match the extension’s real type.
-   - **On failure:** A CSS “bug” that is a 404 is S06, not a rewrite of chrome.css.
+   - **On failure:** A CSS “bug” that is a 404 is S06, not a rewrite of <site.css>.
 
 ## Expected samples
 
@@ -162,12 +139,10 @@ CSS/JS/images MUST 200 ([OEN-S06](../supporting/s06-do-not-ship-html-only.md)). 
 
 ## Verify
 
-- One generated blocking chrome.css.
+- One generated blocking <site.css>.
 - At most two variable font preloads, href matches @font-face.
 - Mobile PSI did not drop from an extra blocking link.
 - Playwright three-device layout gate green for nav/hero changes.
-- ICMP / small ping success was **not** used as the pass criterion when this spec names TCP, SSH, or HTTPS.
-- Bind table was filled by a human before any live `ip` / nft / iptables change.
 
 ## MUST NOT
 
@@ -175,9 +150,11 @@ CSS/JS/images MUST 200 ([OEN-S06](../supporting/s06-do-not-ship-html-only.md)). 
 - MUST NOT ship per-weight filenames that are identical variable files.
 - MUST NOT describe origin Pi, Access, or lead pipeline.
 - MUST NOT skip file(1) on images.
-- MUST NOT apply live network or firewall changes until Bind is filled by a human.
-- MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
 - MUST NOT publish hostnames, addresses, ULAs, or custom ports.
+
+## Page changelog
+
+- Edition 2 (8 Sep 2026, Mountain Time): Trap-specific Bind and agent stop rule (review cleanup).
 
 ## Related specs
 

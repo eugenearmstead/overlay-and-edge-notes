@@ -1,13 +1,13 @@
 ---
-id: OEN-S04
+id: "OEN-S04"
 title: "Purge the content delivery network after deploy"
-kind: supporting
-status: active
-edition: 1
-date_published: 2026-09-08
-author: Eugene Armstead
-author_url: https://www.armsteadent.com/
-canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s04-purge-cdn-after-deploy.html
+kind: "supporting"
+status: "active"
+edition: 2
+date_published: "2026-09-08"
+author: "Eugene Armstead"
+author_url: "https://www.armsteadent.com/"
+canonical: "https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s04-purge-cdn-after-deploy.html"
 keywords:
   - "purge CDN after deploy"
   - "Workers-edit lacks Cache Purge"
@@ -25,37 +25,26 @@ backs:
   - OEN-08
   - OEN-09
   - OEN-10
-backed_by: []
+backed_by:
+  []
 description: "After a successful deploy, purge HTML. Workers-edit tokens often lack Cache Purge. Query-string cache busts do not replace a zone purge for HTML."
 terms:
-  - abbr: OEN
-    expansion: Overlay and Edge Notes
-  - abbr: SSH
-    expansion: Secure Shell
-  - abbr: TCP
-    expansion: Transmission Control Protocol
-  - abbr: ICMP
-    expansion: Internet Control Message Protocol
-  - abbr: HTTPS
-    expansion: Hypertext Transfer Protocol Secure
-  - abbr: HTML
-    expansion: HyperText Markup Language
   - abbr: API
     expansion: application programming interface
-  - abbr: nft
-    expansion: nftables (Linux packet filter)
   - abbr: CDN
     expansion: content delivery network
-  - abbr: URL
-    expansion: Uniform Resource Locator
-  - abbr: UI
-    expansion: user interface
-  - abbr: HIT
-    expansion: cache HIT (content still served from cache)
-  - abbr: Wrangler
-    expansion: Cloudflare Workers command-line tool
   - abbr: Cloudflare
     expansion: content delivery and Workers platform
+  - abbr: HIT
+    expansion: cache HIT (content still served from cache)
+  - abbr: HTML
+    expansion: HyperText Markup Language
+  - abbr: HTTPS
+    expansion: Hypertext Transfer Protocol Secure
+  - abbr: OEN
+    expansion: Overlay and Edge Notes
+  - abbr: URL
+    expansion: Uniform Resource Locator
 ---
 
 # Purge the content delivery network after deploy
@@ -66,12 +55,7 @@ Known Cloudflare advice. Unique add-ons: a token with Workers edit often **lacks
 
 ## Topology
 
-```text
-[deploy] --> origin new
-[CDN] HTML still old until zone purge
-Workers-edit token often LACKS Cache Purge
-?v= does not replace HTML purge
-```
+N/A — deploy
 
 ## Bind
 
@@ -79,20 +63,7 @@ Fill this table **before** any live change. Do **not** paste real values back in
 
 | Placeholder | Operator fills | Class |
 |-------------|----------------|-------|
-| `<worker-root>` | Worker / UI source tree | Directory on the workstation |
-| `<live-url>` | Public HTTPS origin | URL the browser loads |
-| `<preview-url>` | Preview origin if used | URL |
-| `<html-path>` | Path that becomes a Response body | File glob |
-
-
-## Formulas
-
-```text
-# Predeploy MUST fail the ship on client-executed matches:
-#   127.0.0.1:7450   localhost:7450   /ingest/   X-Debug-Session-Id
-# Merge ≠ live Worker. Wait ~10 minutes, then Wrangler if the Git build never started.
-# Cache: Workers-edit tokens often lack Cache Purge. ?v= does not replace zone purge for HTML.
-```
+| `<live-url>` | Public HTTPS origin | URL |
 
 ## Method
 
@@ -104,15 +75,13 @@ Visitors see the new HTML. Operators are not told the CDN is “haunted.”
 
 ## Agent stop rule
 
-> A coding agent MUST emit a **bound runbook** (placeholders replaced from Bind).
-> MUST NOT apply live `ip rule`, nft, iptables, ip6tables, sysctl, `wg set`, daemon restart, or deploy until a **human** filled Bind.
-> MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
-> MUST NOT file an upstream bug from this page.
-> MUST NOT publish real addresses, hostnames, or custom ports.
+> MUST emit the purge command for `<live-url>` (and `<preview-url>` if used) after Bind is filled.
+> MUST NOT claim a deploy is visible while CDN still HITs a stale body.
+> MUST say so if the token cannot purge.
+> MUST NOT apply netfilter from this page.
 
 ## Procedure
 
-Placeholders only until Bind is filled: `<cloud-vps>`, `<lan-pi>`, `<overlay-peer>`, `<exit-node>`, `<wg-iface>`, `<gcp-nic>`, plus the Bind extras on this page.
 
 ### Copy-paste commands (after Bind)
 
@@ -143,16 +112,16 @@ cf-cache-status: HIT
 
 - Live view-source has the new string.
 - Purge token limitation was stated if it applied.
-- ICMP / small ping success was **not** used as the pass criterion when this spec names TCP, SSH, or HTTPS.
-- Bind table was filled by a human before any live `ip` / nft / iptables change.
 
 ## MUST NOT
 
 - MUST NOT treat ?v= as a substitute for HTML zone purge.
 - MUST NOT hide a 403 purge as a code bug.
-- MUST NOT apply live network or firewall changes until Bind is filled by a human.
-- MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
 - MUST NOT publish hostnames, addresses, ULAs, or custom ports.
+
+## Page changelog
+
+- Edition 2 (8 Sep 2026, Mountain Time): Trap-specific Bind and agent stop rule (review cleanup).
 
 ## Related specs
 

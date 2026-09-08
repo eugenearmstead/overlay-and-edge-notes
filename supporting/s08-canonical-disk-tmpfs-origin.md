@@ -1,13 +1,13 @@
 ---
-id: OEN-S08
+id: "OEN-S08"
 title: "Canonical disk + tmpfs RAM origin on a Pi"
-kind: supporting
-status: active
-edition: 1
-date_published: 2026-09-08
-author: Eugene Armstead
-author_url: https://www.armsteadent.com/
-canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s08-canonical-disk-tmpfs-origin.html
+kind: "supporting"
+status: "active"
+edition: 2
+date_published: "2026-09-08"
+author: "Eugene Armstead"
+author_url: "https://www.armsteadent.com/"
+canonical: "https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s08-canonical-disk-tmpfs-origin.html"
 keywords:
   - "canonical disk tmpfs RAM origin"
   - "Pi SD wear Cloudflare origin"
@@ -23,43 +23,32 @@ keywords:
   - "SD card static origin"
 backs:
   - OEN-10
-backed_by: []
+backed_by:
+  []
 description: "Deploy to the persistent disk tree, then sync to a tmpfs RAM origin so the content delivery network hits RAM, not the SD card."
 terms:
-  - abbr: OEN
-    expansion: Overlay and Edge Notes
-  - abbr: SSH
-    expansion: Secure Shell
-  - abbr: TCP
-    expansion: Transmission Control Protocol
-  - abbr: ICMP
-    expansion: Internet Control Message Protocol
-  - abbr: HTTPS
-    expansion: Hypertext Transfer Protocol Secure
-  - abbr: HTML
-    expansion: HyperText Markup Language
-  - abbr: CSS
-    expansion: Cascading Style Sheets
-  - abbr: JS
-    expansion: JavaScript
-  - abbr: nft
-    expansion: nftables (Linux packet filter)
-  - abbr: ControlPath
-    expansion: OpenSSH multiplexing socket path option
-  - abbr: URL
-    expansion: Uniform Resource Locator
-  - abbr: UI
-    expansion: user interface
-  - abbr: RAM
-    expansion: random-access memory
-  - abbr: Pi
-    expansion: single-board computer (Raspberry Pi class)
-  - abbr: SD
-    expansion: Secure Digital (flash storage)
-  - abbr: tmpfs
-    expansion: temporary file system in RAM
   - abbr: Cloudflare
     expansion: content delivery and Workers platform
+  - abbr: ControlPath
+    expansion: OpenSSH multiplexing socket path option
+  - abbr: CSS
+    expansion: Cascading Style Sheets
+  - abbr: HTML
+    expansion: HyperText Markup Language
+  - abbr: JS
+    expansion: JavaScript
+  - abbr: LAN
+    expansion: Local Area Network
+  - abbr: OEN
+    expansion: Overlay and Edge Notes
+  - abbr: Pi
+    expansion: single-board computer (Raspberry Pi class)
+  - abbr: RAM
+    expansion: random-access memory
+  - abbr: SD
+    expansion: Secure Digital (flash storage)
+  - abbr: SSH
+    expansion: Secure Shell
 ---
 
 # Canonical disk + tmpfs RAM origin on a Pi
@@ -70,11 +59,7 @@ Not new as “logs in RAM.” The claim is deploy-to-persistent then sync-to-RAM
 
 ## Topology
 
-```text
-[Pi] canonical disk tree  -->  sync --> tmpfs RAM origin
-Cloudflare origin SHOULD hit RAM, not the SD card
-HTML-only rsync to the wrong tree looks deployed
-```
+N/A — deploy
 
 ## Bind
 
@@ -82,11 +67,11 @@ Fill this table **before** any live change. Do **not** paste real values back in
 
 | Placeholder | Operator fills | Class |
 |-------------|----------------|-------|
-| `<worker-root>` | Worker / UI source tree | Directory on the workstation |
-| `<live-url>` | Public HTTPS origin | URL the browser loads |
-| `<preview-url>` | Preview origin if used | URL |
-| `<html-path>` | Path that becomes a Response body | File glob |
-
+| `<user>` | SSH user | Guest account |
+| `<lan-pi>` | Always-on LAN Pi | LAN Pi |
+| `<ram-origin>` | tmpfs serve root | Directory on the Pi |
+| `<site.css>` | Origin stylesheet filename | Asset |
+| `<disk-origin>` | Persistent canonical web tree | Directory on the Pi |
 
 ## Formulas
 
@@ -102,20 +87,18 @@ SD wear drops. Missed sync looks like a CSS bug.
 
 ## Agent stop rule
 
-> A coding agent MUST emit a **bound runbook** (placeholders replaced from Bind).
-> MUST NOT apply live `ip rule`, nft, iptables, ip6tables, sysctl, `wg set`, daemon restart, or deploy until a **human** filled Bind.
-> MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
-> MUST NOT file an upstream bug from this page.
-> MUST NOT publish real addresses, hostnames, or custom ports.
+> MUST name `<disk-origin>` and `<ram-origin>` after Bind is filled.
+> MUST NOT rsync HTML-only to the RAM tree.
+> MUST NOT call a missing `<site.css>` on one tree a CSS bug ([OEN-S06](s06-do-not-ship-html-only.md)).
+> MUST NOT apply netfilter from this page.
 
 ## Procedure
 
-Placeholders only until Bind is filled: `<cloud-vps>`, `<lan-pi>`, `<overlay-peer>`, `<exit-node>`, `<wg-iface>`, `<gcp-nic>`, plus the Bind extras on this page.
 
 ### Copy-paste commands (after Bind)
 
 ```bash
-ssh -o ControlPath=none <user>@<lan-pi> 'df -hT | grep -E "tmpfs|ext"; ls <ram-origin>/chrome.css <disk-origin>/chrome.css'
+ssh -o ControlPath=none <user>@<lan-pi> 'df -hT | grep -E "tmpfs|ext"; ls <ram-origin>/<site.css> <disk-origin>/<site.css>'
 ```
 
 1. **P1 — Name the two trees.**
@@ -141,17 +124,17 @@ tmpfs   ...  /srv/ram-origin
 
 - Disk and RAM hashes match after deploy.
 - Reboot restores RAM from disk.
-- ICMP / small ping success was **not** used as the pass criterion when this spec names TCP, SSH, or HTTPS.
-- Bind table was filled by a human before any live `ip` / nft / iptables change.
 
 ## MUST NOT
 
 - MUST NOT skip the disk copy.
 - MUST NOT publish the Pi hostname.
 - MUST NOT HTML-only to RAM.
-- MUST NOT apply live network or firewall changes until Bind is filled by a human.
-- MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
 - MUST NOT publish hostnames, addresses, ULAs, or custom ports.
+
+## Page changelog
+
+- Edition 2 (8 Sep 2026, Mountain Time): Trap-specific Bind and agent stop rule (review cleanup).
 
 ## Related specs
 

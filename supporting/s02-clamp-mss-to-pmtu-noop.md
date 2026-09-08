@@ -1,13 +1,13 @@
 ---
-id: OEN-S02
+id: "OEN-S02"
 title: "clamp-mss-to-pmtu is a no-op when ICMP is dropped"
-kind: supporting
-status: active
-edition: 1
-date_published: 2026-09-08
-author: Eugene Armstead
-author_url: https://www.armsteadent.com/
-canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s02-clamp-mss-to-pmtu-noop.html
+kind: "supporting"
+status: "active"
+edition: 2
+date_published: "2026-09-08"
+author: "Eugene Armstead"
+author_url: "https://www.armsteadent.com/"
+canonical: "https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s02-clamp-mss-to-pmtu-noop.html"
 keywords:
   - "clamp-mss-to-pmtu no-op"
   - "ICMP blackholed MSS clamp"
@@ -24,59 +24,56 @@ keywords:
 backs:
   - OEN-01
   - OEN-02
-backed_by: []
+backed_by:
+  []
 description: "iptables --clamp-mss-to-pmtu uses learned path MTU. When ICMP fragmentation-needed is blackholed, the clamp does nothing; use explicit --set-mss."
 terms:
-  - abbr: OEN
-    expansion: Overlay and Edge Notes
-  - abbr: SSH
-    expansion: Secure Shell
-  - abbr: VPS
-    expansion: Virtual Private Server
-  - abbr: LAN
-    expansion: Local Area Network
-  - abbr: WAN
-    expansion: Wide Area Network
-  - abbr: VPN
-    expansion: Virtual Private Network
-  - abbr: KB
-    expansion: kilobyte
-  - abbr: TCP
-    expansion: Transmission Control Protocol
-  - abbr: MSS
-    expansion: Maximum Segment Size
-  - abbr: TCPMSS
-    expansion: iptables/nft target that sets TCP Maximum Segment Size
-  - abbr: MTU
-    expansion: Maximum Transmission Unit
-  - abbr: ICMP
-    expansion: Internet Control Message Protocol
-  - abbr: PMTU
-    expansion: path Maximum Transmission Unit
-  - abbr: PMTUD
-    expansion: path MTU discovery
+  - abbr: Chromium
+    expansion: open-source browser engine
   - abbr: DF
     expansion: don't-fragment (IP flag)
+  - abbr: FORWARD
+    expansion: netfilter/iptables forward chain
   - abbr: HTTPS
     expansion: Hypertext Transfer Protocol Secure
+  - abbr: ICMP
+    expansion: Internet Control Message Protocol
   - abbr: IP
     expansion: Internet Protocol
   - abbr: IPv4
     expansion: Internet Protocol version 4
   - abbr: IPv6
     expansion: Internet Protocol version 6
-  - abbr: WireGuard
-    expansion: UDP-based VPN protocol
+  - abbr: KB
+    expansion: kilobyte
+  - abbr: LAN
+    expansion: Local Area Network
+  - abbr: MSS
+    expansion: Maximum Segment Size
+  - abbr: MTU
+    expansion: Maximum Transmission Unit
   - abbr: nft
     expansion: nftables (Linux packet filter)
-  - abbr: FORWARD
-    expansion: netfilter/iptables forward chain
+  - abbr: OEN
+    expansion: Overlay and Edge Notes
   - abbr: Pi
     expansion: single-board computer (Raspberry Pi class)
-  - abbr: Chromium
-    expansion: open-source browser engine
-  - abbr: Inter
-    expansion: variable sans-serif font family
+  - abbr: PMTU
+    expansion: path Maximum Transmission Unit
+  - abbr: PMTUD
+    expansion: path MTU discovery
+  - abbr: SSH
+    expansion: Secure Shell
+  - abbr: TCP
+    expansion: Transmission Control Protocol
+  - abbr: TCPMSS
+    expansion: iptables/nft target that sets TCP Maximum Segment Size
+  - abbr: VPN
+    expansion: Virtual Private Network
+  - abbr: VPS
+    expansion: Virtual Private Server
+  - abbr: WAN
+    expansion: Wide Area Network
 ---
 
 # clamp-mss-to-pmtu is a no-op when ICMP is dropped
@@ -190,6 +187,10 @@ TCPMSS  ...  clamp to PMTU  pkts:N
 - MUST NOT apply live network or firewall changes until Bind is filled by a human.
 - MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
 - MUST NOT publish hostnames, addresses, ULAs, or custom ports.
+
+## Page changelog
+
+- Edition 2 (8 Sep 2026, Mountain Time): Added overlay-impl Bind and trap-specific terms (review cleanup).
 
 ## Related specs
 

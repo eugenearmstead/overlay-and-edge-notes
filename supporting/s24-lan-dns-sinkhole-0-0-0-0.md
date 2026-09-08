@@ -1,13 +1,13 @@
 ---
-id: OEN-S24
+id: "OEN-S24"
 title: "LAN DNS returning 0.0.0.0 is a sinkhole, not a site bug"
-kind: supporting
-status: active
-edition: 1
-date_published: 2026-09-08
-author: Eugene Armstead
-author_url: https://www.armsteadent.com/
-canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s24-lan-dns-sinkhole-0-0-0-0.html
+kind: "supporting"
+status: "active"
+edition: 2
+date_published: "2026-09-08"
+author: "Eugene Armstead"
+author_url: "https://www.armsteadent.com/"
+canonical: "https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s24-lan-dns-sinkhole-0-0-0-0.html"
 keywords:
   - "LAN DNS 0.0.0.0 sinkhole"
   - "ERR_CONNECTION_REFUSED 0.0.0.0"
@@ -24,43 +24,30 @@ keywords:
 backs:
   - OEN-03
   - OEN-10
-backed_by: []
+backed_by:
+  []
 description: "LAN dig returning 0.0.0.0 is a DNS sinkhole. Compare LAN dig vs DNS-over-HTTPS. Temporary /etc/hosts on the workstation only, operator-approved. Not a website bug."
 terms:
-  - abbr: OEN
-    expansion: Overlay and Edge Notes
-  - abbr: SSH
-    expansion: Secure Shell
-  - abbr: LAN
-    expansion: Local Area Network
-  - abbr: WAN
-    expansion: Wide Area Network
-  - abbr: TCP
-    expansion: Transmission Control Protocol
-  - abbr: MTU
-    expansion: Maximum Transmission Unit
-  - abbr: ICMP
-    expansion: Internet Control Message Protocol
-  - abbr: HTTPS
-    expansion: Hypertext Transfer Protocol Secure
-  - abbr: HTML
-    expansion: HyperText Markup Language
+  - abbr: AAAA
+    expansion: DNS IPv6 address record
   - abbr: CSS
     expansion: Cascading Style Sheets
-  - abbr: IP
-    expansion: Internet Protocol
-  - abbr: WireGuard
-    expansion: UDP-based VPN protocol
   - abbr: DNS
     expansion: Domain Name System
   - abbr: DoH
     expansion: DNS over HTTPS
-  - abbr: nft
-    expansion: nftables (Linux packet filter)
+  - abbr: HTML
+    expansion: HyperText Markup Language
+  - abbr: HTTPS
+    expansion: Hypertext Transfer Protocol Secure
+  - abbr: IP
+    expansion: Internet Protocol
+  - abbr: LAN
+    expansion: Local Area Network
+  - abbr: OEN
+    expansion: Overlay and Edge Notes
   - abbr: Pi
     expansion: single-board computer (Raspberry Pi class)
-  - abbr: AAAA
-    expansion: DNS IPv6 address record
 ---
 
 # LAN DNS returning 0.0.0.0 is a sinkhole, not a site bug
@@ -84,11 +71,8 @@ Fill this table **before** any live change. Do **not** paste real values back in
 
 | Placeholder | Operator fills | Class |
 |-------------|----------------|-------|
-| `<wg-iface>` | Consumer-router WireGuard client iface | Iface |
-| `<lan-bridge>` | LAN bridge | Iface; MTU 1500 |
-| `<wan-iface>` | WAN iface | Iface |
-| `<lan-resolver>` | Intended LAN DNS | Address; never publish |
-
+| `<lan-resolver>` | LAN DNS resolver the client uses | Address; never publish |
+| `<name>` | Name the sinkhole returns 0.0.0.0 for | Hostname class |
 
 ## Formulas
 
@@ -104,15 +88,13 @@ Analytics/tag hosts can be tested without blaming HTML.
 
 ## Agent stop rule
 
-> A coding agent MUST emit a **bound runbook** (placeholders replaced from Bind).
-> MUST NOT apply live `ip rule`, nft, iptables, ip6tables, sysctl, `wg set`, daemon restart, or deploy until a **human** filled Bind.
-> MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
-> MUST NOT file an upstream bug from this page.
-> MUST NOT publish real addresses, hostnames, or custom ports.
+> MUST compare LAN DNS vs DNS-over-HTTPS after `<lan-resolver>` is filled.
+> MUST NOT pin `/etc/hosts` on the origin Pi.
+> MUST NOT call a 0.0.0.0 sinkhole a site outage.
+> MUST NOT apply netfilter from this page.
 
 ## Procedure
 
-Placeholders only until Bind is filled: `<cloud-vps>`, `<lan-pi>`, `<overlay-peer>`, `<exit-node>`, `<wg-iface>`, `<gcp-nic>`, plus the Bind extras on this page.
 
 ### Copy-paste commands (after Bind)
 
@@ -144,17 +126,17 @@ dig +short @<lan-resolver> <name>
 
 - Sinkhole identified via LAN vs DoH.
 - No site-code “fix” for 0.0.0.0.
-- ICMP / small ping success was **not** used as the pass criterion when this spec names TCP, SSH, or HTTPS.
-- Bind table was filled by a human before any live `ip` / nft / iptables change.
 
 ## MUST NOT
 
 - MUST NOT treat 0.0.0.0 as a website bug.
 - MUST NOT apply hosts pins without operator approval.
 - MUST NOT pin on the origin server.
-- MUST NOT apply live network or firewall changes until Bind is filled by a human.
-- MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
 - MUST NOT publish hostnames, addresses, ULAs, or custom ports.
+
+## Page changelog
+
+- Edition 2 (8 Sep 2026, Mountain Time): Trap-specific Bind and agent stop rule (review cleanup).
 
 ## Related specs
 

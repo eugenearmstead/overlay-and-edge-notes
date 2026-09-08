@@ -1,13 +1,13 @@
 ---
-id: OEN-S18
+id: "OEN-S18"
 title: "Do not set exit-node on the agent workstation"
-kind: supporting
-status: active
-edition: 1
-date_published: 2026-09-08
-author: Eugene Armstead
-author_url: https://www.armsteadent.com/
-canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s18-do-not-set-exit-on-agent-workstation.html
+kind: "supporting"
+status: "active"
+edition: 2
+date_published: "2026-09-08"
+author: "Eugene Armstead"
+author_url: "https://www.armsteadent.com/"
+canonical: "https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s18-do-not-set-exit-on-agent-workstation.html"
 keywords:
   - "do not set exit-node on agent workstation"
   - "tailscale set --exit-node workstation"
@@ -25,37 +25,24 @@ backs:
   - OEN-17
   - OEN-04
   - OEN-20
-backed_by: []
+backed_by:
+  []
 description: "Do not tailscale set --exit-node on the agent workstation unless the operator asks. Overlay SSH first. nmap only after a failed connect."
 terms:
-  - abbr: OEN
-    expansion: Overlay and Edge Notes
-  - abbr: SSH
-    expansion: Secure Shell
-  - abbr: LAN
-    expansion: Local Area Network
-  - abbr: WAN
-    expansion: Wide Area Network
-  - abbr: TCP
-    expansion: Transmission Control Protocol
-  - abbr: MTU
-    expansion: Maximum Transmission Unit
-  - abbr: ICMP
-    expansion: Internet Control Message Protocol
-  - abbr: HTTPS
-    expansion: Hypertext Transfer Protocol Secure
   - abbr: DNS
     expansion: Domain Name System
-  - abbr: GCP
-    expansion: Google Cloud Platform
-  - abbr: VM
-    expansion: virtual machine
-  - abbr: NIC
-    expansion: network interface card
-  - abbr: nft
-    expansion: nftables (Linux packet filter)
+  - abbr: LAN
+    expansion: Local Area Network
+  - abbr: OEN
+    expansion: Overlay and Edge Notes
   - abbr: Pi
     expansion: single-board computer (Raspberry Pi class)
+  - abbr: SSH
+    expansion: Secure Shell
+  - abbr: VM
+    expansion: virtual machine
+  - abbr: VPS
+    expansion: Virtual Private Server
 ---
 
 # Do not set exit-node on the agent workstation
@@ -78,14 +65,10 @@ Fill this table **before** any live change. Do **not** paste real values back in
 
 | Placeholder | Operator fills | Class |
 |-------------|----------------|-------|
-| `<exit-node>` | Overlay exit node | Cloud VM or LAN Pi used as exit |
-| `<overlay-peer>` | Soak client (**not** the agent workstation) | LAN Pi |
-| `<user>` | SSH user | Guest |
-| `<overlay-tun>` | Overlay tun on the exit | Iface |
-| `<gcp-nic>` | Public NIC on a Google Cloud guest | Iface; omit on non-GCP exits |
-| `<wan-iface>` | WAN / public NIC | Iface |
-| `<mss4>` / `<mss6>` | Computed from underlay or overlay tun MTU | Formulas |
-
+| `<overlay-peer>` | Soak client (not the agent workstation) | LAN Pi or phone |
+| `<exit-node>` | Overlay exit node | Cloud VM or LAN Pi |
+| `<lan-pi>` | Always-on LAN Pi | LAN Pi |
+| `<cloud-vps>` | Cloud VPS under test | Cloud VPS |
 
 ## Formulas
 
@@ -101,15 +84,13 @@ Agent sessions keep internet. Exit tests still happen on a Pi.
 
 ## Agent stop rule
 
-> A coding agent MUST emit a **bound runbook** (placeholders replaced from Bind).
-> MUST NOT apply live `ip rule`, nft, iptables, ip6tables, sysctl, `wg set`, daemon restart, or deploy until a **human** filled Bind.
-> MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
-> MUST NOT file an upstream bug from this page.
-> MUST NOT publish real addresses, hostnames, or custom ports.
+> MUST NOT `tailscale set --exit-node` on the agent workstation unless the operator asks.
+> This spec does not apply if `<overlay-impl>` is not tailscale-compatible.
+> MUST soak exits from `<overlay-peer>` or a phone.
+> MUST NOT apply netfilter from this page.
 
 ## Procedure
 
-Placeholders only until Bind is filled: `<cloud-vps>`, `<lan-pi>`, `<overlay-peer>`, `<exit-node>`, `<wg-iface>`, `<gcp-nic>`, plus the Bind extras on this page.
 
 ### Copy-paste commands (after Bind)
 
@@ -141,16 +122,16 @@ Placeholders only until Bind is filled: `<cloud-vps>`, `<lan-pi>`, `<overlay-pee
 
 - Workstation exit unset.
 - Exit soak documented on a Pi or phone.
-- ICMP / small ping success was **not** used as the pass criterion when this spec names TCP, SSH, or HTTPS.
-- Bind table was filled by a human before any live `ip` / nft / iptables change.
 
 ## MUST NOT
 
 - MUST NOT set exit on the agent workstation to reproduce.
 - MUST NOT nmap before the first connect when using connect wrappers.
-- MUST NOT apply live network or firewall changes until Bind is filled by a human.
-- MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
 - MUST NOT publish hostnames, addresses, ULAs, or custom ports.
+
+## Page changelog
+
+- Edition 2 (8 Sep 2026, Mountain Time): Trap-specific Bind and agent stop rule (review cleanup).
 
 ## Related specs
 

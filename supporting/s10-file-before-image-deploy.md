@@ -1,13 +1,13 @@
 ---
-id: OEN-S10
+id: "OEN-S10"
 title: "file(1) before image deploy"
-kind: supporting
-status: active
-edition: 1
-date_published: 2026-09-08
-author: Eugene Armstead
-author_url: https://www.armsteadent.com/
-canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s10-file-before-image-deploy.html
+kind: "supporting"
+status: "active"
+edition: 2
+date_published: "2026-09-08"
+author: "Eugene Armstead"
+author_url: "https://www.armsteadent.com/"
+canonical: "https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s10-file-before-image-deploy.html"
 keywords:
   - "file before image deploy"
   - "extension is not format"
@@ -24,29 +24,16 @@ keywords:
 backs:
   - OEN-10
   - OEN-11
-backed_by: []
+backed_by:
+  []
 description: "Extension is not format. Map source to destination by actual type from file(1). Do not swap look-alike attachments."
 terms:
-  - abbr: OEN
-    expansion: Overlay and Edge Notes
-  - abbr: SSH
-    expansion: Secure Shell
-  - abbr: TCP
-    expansion: Transmission Control Protocol
-  - abbr: ICMP
-    expansion: Internet Control Message Protocol
-  - abbr: HTTPS
-    expansion: Hypertext Transfer Protocol Secure
   - abbr: HTML
     expansion: HyperText Markup Language
-  - abbr: nft
-    expansion: nftables (Linux packet filter)
-  - abbr: URL
-    expansion: Uniform Resource Locator
-  - abbr: UI
-    expansion: user interface
   - abbr: JPEG
     expansion: Joint Photographic Experts Group image format
+  - abbr: OEN
+    expansion: Overlay and Edge Notes
   - abbr: PNG
     expansion: Portable Network Graphics
 ---
@@ -59,10 +46,7 @@ A `.png` can be JPEG data. Hero cutouts need alpha. Swapping look-alike attachme
 
 ## Topology
 
-```text
-source_path --file(1)--> actual type  -->  dest_path same type
-Extension ≠ format. Do not swap look-alike attachments.
-```
+N/A — deploy
 
 ## Bind
 
@@ -70,11 +54,9 @@ Fill this table **before** any live change. Do **not** paste real values back in
 
 | Placeholder | Operator fills | Class |
 |-------------|----------------|-------|
-| `<worker-root>` | Worker / UI source tree | Directory on the workstation |
-| `<live-url>` | Public HTTPS origin | URL the browser loads |
-| `<preview-url>` | Preview origin if used | URL |
-| `<html-path>` | Path that becomes a Response body | File glob |
-
+| `<src-a>` | First image source | Path |
+| `<src-b>` | Second image source | Path |
+| `<dest>` | Deploy destination path | Path |
 
 ## Formulas
 
@@ -90,15 +72,12 @@ Hero transparency and photo JPEG stay in the right slots.
 
 ## Agent stop rule
 
-> A coding agent MUST emit a **bound runbook** (placeholders replaced from Bind).
-> MUST NOT apply live `ip rule`, nft, iptables, ip6tables, sysctl, `wg set`, daemon restart, or deploy until a **human** filled Bind.
-> MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
-> MUST NOT file an upstream bug from this page.
-> MUST NOT publish real addresses, hostnames, or custom ports.
+> MUST run `file` on `<src-a>` / `<src-b>` / `<dest>` after Bind is filled.
+> MUST NOT swap filenames to “fix” display without confirming format.
+> MUST NOT apply netfilter from this page.
 
 ## Procedure
 
-Placeholders only until Bind is filled: `<cloud-vps>`, `<lan-pi>`, `<overlay-peer>`, `<exit-node>`, `<wg-iface>`, `<gcp-nic>`, plus the Bind extras on this page.
 
 ### Copy-paste commands (after Bind)
 
@@ -130,16 +109,16 @@ hero.png: JPEG image data   # trap: named png, is jpeg
 
 - file agrees on both ends.
 - HTML src matches.
-- ICMP / small ping success was **not** used as the pass criterion when this spec names TCP, SSH, or HTTPS.
-- Bind table was filled by a human before any live `ip` / nft / iptables change.
 
 ## MUST NOT
 
 - MUST NOT swap look-alike attachments without file.
 - MUST NOT re-process unless asked.
-- MUST NOT apply live network or firewall changes until Bind is filled by a human.
-- MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
 - MUST NOT publish hostnames, addresses, ULAs, or custom ports.
+
+## Page changelog
+
+- Edition 2 (8 Sep 2026, Mountain Time): Trap-specific Bind and agent stop rule (review cleanup).
 
 ## Related specs
 

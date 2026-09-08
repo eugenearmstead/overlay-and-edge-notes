@@ -1,13 +1,13 @@
 ---
-id: OEN-23
+id: "OEN-23"
 title: "Cloud-exit accept-dns=true pretty-prints, breaks overlay peer-API DNS"
-kind: original
-status: active
-edition: 1
-date_published: 2026-09-08
-author: Eugene Armstead
-author_url: https://www.armsteadent.com/
-canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/networking/23-cloud-exit-accept-dns.html
+kind: "original"
+status: "active"
+edition: 2
+date_published: "2026-09-08"
+author: "Eugene Armstead"
+author_url: "https://www.armsteadent.com/"
+canonical: "https://eugenearmstead.github.io/overlay-and-edge-notes/networking/23-cloud-exit-accept-dns.html"
 keywords:
   - "accept-dns=true breaks PeerAPI"
   - "tailscale dns query pretty print"
@@ -21,63 +21,54 @@ keywords:
   - "169.254.169.254 not PeerAPI"
   - "Headscale exit accept-dns"
   - "pretty dns query broken exit"
-backs: []
+backs:
+  []
 backed_by:
   - OEN-19
   - OEN-14
   - OEN-17
 description: "On Google Compute Engine-like hosts, accept-dns=true makes tailscale dns query look pretty and breaks the Recursion Desired-off exit DNS path."
 terms:
-  - abbr: OEN
-    expansion: Overlay and Edge Notes
-  - abbr: SSH
-    expansion: Secure Shell
-  - abbr: LAN
-    expansion: Local Area Network
-  - abbr: WAN
-    expansion: Wide Area Network
-  - abbr: TCP
-    expansion: Transmission Control Protocol
-  - abbr: MTU
-    expansion: Maximum Transmission Unit
-  - abbr: ICMP
-    expansion: Internet Control Message Protocol
-  - abbr: HTTP
-    expansion: Hypertext Transfer Protocol
-  - abbr: HTTPS
-    expansion: Hypertext Transfer Protocol Secure
+  - abbr: API
+    expansion: application programming interface
+  - abbr: CLI
+    expansion: command-line interface
+  - abbr: ControlPath
+    expansion: OpenSSH multiplexing socket path option
   - abbr: DNS
     expansion: Domain Name System
   - abbr: DoH
     expansion: DNS over HTTPS
-  - abbr: GCP
-    expansion: Google Cloud Platform
   - abbr: GCE
     expansion: Google Compute Engine
-  - abbr: VM
-    expansion: virtual machine
-  - abbr: NIC
-    expansion: network interface card
-  - abbr: API
-    expansion: application programming interface
-  - abbr: PeerAPI
-    expansion: overlay peer application-programming interface (exit DNS over HTTPS)
-  - abbr: RD
-    expansion: Recursion Desired (DNS flag)
-  - abbr: nft
-    expansion: nftables (Linux packet filter)
-  - abbr: ControlPath
-    expansion: OpenSSH multiplexing socket path option
+  - abbr: GCP
+    expansion: Google Cloud Platform
+  - abbr: HTTP
+    expansion: Hypertext Transfer Protocol
+  - abbr: HTTPS
+    expansion: Hypertext Transfer Protocol Secure
   - abbr: JSON
     expansion: JavaScript Object Notation
-  - abbr: Pi
-    expansion: single-board computer (Raspberry Pi class)
-  - abbr: REFUSES
-    expansion: DNS response code meaning the server will not answer
-  - abbr: Unbound
-    expansion: validating recursive DNS resolver
+  - abbr: LAN
+    expansion: Local Area Network
   - abbr: NOERROR
     expansion: DNS response code meaning the query succeeded
+  - abbr: OEN
+    expansion: Overlay and Edge Notes
+  - abbr: PeerAPI
+    expansion: overlay peer application-programming interface (exit DNS over HTTPS)
+  - abbr: Pi
+    expansion: single-board computer (Raspberry Pi class)
+  - abbr: RD
+    expansion: Recursion Desired (DNS flag)
+  - abbr: REFUSES
+    expansion: DNS response code meaning the server will not answer
+  - abbr: SSH
+    expansion: Secure Shell
+  - abbr: Unbound
+    expansion: validating recursive DNS resolver
+  - abbr: VM
+    expansion: virtual machine
 ---
 
 # Cloud-exit accept-dns=true pretty-prints, breaks overlay peer-API DNS
@@ -103,14 +94,10 @@ Fill this table **before** any live change. Do **not** paste real values back in
 
 | Placeholder | Operator fills | Class |
 |-------------|----------------|-------|
-| `<exit-node>` | Overlay exit node | Cloud VM or LAN Pi used as exit |
-| `<overlay-peer>` | Soak client (**not** the agent workstation) | LAN Pi |
-| `<user>` | SSH user | Guest |
-| `<overlay-tun>` | Overlay tun on the exit | Iface |
-| `<gcp-nic>` | Public NIC on a Google Cloud guest | Iface; omit on non-GCP exits |
-| `<wan-iface>` | WAN / public NIC | Iface |
-| `<mss4>` / `<mss6>` | Computed from underlay or overlay tun MTU | Formulas |
-
+| `<overlay-impl>` | Overlay implementation class | `tailscale-compatible` or other — stop and translate CLI |
+| `<user>` | SSH user | Guest account |
+| `<exit-node>` | Overlay exit node | Cloud VM or LAN Pi |
+| `<overlay-peer>` | Soak client (not the agent workstation) | LAN Pi or phone |
 
 ## Formulas
 
@@ -128,15 +115,13 @@ Exit virtual machines MUST keep `accept-dns=false`. MUST NOT “fix DNS display�
 
 ## Agent stop rule
 
-> A coding agent MUST emit a **bound runbook** (placeholders replaced from Bind).
-> MUST NOT apply live `ip rule`, nft, iptables, ip6tables, sysctl, `wg set`, daemon restart, or deploy until a **human** filled Bind.
-> MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
-> MUST NOT file an upstream bug from this page.
-> MUST NOT publish real addresses, hostnames, or custom ports.
+> MUST emit bound `accept-dns` / `tailscale dns query` commands only after `<overlay-impl>` is `tailscale-compatible`.
+> MUST NOT set `accept-dns=true` on an exit VM to pretty-print.
+> MUST NOT apply netfilter from this page.
 
 ## Procedure
 
-Placeholders only until Bind is filled: `<cloud-vps>`, `<lan-pi>`, `<overlay-peer>`, `<exit-node>`, `<wg-iface>`, `<gcp-nic>`, plus the Bind extras on this page.
+This spec does not apply if `<overlay-impl>` is not tailscale-compatible.
 
 ### Copy-paste commands (after Bind)
 
@@ -175,8 +160,6 @@ ssh -o ControlPath=none <user>@<exit-node> 'tailscale status --json | head -c 20
 - PeerAPI DoH from a non-exit client works.
 - Guest dns query may still show metadata — ignored.
 - Agent workstation exit unset.
-- ICMP / small ping success was **not** used as the pass criterion when this spec names TCP, SSH, or HTTPS.
-- Bind table was filled by a human before any live `ip` / nft / iptables change.
 
 ## MUST NOT
 
@@ -184,9 +167,11 @@ ssh -o ControlPath=none <user>@<exit-node> 'tailscale status --json | head -c 20
 - MUST NOT treat metadata 169.254.169.254 as PeerAPI.
 - MUST NOT publish GCP project or VM names.
 - MUST NOT use leak-test 502 as proof the exit is down.
-- MUST NOT apply live network or firewall changes until Bind is filled by a human.
-- MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
 - MUST NOT publish hostnames, addresses, ULAs, or custom ports.
+
+## Page changelog
+
+- Edition 2 (8 Sep 2026, Mountain Time): Trap-specific Bind and agent stop rule (review cleanup).
 
 ## Related specs
 

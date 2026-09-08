@@ -1,13 +1,13 @@
 ---
-id: OEN-S17
+id: "OEN-S17"
 title: "Coordination CLI blocks on SQLite write-ahead log while serve is up"
-kind: supporting
-status: active
-edition: 1
-date_published: 2026-09-08
-author: Eugene Armstead
-author_url: https://www.armsteadent.com/
-canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s17-coordination-cli-sqlite-wal.html
+kind: "supporting"
+status: "active"
+edition: 2
+date_published: "2026-09-08"
+author: "Eugene Armstead"
+author_url: "https://www.armsteadent.com/"
+canonical: "https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s17-coordination-cli-sqlite-wal.html"
 keywords:
   - "coordination CLI SQLite WAL block"
   - "nodes list blocks while serve up"
@@ -21,52 +21,34 @@ keywords:
   - "SQLite write-ahead log lock"
   - "Headscale nodes list timeout"
   - "healthcheck not CLI"
-backs: []
-backed_by: []
+backs:
+  []
+backed_by:
+  []
 description: "Coordination nodes-list CLI can block minutes on SQLite WAL while serve is up. Health checks MUST use HTTP /health or a readonly sqlite query, not the admin CLI."
 terms:
-  - abbr: OEN
-    expansion: Overlay and Edge Notes
-  - abbr: SSH
-    expansion: Secure Shell
-  - abbr: VPS
-    expansion: Virtual Private Server
-  - abbr: LAN
-    expansion: Local Area Network
-  - abbr: WAN
-    expansion: Wide Area Network
-  - abbr: TCP
-    expansion: Transmission Control Protocol
-  - abbr: MSS
-    expansion: Maximum Segment Size
-  - abbr: MTU
-    expansion: Maximum Transmission Unit
-  - abbr: ICMP
-    expansion: Internet Control Message Protocol
-  - abbr: HTTP
-    expansion: Hypertext Transfer Protocol
-  - abbr: HTTPS
-    expansion: Hypertext Transfer Protocol Secure
-  - abbr: WireGuard
-    expansion: UDP-based VPN protocol
+  - abbr: API
+    expansion: application programming interface
   - abbr: CLI
     expansion: command-line interface
-  - abbr: nft
-    expansion: nftables (Linux packet filter)
-  - abbr: WAL
-    expansion: write-ahead log
-  - abbr: Pi
-    expansion: single-board computer (Raspberry Pi class)
-  - abbr: SQLite
-    expansion: embedded SQL database
-  - abbr: systemd
-    expansion: Linux service manager
-  - abbr: GET
-    expansion: HTTP method
   - abbr: DB
     expansion: database
+  - abbr: GET
+    expansion: HTTP method
+  - abbr: HTTP
+    expansion: Hypertext Transfer Protocol
+  - abbr: OEN
+    expansion: Overlay and Edge Notes
   - abbr: SIGKILL
     expansion: Unix signal 9 (kill)
+  - abbr: SQLite
+    expansion: embedded SQL database
+  - abbr: SSH
+    expansion: Secure Shell
+  - abbr: systemd
+    expansion: Linux service manager
+  - abbr: WAL
+    expansion: write-ahead log
 ---
 
 # Coordination CLI blocks on SQLite write-ahead log while serve is up
@@ -77,11 +59,7 @@ Operators hang SSH sessions on `nodes list` during WAL checkpoints. Serve is fin
 
 ## Topology
 
-```text
-coordination `nodes list` CLI  -->  blocks minutes on SQLite WAL
-HTTP /health or readonly sqlite still works
-Health checks MUST NOT use the admin CLI
-```
+N/A — API
 
 ## Bind
 
@@ -89,18 +67,7 @@ Fill this table **before** any live change. Do **not** paste real values back in
 
 | Placeholder | Operator fills | Class |
 |-------------|----------------|-------|
-| `<cloud-vps>` | Overlay SSH target | Cloud VPS |
-| `<lan-pi>` | Overlay SSH target | LAN Pi |
-| `<user>` | SSH user | Guest account |
-| `<wg-iface>` | Commercial WireGuard iface | Router or VPS client |
-| `<wan-iface>` | WAN iface | Router |
-| `<lan-bridge>` | LAN bridge | Router (MTU 1500) |
-| `<overlay-tun>` | Overlay tun iface | Node under test |
-| `<wg-mtu>` | MTU integer from `ip link` | Measured |
-| `<mss4>` / `<mss6>` | Computed MSS | Formulas |
-| `<vps-public-v4>` / `<vps-public-v6>` | VPS public addresses | WAN; never publish |
-| `<overlay-v4>` / `<overlay-v6>` | Overlay addresses | Overlay; never publish |
-
+| `<health-port>` | Coordination HTTP health port | Port the operator already uses |
 
 ## Formulas
 
@@ -116,15 +83,12 @@ Health checks return. Serve is not mistaken for dead.
 
 ## Agent stop rule
 
-> A coding agent MUST emit a **bound runbook** (placeholders replaced from Bind).
-> MUST NOT apply live `ip rule`, nft, iptables, ip6tables, sysctl, `wg set`, daemon restart, or deploy until a **human** filled Bind.
-> MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
-> MUST NOT file an upstream bug from this page.
-> MUST NOT publish real addresses, hostnames, or custom ports.
+> MUST emit bound `/health` (or readonly sqlite) checks after Bind is filled.
+> MUST NOT call the coordination admin CLI from a health probe.
+> MUST NOT apply netfilter from this page.
 
 ## Procedure
 
-Placeholders only until Bind is filled: `<cloud-vps>`, `<lan-pi>`, `<overlay-peer>`, `<exit-node>`, `<wg-iface>`, `<gcp-nic>`, plus the Bind extras on this page.
 
 ### Copy-paste commands (after Bind)
 
@@ -157,16 +121,16 @@ ok
 
 - Health uses /health.
 - CLI slowness no longer pages as down.
-- ICMP / small ping success was **not** used as the pass criterion when this spec names TCP, SSH, or HTTPS.
-- Bind table was filled by a human before any live `ip` / nft / iptables change.
 
 ## MUST NOT
 
 - MUST NOT health-check with nodes list.
 - MUST NOT publish the DB path.
-- MUST NOT apply live network or firewall changes until Bind is filled by a human.
-- MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
 - MUST NOT publish hostnames, addresses, ULAs, or custom ports.
+
+## Page changelog
+
+- Edition 2 (8 Sep 2026, Mountain Time): Trap-specific Bind and agent stop rule (review cleanup).
 
 ## Related specs
 

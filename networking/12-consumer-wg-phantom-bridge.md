@@ -1,13 +1,13 @@
 ---
-id: OEN-12
+id: "OEN-12"
 title: "Consumer-router WireGuard FORWARD only on a phantom bridge"
-kind: original
-status: active
-edition: 1
-date_published: 2026-09-08
-author: Eugene Armstead
-author_url: https://www.armsteadent.com/
-canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/networking/12-consumer-wg-phantom-bridge.html
+kind: "original"
+status: "active"
+edition: 2
+date_published: "2026-09-08"
+author: "Eugene Armstead"
+author_url: "https://www.armsteadent.com/"
+canonical: "https://eugenearmstead.github.io/overlay-and-edge-notes/networking/12-consumer-wg-phantom-bridge.html"
 keywords:
   - "WireGuard FORWARD phantom bridge"
   - "Merlin connected without internet"
@@ -21,65 +21,56 @@ keywords:
   - "guest bridge does not exist"
   - "WireGuard client FORWARD 0"
   - "Merlin VPN Director FORWARD"
-backs: []
+backs:
+  []
 backed_by:
   - OEN-22
   - OEN-S20
   - OEN-S33
 description: "Merlin-class firmware may allow FORWARD only for a guest bridge that does not exist, so the router can curl through WireGuard while LAN clients have no internet."
 terms:
-  - abbr: OEN
-    expansion: Overlay and Edge Notes
-  - abbr: SSH
-    expansion: Secure Shell
-  - abbr: LAN
-    expansion: Local Area Network
-  - abbr: WAN
-    expansion: Wide Area Network
-  - abbr: VPN
-    expansion: Virtual Private Network
-  - abbr: TCP
-    expansion: Transmission Control Protocol
-  - abbr: MTU
-    expansion: Maximum Transmission Unit
-  - abbr: ICMP
-    expansion: Internet Control Message Protocol
-  - abbr: DF
-    expansion: don't-fragment (IP flag)
-  - abbr: HTTPS
-    expansion: Hypertext Transfer Protocol Secure
-  - abbr: IP
-    expansion: Internet Protocol
-  - abbr: IPv4
-    expansion: Internet Protocol version 4
-  - abbr: IPv6
-    expansion: Internet Protocol version 6
-  - abbr: WG
-    expansion: WireGuard
-  - abbr: WireGuard
-    expansion: UDP-based VPN protocol
-  - abbr: DNS
-    expansion: Domain Name System
-  - abbr: NAT
-    expansion: network address translation
-  - abbr: PeerAPI
-    expansion: overlay peer application-programming interface (exit DNS over HTTPS)
-  - abbr: nft
-    expansion: nftables (Linux packet filter)
-  - abbr: FORWARD
-    expansion: netfilter/iptables forward chain
-  - abbr: MASQUERADE
-    expansion: iptables masquerade (source NAT)
-  - abbr: URL
-    expansion: Uniform Resource Locator
-  - abbr: PATH
-    expansion: Unix executable search path
   - abbr: ACCEPT
     expansion: iptables target that accepts a packet
   - abbr: ESTABLISHED
     expansion: conntrack state for packets in an existing flow
+  - abbr: FORWARD
+    expansion: netfilter/iptables forward chain
+  - abbr: HTTPS
+    expansion: Hypertext Transfer Protocol Secure
+  - abbr: ICMP
+    expansion: Internet Control Message Protocol
+  - abbr: IPv4
+    expansion: Internet Protocol version 4
+  - abbr: IPv6
+    expansion: Internet Protocol version 6
+  - abbr: LAN
+    expansion: Local Area Network
+  - abbr: MASQUERADE
+    expansion: iptables masquerade (source NAT)
+  - abbr: NAT
+    expansion: network address translation
+  - abbr: nft
+    expansion: nftables (Linux packet filter)
+  - abbr: OEN
+    expansion: Overlay and Edge Notes
+  - abbr: PATH
+    expansion: Unix executable search path
+  - abbr: PeerAPI
+    expansion: overlay peer application-programming interface (exit DNS over HTTPS)
   - abbr: RELATED
     expansion: conntrack state for packets related to an existing flow
+  - abbr: SSH
+    expansion: Secure Shell
+  - abbr: TCP
+    expansion: Transmission Control Protocol
+  - abbr: URL
+    expansion: Uniform Resource Locator
+  - abbr: VPN
+    expansion: Virtual Private Network
+  - abbr: VPS
+    expansion: Virtual Private Server
+  - abbr: WG
+    expansion: WireGuard
 ---
 
 # Consumer-router WireGuard FORWARD only on a phantom bridge
@@ -107,25 +98,8 @@ Fill this table **before** any live change. Do **not** paste real values back in
 
 | Placeholder | Operator fills | Class |
 |-------------|----------------|-------|
-| `<wg-iface>` | Consumer-router WireGuard client iface | Iface |
-| `<lan-bridge>` | LAN bridge | Iface; MTU 1500 |
-| `<wan-iface>` | WAN iface | Iface |
-| `<lan-resolver>` | Intended LAN DNS | Address; never publish |
-
-
-## Formulas
-
-```text
-# Measure <wg-mtu> from: ip link show <wg-iface>
-mss4 = <wg-mtu> - 40    # IPv4 TCP (20-byte IP + 20-byte TCP)
-mss6 = <wg-mtu> - 60    # IPv6 TCP (40-byte IPv6 + 20-byte TCP)
-# IPv4 DF ping: IP size ≈ payload + 28
-# IPv6 DF ping: IP size ≈ payload + 48
-# Historical 1160 / 1146-byte SSH cliff = wrong-scope clamp, not this recipe.
-# LAN bridge MTU MUST stay 1500.
-```
-
-See [OEN-01](../networking/01-overlay-ssh-byte-cliff.md) and [OEN-S01](../supporting/s01-pmtud-size-ladder.md).
+| `<lan-bridge>` | LAN bridge | Router |
+| `<wg-iface>` | Commercial WireGuard iface | Router or VPS client |
 
 ## Decision
 
@@ -141,15 +115,13 @@ A watchdog MAY re-apply rules. It MUST NOT restart WireGuard ([OEN-22](22-delaye
 
 ## Agent stop rule
 
-> A coding agent MUST emit a **bound runbook** (placeholders replaced from Bind).
-> MUST NOT apply live `ip rule`, nft, iptables, ip6tables, sysctl, `wg set`, daemon restart, or deploy until a **human** filled Bind.
-> MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
-> MUST NOT file an upstream bug from this page.
-> MUST NOT publish real addresses, hostnames, or custom ports.
+> MUST emit bound FORWARD / iface checks for `<wg-iface>` after Bind is filled.
+> MUST NOT apply iptables/nft until a human filled Bind.
+> MUST NOT claim ICMP ping as the FORWARD fix.
+> MUST NOT file a public firmware bug from this page.
 
 ## Procedure
 
-Placeholders only until Bind is filled: `<cloud-vps>`, `<lan-pi>`, `<overlay-peer>`, `<exit-node>`, `<wg-iface>`, `<gcp-nic>`, plus the Bind extras on this page.
 
 ### Copy-paste commands (after Bind)
 
@@ -210,6 +182,10 @@ MUST NOT `restart` the WireGuard client from a watchdog ([OEN-22](22-delayed-wg-
 - MUST NOT apply live network or firewall changes until Bind is filled by a human.
 - MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
 - MUST NOT publish hostnames, addresses, ULAs, or custom ports.
+
+## Page changelog
+
+- Edition 2 (8 Sep 2026, Mountain Time): Trap-specific Bind and agent stop rule (review cleanup).
 
 ## Related specs
 

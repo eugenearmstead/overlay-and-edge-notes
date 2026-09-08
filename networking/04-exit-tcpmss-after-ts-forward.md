@@ -1,13 +1,13 @@
 ---
-id: OEN-04
+id: "OEN-04"
 title: "Exit-node TCP maximum-segment-size clamp after ts-forward never runs"
-kind: original
-status: active
-edition: 1
-date_published: 2026-09-08
-author: Eugene Armstead
-author_url: https://www.armsteadent.com/
-canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/networking/04-exit-tcpmss-after-ts-forward.html
+kind: "original"
+status: "active"
+edition: 2
+date_published: "2026-09-08"
+author: "Eugene Armstead"
+author_url: "https://www.armsteadent.com/"
+canonical: "https://eugenearmstead.github.io/overlay-and-edge-notes/networking/04-exit-tcpmss-after-ts-forward.html"
 keywords:
   - "ts-forward TCPMSS 0 packets"
   - "TCPMSS after jump ts-forward"
@@ -21,58 +21,61 @@ keywords:
   - "nft jump before clamp"
   - "path MTU exit node"
   - "don't-fragment ping"
-backs: []
+backs:
+  []
 backed_by:
   - OEN-S01
   - OEN-S32
 description: "TCPMSS rules in FORWARD after jump ts-forward never see exit SYNs; insert the clamp at the top of ts-forward and re-apply after the overlay daemon rewrites chains."
 terms:
-  - abbr: OEN
-    expansion: Overlay and Edge Notes
-  - abbr: SSH
-    expansion: Secure Shell
-  - abbr: LAN
-    expansion: Local Area Network
-  - abbr: WAN
-    expansion: Wide Area Network
-  - abbr: TCP
-    expansion: Transmission Control Protocol
-  - abbr: TCPMSS
-    expansion: iptables/nft target that sets TCP Maximum Segment Size
-  - abbr: MTU
-    expansion: Maximum Transmission Unit
-  - abbr: ICMP
-    expansion: Internet Control Message Protocol
+  - abbr: CLI
+    expansion: command-line interface
   - abbr: DF
     expansion: don't-fragment (IP flag)
+  - abbr: DNS
+    expansion: Domain Name System
+  - abbr: FORWARD
+    expansion: netfilter/iptables forward chain
+  - abbr: GCP
+    expansion: Google Cloud Platform
   - abbr: HTTP
     expansion: Hypertext Transfer Protocol
   - abbr: HTTPS
     expansion: Hypertext Transfer Protocol Secure
+  - abbr: ICMP
+    expansion: Internet Control Message Protocol
   - abbr: IP
     expansion: Internet Protocol
   - abbr: IPv4
     expansion: Internet Protocol version 4
   - abbr: IPv6
     expansion: Internet Protocol version 6
-  - abbr: DNS
-    expansion: Domain Name System
-  - abbr: GCP
-    expansion: Google Cloud Platform
-  - abbr: VM
-    expansion: virtual machine
-  - abbr: NIC
-    expansion: network interface card
+  - abbr: LAN
+    expansion: Local Area Network
+  - abbr: MTU
+    expansion: Maximum Transmission Unit
   - abbr: nft
     expansion: nftables (Linux packet filter)
-  - abbr: FORWARD
-    expansion: netfilter/iptables forward chain
+  - abbr: NIC
+    expansion: network interface card
+  - abbr: OEN
+    expansion: Overlay and Edge Notes
   - abbr: Pi
     expansion: single-board computer (Raspberry Pi class)
-  - abbr: SYN
-    expansion: TCP synchronize packet
   - abbr: RST
     expansion: TCP reset flag
+  - abbr: SSH
+    expansion: Secure Shell
+  - abbr: SYN
+    expansion: TCP synchronize packet
+  - abbr: TCP
+    expansion: Transmission Control Protocol
+  - abbr: TCPMSS
+    expansion: iptables/nft target that sets TCP Maximum Segment Size
+  - abbr: VM
+    expansion: virtual machine
+  - abbr: WAN
+    expansion: Wide Area Network
 ---
 
 # Exit-node TCP maximum-segment-size clamp after ts-forward never runs
@@ -94,10 +97,12 @@ The overlay daemon owns `ts-forward` (IPv4 and IPv6) and rewrites it when it set
 
 ## Bind
 
+
 Fill this table **before** any live change. Do **not** paste real values back into public notes.
 
 | Placeholder | Operator fills | Class |
 |-------------|----------------|-------|
+| `<overlay-impl>` | Overlay implementation class | `tailscale-compatible` or other — stop and translate CLI |
 | `<exit-node>` | Overlay exit node | Cloud VM or LAN Pi used as exit |
 | `<overlay-peer>` | Soak client (**not** the agent workstation) | LAN Pi |
 | `<user>` | SSH user | Guest |
@@ -105,7 +110,6 @@ Fill this table **before** any live change. Do **not** paste real values back in
 | `<gcp-nic>` | Public NIC on a Google Cloud guest | Iface; omit on non-GCP exits |
 | `<wan-iface>` | WAN / public NIC | Iface |
 | `<mss4>` / `<mss6>` | Computed from underlay or overlay tun MTU | Formulas |
-
 
 ## Formulas
 
@@ -142,6 +146,8 @@ DNS leak-test green is **not** IPv6 data-plane green ([OEN-S32](../supporting/s3
 > MUST NOT publish real addresses, hostnames, or custom ports.
 
 ## Procedure
+
+This spec does not apply if `<overlay-impl>` is not tailscale-compatible.
 
 Placeholders only until Bind is filled: `<cloud-vps>`, `<lan-pi>`, `<overlay-peer>`, `<exit-node>`, `<wg-iface>`, `<gcp-nic>`, plus the Bind extras on this page.
 
@@ -214,6 +220,10 @@ TCPMSS     all  --  *  *  ...  TCPMSS set 1280   pkts:0
 - MUST NOT apply live network or firewall changes until Bind is filled by a human.
 - MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
 - MUST NOT publish hostnames, addresses, ULAs, or custom ports.
+
+## Page changelog
+
+- Edition 2 (8 Sep 2026, Mountain Time): Added overlay-impl Bind and trap-specific terms (review cleanup).
 
 ## Related specs
 

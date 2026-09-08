@@ -1,13 +1,13 @@
 ---
-id: OEN-17
-title: Google Cloud overlay exit (IP forwarding, listen port, Identity-Aware Proxy)
-kind: original
-status: active
+id: "OEN-17"
+title: "Google Cloud overlay exit (IP forwarding, listen port, Identity-Aware Proxy)"
+kind: "original"
+status: "active"
 edition: 2
-date_published: 2026-09-07
-author: Eugene Armstead
-author_url: https://www.armsteadent.com/
-canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/networking/17-gcp-overlay-exit.html
+date_published: "2026-09-07"
+author: "Eugene Armstead"
+author_url: "https://www.armsteadent.com/"
+canonical: "https://eugenearmstead.github.io/overlay-and-edge-notes/networking/17-gcp-overlay-exit.html"
 keywords:
   - "canIpForward exit node"
   - "Google Cloud overlay exit"
@@ -22,9 +22,11 @@ keywords:
   - "accept-dns vs PeerAPI"
   - "VPC UDP 41641 PORT=0"
   - "Headscale GCP exit"
-backs: []
-backed_by: []
-description: A Google Cloud virtual machine can advertise an overlay exit only with IP forwarding, both default routes, a fixed overlay UDP listen port, scoped network address translation, and Identity-Aware Proxy as break-glass — not as the daily door.
+backs:
+  []
+backed_by:
+  []
+description: "A Google Cloud virtual machine can advertise an overlay exit only with IP forwarding, both default routes, a fixed overlay UDP listen port, scoped network address translation, and Identity-Aware Proxy as break-glass — not as the daily door."
 terms:
   - abbr: OEN
     expansion: Overlay and Edge Notes
@@ -74,8 +76,6 @@ terms:
     expansion: unique-local address (IPv6)
   - abbr: LAN
     expansion: Local Area Network
-  - abbr: WAN
-    expansion: Wide Area Network
   - abbr: WG
     expansion: WireGuard
   - abbr: canIpForward
@@ -92,8 +92,6 @@ terms:
     expansion: dual-stack connection racing (RFC 8305)
   - abbr: LOCAL
     expansion: iptables addrtype match for locally-owned addresses
-  - abbr: WireGuard
-    expansion: UDP-based VPN protocol
   - abbr: nft
     expansion: nftables (Linux packet filter)
   - abbr: Pi

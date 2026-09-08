@@ -1,13 +1,13 @@
 ---
-id: OEN-05
+id: "OEN-05"
 title: "Exit-node overlay peer-API DNS stub (loopback only)"
-kind: original
-status: active
-edition: 1
-date_published: 2026-09-08
-author: Eugene Armstead
-author_url: https://www.armsteadent.com/
-canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/networking/05-exit-peerapi-dns-stub.html
+kind: "original"
+status: "active"
+edition: 2
+date_published: "2026-09-08"
+author: "Eugene Armstead"
+author_url: "https://www.armsteadent.com/"
+canonical: "https://eugenearmstead.github.io/overlay-and-edge-notes/networking/05-exit-peerapi-dns-stub.html"
 keywords:
   - "PeerAPI DNS"
   - "exit-node PeerAPI stub"
@@ -21,76 +21,69 @@ keywords:
   - "Headscale PeerAPI"
   - "Recursion Desired stub"
   - "DoH dns-query exit"
-backs: []
+backs:
+  []
 backed_by:
   - OEN-S29
   - OEN-19
 description: "Android exit DNS is overlay peer-API DNS over HTTPS on a dynamic port. A loopback stub that forces Recursion Desired works; binding the stub on the overlay address:53 breaks all exit."
 terms:
-  - abbr: OEN
-    expansion: Overlay and Edge Notes
-  - abbr: SSH
-    expansion: Secure Shell
-  - abbr: LAN
-    expansion: Local Area Network
-  - abbr: WAN
-    expansion: Wide Area Network
-  - abbr: KB
-    expansion: kilobyte
-  - abbr: TCP
-    expansion: Transmission Control Protocol
-  - abbr: UDP
-    expansion: User Datagram Protocol
-  - abbr: MTU
-    expansion: Maximum Transmission Unit
-  - abbr: ICMP
-    expansion: Internet Control Message Protocol
-  - abbr: HTTP
-    expansion: Hypertext Transfer Protocol
-  - abbr: HTTPS
-    expansion: Hypertext Transfer Protocol Secure
-  - abbr: IPv6
-    expansion: Internet Protocol version 6
-  - abbr: DNS
-    expansion: Domain Name System
-  - abbr: DoH
-    expansion: DNS over HTTPS
-  - abbr: GCP
-    expansion: Google Cloud Platform
-  - abbr: VM
-    expansion: virtual machine
-  - abbr: NIC
-    expansion: network interface card
+  - abbr: Android
+    expansion: mobile operating system
   - abbr: API
     expansion: application programming interface
   - abbr: CLI
     expansion: command-line interface
-  - abbr: PeerAPI
-    expansion: overlay peer application-programming interface (exit DNS over HTTPS)
-  - abbr: RD
-    expansion: Recursion Desired (DNS flag)
-  - abbr: nft
-    expansion: nftables (Linux packet filter)
   - abbr: ControlPath
     expansion: OpenSSH multiplexing socket path option
+  - abbr: DNS
+    expansion: Domain Name System
+  - abbr: DoH
+    expansion: DNS over HTTPS
+  - abbr: HTTP
+    expansion: Hypertext Transfer Protocol
+  - abbr: HTTPS
+    expansion: Hypertext Transfer Protocol Secure
+  - abbr: IPv4
+    expansion: Internet Protocol version 4
+  - abbr: IPv6
+    expansion: Internet Protocol version 6
   - abbr: JSON
     expansion: JavaScript Object Notation
-  - abbr: URL
-    expansion: Uniform Resource Locator
-  - abbr: Pi
-    expansion: single-board computer (Raspberry Pi class)
-  - abbr: REFUSES
-    expansion: DNS response code meaning the server will not answer
-  - abbr: REFUSED
-    expansion: DNS response code meaning the server will not answer
-  - abbr: Unbound
-    expansion: validating recursive DNS resolver
-  - abbr: Android
-    expansion: mobile operating system
-  - abbr: UNCONN
-    expansion: ss(8) unconnected socket state
+  - abbr: KB
+    expansion: kilobyte
+  - abbr: LAN
+    expansion: Local Area Network
+  - abbr: nft
+    expansion: nftables (Linux packet filter)
   - abbr: NOERROR
     expansion: DNS response code meaning the query succeeded
+  - abbr: OEN
+    expansion: Overlay and Edge Notes
+  - abbr: PeerAPI
+    expansion: overlay peer application-programming interface (exit DNS over HTTPS)
+  - abbr: Pi
+    expansion: single-board computer (Raspberry Pi class)
+  - abbr: RD
+    expansion: Recursion Desired (DNS flag)
+  - abbr: REFUSED
+    expansion: DNS response code meaning the server will not answer
+  - abbr: REFUSES
+    expansion: DNS response code meaning the server will not answer
+  - abbr: SSH
+    expansion: Secure Shell
+  - abbr: TCP
+    expansion: Transmission Control Protocol
+  - abbr: UDP
+    expansion: User Datagram Protocol
+  - abbr: Unbound
+    expansion: validating recursive DNS resolver
+  - abbr: UNCONN
+    expansion: ss(8) unconnected socket state
+  - abbr: URL
+    expansion: Uniform Resource Locator
+  - abbr: VM
+    expansion: virtual machine
 ---
 
 # Exit-node overlay peer-API DNS stub (loopback only)
@@ -119,14 +112,14 @@ Fill this table **before** any live change. Do **not** paste real values back in
 
 | Placeholder | Operator fills | Class |
 |-------------|----------------|-------|
-| `<exit-node>` | Overlay exit node | Cloud VM or LAN Pi used as exit |
-| `<overlay-peer>` | Soak client (**not** the agent workstation) | LAN Pi |
-| `<user>` | SSH user | Guest |
-| `<overlay-tun>` | Overlay tun on the exit | Iface |
-| `<gcp-nic>` | Public NIC on a Google Cloud guest | Iface; omit on non-GCP exits |
-| `<wan-iface>` | WAN / public NIC | Iface |
-| `<mss4>` / `<mss6>` | Computed from underlay or overlay tun MTU | Formulas |
-
+| `<overlay-impl>` | Overlay implementation class | `tailscale-compatible` or other — stop and translate CLI |
+| `<user>` | SSH user | Guest account |
+| `<exit-node>` | Overlay exit node | Cloud VM or LAN Pi |
+| `<overlay-v4>` | Overlay IPv4 of the node under test | Overlay; never publish |
+| `<peerapi-port>` | Dynamic overlay peer-API port | Ephemeral; never publish as a lab fingerprint |
+| `<overlay-peer>` | Soak client (not the agent workstation) | LAN Pi or phone |
+| `<exit>` | Operator fills from this procedure | Local |
+| `<ephemeral>` | Peer-API listen port from status JSON | Ephemeral |
 
 ## Formulas
 
@@ -146,15 +139,14 @@ The stub MUST NOT block the event loop on a synchronous upstream. Verify IPv6 **
 
 ## Agent stop rule
 
-> A coding agent MUST emit a **bound runbook** (placeholders replaced from Bind).
-> MUST NOT apply live `ip rule`, nft, iptables, ip6tables, sysctl, `wg set`, daemon restart, or deploy until a **human** filled Bind.
-> MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
-> MUST NOT file an upstream bug from this page.
-> MUST NOT publish real addresses, hostnames, or custom ports.
+> MUST emit bound `tailscale status --json` / PeerAPIURL commands only after `<overlay-impl>` is `tailscale-compatible`.
+> MUST NOT apply live nft or iptables from this DNS-stub page.
+> MUST NOT file an overlay-product bug until loopback-only and RD=1 are evidenced.
+> MUST NOT publish PeerAPI URLs or custom ports.
 
 ## Procedure
 
-Placeholders only until Bind is filled: `<cloud-vps>`, `<lan-pi>`, `<overlay-peer>`, `<exit-node>`, `<wg-iface>`, `<gcp-nic>`, plus the Bind extras on this page.
+This spec does not apply if `<overlay-impl>` is not tailscale-compatible.
 
 ### Copy-paste commands (after Bind)
 
@@ -208,8 +200,6 @@ udp  UNCONN  0  0  <overlay-v4>:53  0.0.0.0:*
 - RD=0 to Unbound REFUSED; RD=1 via stub answers.
 - UDP recv-Q does not grow under phone load.
 - IPv6 HTTP through the exit works, not only DNS.
-- ICMP / small ping success was **not** used as the pass criterion when this spec names TCP, SSH, or HTTPS.
-- Bind table was filled by a human before any live `ip` / nft / iptables change.
 
 ## MUST NOT
 
@@ -217,9 +207,11 @@ udp  UNCONN  0  0  <overlay-v4>:53  0.0.0.0:*
 - MUST NOT assume PeerAPI is :53 or a fixed high port.
 - MUST NOT claim exit DNS is healed from a leak-test name alone.
 - MUST NOT restart the coordinator to “fix DNS.”
-- MUST NOT apply live network or firewall changes until Bind is filled by a human.
-- MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
 - MUST NOT publish hostnames, addresses, ULAs, or custom ports.
+
+## Page changelog
+
+- Edition 2 (8 Sep 2026, Mountain Time): Trap-specific Bind and agent stop rule (review cleanup).
 
 ## Related specs
 

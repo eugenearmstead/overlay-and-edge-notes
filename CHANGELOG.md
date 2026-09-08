@@ -27,12 +27,8 @@ terms:
     expansion: HyperText Markup Language
   - abbr: SSH
     expansion: Secure Shell
-  - abbr: MSS
-    expansion: Maximum Segment Size
   - abbr: ICMP
     expansion: Internet Control Message Protocol
-  - abbr: MTU
-    expansion: Maximum Transmission Unit
   - abbr: IPv4
     expansion: Internet Protocol version 4
   - abbr: IPv6
@@ -51,10 +47,6 @@ terms:
     expansion: iptables/nft target that sets TCP Maximum Segment Size
   - abbr: README
     expansion: repository citation index in Markdown
-  - abbr: CAPI
-    expansion: CrowdSec Central API
-  - abbr: DNS
-    expansion: Domain Name System
 ---
 
 # Changelog

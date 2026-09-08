@@ -887,7 +887,8 @@ def write_index() -> None:
         "Looks like MTU, actually DNS. "
         "Exit HTTPS dies, ts-forward MSS counters 0. "
         "CAPI HTTP 403. "
-        "HTML 200, layout exploded CSS."
+        "HTML 200, layout exploded CSS. "
+        "OEN-01 OEN-02 OEN-03 OEN-04 OEN-07 S01 S02 S03 S06 S08 S34."
     )
     assert_terms_cover("index.html", home_prose, HOME_TERMS)
     assert_terms_used("index.html", home_prose, HOME_TERMS)

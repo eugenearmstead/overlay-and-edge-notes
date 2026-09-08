@@ -1,13 +1,13 @@
 ---
-id: OEN-S26
+id: "OEN-S26"
 title: "Wi-Fi underlay vs cellular underlay to the same cloud exit"
-kind: supporting
-status: active
-edition: 1
-date_published: 2026-09-08
-author: Eugene Armstead
-author_url: https://www.armsteadent.com/
-canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s26-wifi-vs-cellular-underlay.html
+kind: "supporting"
+status: "active"
+edition: 2
+date_published: "2026-09-08"
+author: "Eugene Armstead"
+author_url: "https://www.armsteadent.com/"
+canonical: "https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s26-wifi-vs-cellular-underlay.html"
 keywords:
   - "Wi-Fi vs cellular underlay"
   - "same cloud exit two underlays"
@@ -25,55 +25,36 @@ backs:
   - OEN-13
   - OEN-16
   - OEN-17
-backed_by: []
+backed_by:
+  []
 description: "Home Wi-Fi may encapsulate overlay inside commercial WireGuard; cellular may go direct. IPv4 can show the cloud while IPv6 leaks the home tunnel. Not “the GCP exit is broken.”"
 terms:
-  - abbr: OEN
-    expansion: Overlay and Edge Notes
-  - abbr: SSH
-    expansion: Secure Shell
-  - abbr: LAN
-    expansion: Local Area Network
-  - abbr: WAN
-    expansion: Wide Area Network
-  - abbr: TCP
-    expansion: Transmission Control Protocol
-  - abbr: MTU
-    expansion: Maximum Transmission Unit
-  - abbr: ICMP
-    expansion: Internet Control Message Protocol
-  - abbr: DF
-    expansion: don't-fragment (IP flag)
-  - abbr: HTTPS
-    expansion: Hypertext Transfer Protocol Secure
-  - abbr: IP
-    expansion: Internet Protocol
+  - abbr: GCP
+    expansion: Google Cloud Platform
+  - abbr: Happy-Eyeballs
+    expansion: dual-stack connection racing (RFC 8305)
   - abbr: IPv4
     expansion: Internet Protocol version 4
   - abbr: IPv6
     expansion: Internet Protocol version 6
-  - abbr: WG
-    expansion: WireGuard
-  - abbr: WireGuard
-    expansion: UDP-based VPN protocol
+  - abbr: LAN
+    expansion: Local Area Network
+  - abbr: MTU
+    expansion: Maximum Transmission Unit
   - abbr: NAT
     expansion: network address translation
-  - abbr: ULA
-    expansion: unique-local address (IPv6)
-  - abbr: GCP
-    expansion: Google Cloud Platform
-  - abbr: VM
-    expansion: virtual machine
-  - abbr: NIC
-    expansion: network interface card
-  - abbr: nft
-    expansion: nftables (Linux packet filter)
-  - abbr: Pi
-    expansion: single-board computer (Raspberry Pi class)
-  - abbr: Happy-Eyeballs
-    expansion: dual-stack connection racing (RFC 8305)
+  - abbr: OEN
+    expansion: Overlay and Edge Notes
   - abbr: PC
     expansion: personal computer
+  - abbr: Pi
+    expansion: single-board computer (Raspberry Pi class)
+  - abbr: ULA
+    expansion: unique-local address (IPv6)
+  - abbr: VM
+    expansion: virtual machine
+  - abbr: WG
+    expansion: WireGuard
 ---
 
 # Wi-Fi underlay vs cellular underlay to the same cloud exit
@@ -98,28 +79,7 @@ Fill this table **before** any live change. Do **not** paste real values back in
 
 | Placeholder | Operator fills | Class |
 |-------------|----------------|-------|
-| `<exit-node>` | Overlay exit node | Cloud VM or LAN Pi used as exit |
-| `<overlay-peer>` | Soak client (**not** the agent workstation) | LAN Pi |
-| `<user>` | SSH user | Guest |
-| `<overlay-tun>` | Overlay tun on the exit | Iface |
-| `<gcp-nic>` | Public NIC on a Google Cloud guest | Iface; omit on non-GCP exits |
-| `<wan-iface>` | WAN / public NIC | Iface |
-| `<mss4>` / `<mss6>` | Computed from underlay or overlay tun MTU | Formulas |
-
-
-## Formulas
-
-```text
-# Measure <wg-mtu> from: ip link show <wg-iface>
-mss4 = <wg-mtu> - 40    # IPv4 TCP (20-byte IP + 20-byte TCP)
-mss6 = <wg-mtu> - 60    # IPv6 TCP (40-byte IPv6 + 20-byte TCP)
-# IPv4 DF ping: IP size ≈ payload + 28
-# IPv6 DF ping: IP size ≈ payload + 48
-# Historical 1160 / 1146-byte SSH cliff = wrong-scope clamp, not this recipe.
-# LAN bridge MTU MUST stay 1500.
-```
-
-See [OEN-01](../networking/01-overlay-ssh-byte-cliff.md) and [OEN-S01](../supporting/s01-pmtud-size-ladder.md).
+| `<exit-node>` | Overlay exit node | Cloud VM or LAN Pi |
 
 ## Method
 
@@ -131,15 +91,12 @@ Fewer pointless GCP MTU changes.
 
 ## Agent stop rule
 
-> A coding agent MUST emit a **bound runbook** (placeholders replaced from Bind).
-> MUST NOT apply live `ip rule`, nft, iptables, ip6tables, sysctl, `wg set`, daemon restart, or deploy until a **human** filled Bind.
-> MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
-> MUST NOT file an upstream bug from this page.
-> MUST NOT publish real addresses, hostnames, or custom ports.
+> MUST soak the same exit from Wi-Fi and cellular after Bind is filled.
+> MUST NOT declare a cloud exit broken when only one underlay fails.
+> MUST NOT apply netfilter from this page.
 
 ## Procedure
 
-Placeholders only until Bind is filled: `<cloud-vps>`, `<lan-pi>`, `<overlay-peer>`, `<exit-node>`, `<wg-iface>`, `<gcp-nic>`, plus the Bind extras on this page.
 
 ### Copy-paste commands (after Bind)
 
@@ -170,16 +127,16 @@ Placeholders only until Bind is filled: `<cloud-vps>`, `<lan-pi>`, `<overlay-pee
 
 - Wi-Fi vs cellular matrix recorded.
 - GCP not blamed for a Wi-Fi-only encapsulate leak.
-- ICMP / small ping success was **not** used as the pass criterion when this spec names TCP, SSH, or HTTPS.
-- Bind table was filled by a human before any live `ip` / nft / iptables change.
 
 ## MUST NOT
 
 - MUST NOT keep changing GCP MTU for a Wi-Fi/cellular split.
 - MUST NOT publish underlay IPs.
-- MUST NOT apply live network or firewall changes until Bind is filled by a human.
-- MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
 - MUST NOT publish hostnames, addresses, ULAs, or custom ports.
+
+## Page changelog
+
+- Edition 2 (8 Sep 2026, Mountain Time): Trap-specific Bind and agent stop rule (review cleanup).
 
 ## Related specs
 

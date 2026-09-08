@@ -1,13 +1,13 @@
 ---
-id: OEN-03
+id: "OEN-03"
 title: "Router VPN DNS hijack looks like a path-MTU problem"
-kind: original
-status: active
-edition: 1
-date_published: 2026-09-08
-author: Eugene Armstead
-author_url: https://www.armsteadent.com/
-canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/networking/03-router-vpn-dns-hijack.html
+kind: "original"
+status: "active"
+edition: 2
+date_published: "2026-09-08"
+author: "Eugene Armstead"
+author_url: "https://www.armsteadent.com/"
+canonical: "https://eugenearmstead.github.io/overlay-and-edge-notes/networking/03-router-vpn-dns-hijack.html"
 keywords:
   - "router VPN DNS hijack"
   - "ASUSWRT-Merlin DNSVPN2"
@@ -21,71 +21,68 @@ keywords:
   - "IPv6 stall DNS"
   - "destination NAT :53"
   - "Merlin DNSVPN2"
-backs: []
+backs:
+  []
 backed_by:
   - OEN-S24
 description: "Consumer-router VPN DNS Server fields can destination-NAT LAN port 53 into the tunnel, producing hung DNS and browser timeouts that look like a path-MTU failure."
 terms:
-  - abbr: OEN
-    expansion: Overlay and Edge Notes
-  - abbr: SSH
-    expansion: Secure Shell
-  - abbr: LAN
-    expansion: Local Area Network
-  - abbr: WAN
-    expansion: Wide Area Network
-  - abbr: VPN
-    expansion: Virtual Private Network
-  - abbr: TCP
-    expansion: Transmission Control Protocol
-  - abbr: UDP
-    expansion: User Datagram Protocol
-  - abbr: MSS
-    expansion: Maximum Segment Size
-  - abbr: MTU
-    expansion: Maximum Transmission Unit
-  - abbr: ICMP
-    expansion: Internet Control Message Protocol
-  - abbr: PMTU
-    expansion: path Maximum Transmission Unit
+  - abbr: ASUSWRT
+    expansion: ASUS consumer-router firmware family
+  - abbr: Chromium
+    expansion: open-source browser engine
   - abbr: DF
     expansion: don't-fragment (IP flag)
-  - abbr: TLS
-    expansion: Transport Layer Security
+  - abbr: DHCP
+    expansion: Dynamic Host Configuration Protocol
+  - abbr: DNAT
+    expansion: destination network address translation
+  - abbr: DNS
+    expansion: Domain Name System
+  - abbr: DoH
+    expansion: DNS over HTTPS
+  - abbr: Happy-Eyeballs
+    expansion: dual-stack connection racing (RFC 8305)
   - abbr: HTTPS
     expansion: Hypertext Transfer Protocol Secure
+  - abbr: ICMP
+    expansion: Internet Control Message Protocol
   - abbr: IP
     expansion: Internet Protocol
   - abbr: IPv4
     expansion: Internet Protocol version 4
   - abbr: IPv6
     expansion: Internet Protocol version 6
-  - abbr: WireGuard
-    expansion: UDP-based VPN protocol
-  - abbr: DNS
-    expansion: Domain Name System
-  - abbr: DoH
-    expansion: DNS over HTTPS
+  - abbr: LAN
+    expansion: Local Area Network
+  - abbr: MSS
+    expansion: Maximum Segment Size
+  - abbr: MTU
+    expansion: Maximum Transmission Unit
   - abbr: NAT
     expansion: network address translation
-  - abbr: DNAT
-    expansion: destination network address translation
   - abbr: nft
     expansion: nftables (Linux packet filter)
-  - abbr: Happy-Eyeballs
-    expansion: dual-stack connection racing (RFC 8305)
-  - abbr: REFUSED
-    expansion: DNS response code meaning the server will not answer
-  - abbr: DHCP
-    expansion: Dynamic Host Configuration Protocol
+  - abbr: OEN
+    expansion: Overlay and Edge Notes
+  - abbr: PMTU
+    expansion: path Maximum Transmission Unit
   - abbr: RA
     expansion: Router Advertisement (IPv6)
-  - abbr: ASUSWRT-Merlin
-    expansion: consumer-router firmware class
-  - abbr: Chromium
-    expansion: open-source browser engine
-  - abbr: ASUSWRT
-    expansion: ASUS consumer-router firmware family
+  - abbr: REFUSED
+    expansion: DNS response code meaning the server will not answer
+  - abbr: SSH
+    expansion: Secure Shell
+  - abbr: TCP
+    expansion: Transmission Control Protocol
+  - abbr: TLS
+    expansion: Transport Layer Security
+  - abbr: UDP
+    expansion: User Datagram Protocol
+  - abbr: VPN
+    expansion: Virtual Private Network
+  - abbr: WAN
+    expansion: Wide Area Network
 ---
 
 # Router VPN DNS hijack looks like a path-MTU problem
@@ -219,6 +216,10 @@ example.com.  0  IN  A  0.0.0.0
 - MUST NOT apply live network or firewall changes until Bind is filled by a human.
 - MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
 - MUST NOT publish hostnames, addresses, ULAs, or custom ports.
+
+## Page changelog
+
+- Edition 2 (8 Sep 2026, Mountain Time): Added overlay-impl Bind and trap-specific terms (review cleanup).
 
 ## Related specs
 

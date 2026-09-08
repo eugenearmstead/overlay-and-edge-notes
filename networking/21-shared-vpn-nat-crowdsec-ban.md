@@ -1,13 +1,13 @@
 ---
-id: OEN-21
+id: "OEN-21"
 title: "Shared commercial-VPN network address translation: CrowdSec bans the whole house"
-kind: original
-status: active
-edition: 1
-date_published: 2026-09-08
-author: Eugene Armstead
-author_url: https://www.armsteadent.com/
-canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/networking/21-shared-vpn-nat-crowdsec-ban.html
+kind: "original"
+status: "active"
+edition: 2
+date_published: "2026-09-08"
+author: "Eugene Armstead"
+author_url: "https://www.armsteadent.com/"
+canonical: "https://eugenearmstead.github.io/overlay-and-edge-notes/networking/21-shared-vpn-nat-crowdsec-ban.html"
 keywords:
   - "CrowdSec bans shared VPN NAT"
   - "whole house CrowdSec ban"
@@ -21,33 +21,20 @@ keywords:
   - "NAT house ban vs CAPI 403"
   - "WireGuard shared egress ban"
   - "CrowdSec decisions VPN hop"
-backs: []
+backs:
+  []
 backed_by:
   - OEN-16
 description: "Many LAN and overlay clients share one commercial VPN egress IP. CrowdSec banning that address takes down coordination and SSH for everyone while overlay direct UDP often still works."
 terms:
-  - abbr: OEN
-    expansion: Overlay and Edge Notes
-  - abbr: SSH
-    expansion: Secure Shell
-  - abbr: VPS
-    expansion: Virtual Private Server
-  - abbr: LAN
-    expansion: Local Area Network
-  - abbr: WAN
-    expansion: Wide Area Network
-  - abbr: VPN
-    expansion: Virtual Private Network
-  - abbr: TCP
-    expansion: Transmission Control Protocol
-  - abbr: UDP
-    expansion: User Datagram Protocol
-  - abbr: MSS
-    expansion: Maximum Segment Size
-  - abbr: MTU
-    expansion: Maximum Transmission Unit
-  - abbr: ICMP
-    expansion: Internet Control Message Protocol
+  - abbr: API
+    expansion: application programming interface
+  - abbr: CAPI
+    expansion: CrowdSec Central API
+  - abbr: ControlPath
+    expansion: OpenSSH multiplexing socket path option
+  - abbr: CrowdSec
+    expansion: open-source IDS/IPS with a Central API
   - abbr: HTTPS
     expansion: Hypertext Transfer Protocol Secure
   - abbr: IP
@@ -56,22 +43,24 @@ terms:
     expansion: Internet Protocol version 4
   - abbr: IPv6
     expansion: Internet Protocol version 6
-  - abbr: WireGuard
-    expansion: UDP-based VPN protocol
+  - abbr: LAN
+    expansion: Local Area Network
   - abbr: NAT
     expansion: network address translation
-  - abbr: API
-    expansion: application programming interface
-  - abbr: CAPI
-    expansion: CrowdSec Central API
-  - abbr: nft
-    expansion: nftables (Linux packet filter)
-  - abbr: ControlPath
-    expansion: OpenSSH multiplexing socket path option
-  - abbr: Pi
-    expansion: single-board computer (Raspberry Pi class)
-  - abbr: CrowdSec
-    expansion: open-source IDS/IPS with a Central API
+  - abbr: OEN
+    expansion: Overlay and Edge Notes
+  - abbr: SSH
+    expansion: Secure Shell
+  - abbr: TCP
+    expansion: Transmission Control Protocol
+  - abbr: UDP
+    expansion: User Datagram Protocol
+  - abbr: VPN
+    expansion: Virtual Private Network
+  - abbr: VPS
+    expansion: Virtual Private Server
+  - abbr: WAN
+    expansion: Wide Area Network
 ---
 
 # Shared commercial-VPN network address translation: CrowdSec bans the whole house
@@ -97,18 +86,8 @@ Fill this table **before** any live change. Do **not** paste real values back in
 
 | Placeholder | Operator fills | Class |
 |-------------|----------------|-------|
-| `<cloud-vps>` | Overlay SSH target | Cloud VPS |
-| `<lan-pi>` | Overlay SSH target | LAN Pi |
 | `<user>` | SSH user | Guest account |
-| `<wg-iface>` | Commercial WireGuard iface | Router or VPS client |
-| `<wan-iface>` | WAN iface | Router |
-| `<lan-bridge>` | LAN bridge | Router (MTU 1500) |
-| `<overlay-tun>` | Overlay tun iface | Node under test |
-| `<wg-mtu>` | MTU integer from `ip link` | Measured |
-| `<mss4>` / `<mss6>` | Computed MSS | Formulas |
-| `<vps-public-v4>` / `<vps-public-v6>` | VPS public addresses | WAN; never publish |
-| `<overlay-v4>` / `<overlay-v6>` | Overlay addresses | Overlay; never publish |
-
+| `<cloud-vps>` | Cloud VPS under test | Cloud VPS |
 
 ## Formulas
 
@@ -128,15 +107,13 @@ Generic recipe only: allowlist the current egress, not a private push bus.
 
 ## Agent stop rule
 
-> A coding agent MUST emit a **bound runbook** (placeholders replaced from Bind).
-> MUST NOT apply live `ip rule`, nft, iptables, ip6tables, sysctl, `wg set`, daemon restart, or deploy until a **human** filled Bind.
-> MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
-> MUST NOT file an upstream bug from this page.
-> MUST NOT publish real addresses, hostnames, or custom ports.
+> MUST emit bound CrowdSec decision checks after Bind is filled.
+> MUST NOT unban by copying a lab public IP into this page.
+> MUST NOT apply netfilter from this page.
+> MUST NOT file a CrowdSec upstream bug from this page.
 
 ## Procedure
 
-Placeholders only until Bind is filled: `<cloud-vps>`, `<lan-pi>`, `<overlay-peer>`, `<exit-node>`, `<wg-iface>`, `<gcp-nic>`, plus the Bind extras on this page.
 
 ### Copy-paste commands (after Bind)
 
@@ -175,8 +152,6 @@ ssh -o ControlPath=none <user>@<cloud-vps> 'echo overlay-ok'
 - Overlay UDP still worked during the ban (or this was a different outage).
 - Trusted set includes current v4 and v6 egress.
 - No secrets or push architecture in the public write-up.
-- ICMP / small ping success was **not** used as the pass criterion when this spec names TCP, SSH, or HTTPS.
-- Bind table was filled by a human before any live `ip` / nft / iptables change.
 
 ## MUST NOT
 
@@ -184,9 +159,11 @@ ssh -o ControlPath=none <user>@<cloud-vps> 'echo overlay-ok'
 - MUST NOT document trusted-egress push, root forced-command, or token payload.
 - MUST NOT name the commercial VPN provider.
 - MUST NOT loop cscli capi status while diagnosing a ban.
-- MUST NOT apply live network or firewall changes until Bind is filled by a human.
-- MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
 - MUST NOT publish hostnames, addresses, ULAs, or custom ports.
+
+## Page changelog
+
+- Edition 2 (8 Sep 2026, Mountain Time): Trap-specific Bind and agent stop rule (review cleanup).
 
 ## Related specs
 

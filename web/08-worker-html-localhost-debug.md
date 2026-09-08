@@ -1,13 +1,13 @@
 ---
-id: OEN-08
-title: Do not ship localhost debug beacons in Worker HTML
-kind: original
-status: active
+id: "OEN-08"
+title: "Do not ship localhost debug beacons in Worker HTML"
+kind: "original"
+status: "active"
 edition: 2
-date_published: 2026-09-07
-author: Eugene Armstead
-author_url: https://www.armsteadent.com/
-canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/web/08-worker-html-localhost-debug.html
+date_published: "2026-09-07"
+author: "Eugene Armstead"
+author_url: "https://www.armsteadent.com/"
+canonical: "https://eugenearmstead.github.io/overlay-and-edge-notes/web/08-worker-html-localhost-debug.html"
 keywords:
   - "localhost debug beacon Worker"
   - "127.0.0.1:7450 ingest"
@@ -21,9 +21,11 @@ keywords:
   - "public HTTPS loopback fetch"
   - "Worker HTML local-network"
   - "LNA prompt Cloudflare"
-backs: []
-backed_by: []
-description: Agent debug templates that fetch 127.0.0.1 ingest URLs must never ship in Cloudflare Worker HTML; browsers prompt for local-network access on public HTTPS pages.
+backs:
+  []
+backed_by:
+  []
+description: "Agent debug templates that fetch 127.0.0.1 ingest URLs must never ship in Cloudflare Worker HTML; browsers prompt for local-network access on public HTTPS pages."
 terms:
   - abbr: OEN
     expansion: Overlay and Edge Notes
@@ -47,14 +49,10 @@ terms:
     expansion: user interface
   - abbr: PC
     expansion: personal computer
-  - abbr: JS
-    expansion: JavaScript
   - abbr: JSON
     expansion: JavaScript Object Notation
   - abbr: HIT
     expansion: cache HIT (content still served from cache)
-  - abbr: CSS
-    expansion: Cascading Style Sheets
   - abbr: Chromium
     expansion: open-source browser engine
   - abbr: Cloudflare

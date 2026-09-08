@@ -1,13 +1,13 @@
 ---
-id: OEN-09
+id: "OEN-09"
 title: "Git merge is not a live Worker (timed Wrangler fallback)"
-kind: original
-status: active
-edition: 1
-date_published: 2026-09-08
-author: Eugene Armstead
-author_url: https://www.armsteadent.com/
-canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/web/09-git-merge-is-not-a-live-worker.html
+kind: "original"
+status: "active"
+edition: 2
+date_published: "2026-09-08"
+author: "Eugene Armstead"
+author_url: "https://www.armsteadent.com/"
+canonical: "https://eugenearmstead.github.io/overlay-and-edge-notes/web/09-git-merge-is-not-a-live-worker.html"
 keywords:
   - "git merge is not a live Worker"
   - "Cloudflare Git build lag"
@@ -21,7 +21,8 @@ keywords:
   - "source of truth vs live Worker"
   - "Workers cache purge token"
   - "preview HIT stale body"
-backs: []
+backs:
+  []
 backed_by:
   - OEN-S04
   - OEN-S05
@@ -29,38 +30,26 @@ backed_by:
   - OEN-S12
 description: "A merged git source of truth is not a live Cloudflare Worker. Wait about ten minutes, then Wrangler without asking. Workers-edit tokens often lack Cache Purge."
 terms:
-  - abbr: OEN
-    expansion: Overlay and Edge Notes
-  - abbr: SSH
-    expansion: Secure Shell
-  - abbr: TCP
-    expansion: Transmission Control Protocol
-  - abbr: ICMP
-    expansion: Internet Control Message Protocol
+  - abbr: CDN
+    expansion: content delivery network
+  - abbr: Cloudflare
+    expansion: content delivery and Workers platform
+  - abbr: CSS
+    expansion: Cascading Style Sheets
+  - abbr: HIT
+    expansion: cache HIT (content still served from cache)
+  - abbr: HTML
+    expansion: HyperText Markup Language
   - abbr: HTTP
     expansion: Hypertext Transfer Protocol
   - abbr: HTTPS
     expansion: Hypertext Transfer Protocol Secure
-  - abbr: HTML
-    expansion: HyperText Markup Language
-  - abbr: CSS
-    expansion: Cascading Style Sheets
-  - abbr: nft
-    expansion: nftables (Linux packet filter)
-  - abbr: CDN
-    expansion: content delivery network
+  - abbr: OEN
+    expansion: Overlay and Edge Notes
   - abbr: URL
     expansion: Uniform Resource Locator
-  - abbr: UI
-    expansion: user interface
-  - abbr: HIT
-    expansion: cache HIT (content still served from cache)
   - abbr: Wrangler
     expansion: Cloudflare Workers command-line tool
-  - abbr: Cloudflare
-    expansion: content delivery and Workers platform
-  - abbr: Rocket
-    expansion: Cloudflare Rocket Loader
 ---
 
 # Git merge is not a live Worker (timed Wrangler fallback)
@@ -73,13 +62,7 @@ A token with Workers edit often **lacks Cache Purge** — say so; use the dashbo
 
 ## Topology
 
-```text
-[git merge] --> connected Cloudflare Git build  (MAY lag or never start)
-        \
-         +-- wait ~10 min --> Wrangler upload if no live Worker update
-Separate Workers (chat, gated apps) often are NOT on the Git build
-Tunnel preview: cf-cache-status HIT with stale body ([OEN-S05](../supporting/s05-tunnel-preview-stale-hit.md))
-```
+N/A — deploy
 
 ## Bind
 
@@ -87,20 +70,7 @@ Fill this table **before** any live change. Do **not** paste real values back in
 
 | Placeholder | Operator fills | Class |
 |-------------|----------------|-------|
-| `<worker-root>` | Worker / UI source tree | Directory on the workstation |
-| `<live-url>` | Public HTTPS origin | URL the browser loads |
-| `<preview-url>` | Preview origin if used | URL |
-| `<html-path>` | Path that becomes a Response body | File glob |
-
-
-## Formulas
-
-```text
-# Predeploy MUST fail the ship on client-executed matches:
-#   127.0.0.1:7450   localhost:7450   /ingest/   X-Debug-Session-Id
-# Merge ≠ live Worker. Wait ~10 minutes, then Wrangler if the Git build never started.
-# Cache: Workers-edit tokens often lack Cache Purge. ?v= does not replace zone purge for HTML.
-```
+| `<live-url>` | Public HTTPS origin | URL |
 
 ## Decision
 
@@ -114,15 +84,13 @@ Treat merge as source only. Wait ~10 minutes. Then Wrangler. Purge with a token 
 
 ## Agent stop rule
 
-> A coding agent MUST emit a **bound runbook** (placeholders replaced from Bind).
-> MUST NOT apply live `ip rule`, nft, iptables, ip6tables, sysctl, `wg set`, daemon restart, or deploy until a **human** filled Bind.
-> MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
-> MUST NOT file an upstream bug from this page.
-> MUST NOT publish real addresses, hostnames, or custom ports.
+> MUST treat git merge as source-of-truth only until the live Worker updates.
+> MUST NOT call Wrangler until Bind (`<live-url>`) is filled and the wait window elapsed — unless the Git build never started.
+> MUST NOT claim a cache HIT means the new Worker is live ([OEN-S05](../supporting/s05-tunnel-preview-stale-hit.md)).
+> MUST NOT apply netfilter from this page.
 
 ## Procedure
 
-Placeholders only until Bind is filled: `<cloud-vps>`, `<lan-pi>`, `<overlay-peer>`, `<exit-node>`, `<wg-iface>`, `<gcp-nic>`, plus the Bind extras on this page.
 
 ### Copy-paste commands (after Bind)
 
@@ -162,8 +130,6 @@ cf-cache-status: HIT
 - HTML purged or origin no-store.
 - Auth failures were reported, not waited out.
 - Chat/gated Workers not on the Git build were deployed separately if they changed.
-- ICMP / small ping success was **not** used as the pass criterion when this spec names TCP, SSH, or HTTPS.
-- Bind table was filled by a human before any live `ip` / nft / iptables change.
 
 ## MUST NOT
 
@@ -171,9 +137,11 @@ cf-cache-status: HIT
 - MUST NOT wait indefinitely for a Git build that never started.
 - MUST NOT hide a 401/unauthorized token as “wait longer.”
 - MUST NOT ship localhost debug beacons ([OEN-08](08-worker-html-localhost-debug.md)).
-- MUST NOT apply live network or firewall changes until Bind is filled by a human.
-- MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
 - MUST NOT publish hostnames, addresses, ULAs, or custom ports.
+
+## Page changelog
+
+- Edition 2 (8 Sep 2026, Mountain Time): Trap-specific Bind and agent stop rule (review cleanup).
 
 ## Related specs
 

@@ -1,13 +1,13 @@
 ---
-id: OEN-S15
+id: "OEN-S15"
 title: "Router squashfs is always 100%; Save settings misses persistent overlay"
-kind: supporting
-status: active
-edition: 1
-date_published: 2026-09-08
-author: Eugene Armstead
-author_url: https://www.armsteadent.com/
-canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s15-router-squashfs-jffs.html
+kind: "supporting"
+status: "active"
+edition: 2
+date_published: "2026-09-08"
+author: "Eugene Armstead"
+author_url: "https://www.armsteadent.com/"
+canonical: "https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s15-router-squashfs-jffs.html"
 keywords:
   - "router squashfs 100% full"
   - "Save settings misses jffs"
@@ -23,37 +23,20 @@ keywords:
   - "jffs scripts not in cfg"
 backs:
   - OEN-12
-backed_by: []
+backed_by:
+  []
 description: "Router root squashfs reports 100% full; that is normal. Save settings .cfg does not include the persistent overlay scripts. Save JFFS separately. logread is OpenWrt — this firmware uses syslog files."
 terms:
-  - abbr: OEN
-    expansion: Overlay and Edge Notes
-  - abbr: SSH
-    expansion: Secure Shell
-  - abbr: LAN
-    expansion: Local Area Network
-  - abbr: WAN
-    expansion: Wide Area Network
-  - abbr: TCP
-    expansion: Transmission Control Protocol
-  - abbr: MTU
-    expansion: Maximum Transmission Unit
-  - abbr: ICMP
-    expansion: Internet Control Message Protocol
-  - abbr: HTTPS
-    expansion: Hypertext Transfer Protocol Secure
-  - abbr: WireGuard
-    expansion: UDP-based VPN protocol
-  - abbr: DNS
-    expansion: Domain Name System
-  - abbr: nft
-    expansion: nftables (Linux packet filter)
-  - abbr: USB
-    expansion: Universal Serial Bus
+  - abbr: API
+    expansion: application programming interface
   - abbr: JFFS
     expansion: journalled flash file system (router persistent overlay)
   - abbr: NVRAM
     expansion: non-volatile random-access memory
+  - abbr: OEN
+    expansion: Overlay and Edge Notes
+  - abbr: USB
+    expansion: Universal Serial Bus
 ---
 
 # Router squashfs is always 100%; Save settings misses persistent overlay
@@ -77,11 +60,7 @@ Fill this table **before** any live change. Do **not** paste real values back in
 
 | Placeholder | Operator fills | Class |
 |-------------|----------------|-------|
-| `<wg-iface>` | Consumer-router WireGuard client iface | Iface |
-| `<lan-bridge>` | LAN bridge | Iface; MTU 1500 |
-| `<wan-iface>` | WAN iface | Iface |
-| `<lan-resolver>` | Intended LAN DNS | Address; never publish |
-
+| *(none)* | No packet-path Bind for this trap | Use the git host, origin, or API the operator already has |
 
 ## Formulas
 
@@ -97,15 +76,12 @@ Scripts survive a settings save. Operators stop panicking at 100% squashfs.
 
 ## Agent stop rule
 
-> A coding agent MUST emit a **bound runbook** (placeholders replaced from Bind).
-> MUST NOT apply live `ip rule`, nft, iptables, ip6tables, sysctl, `wg set`, daemon restart, or deploy until a **human** filled Bind.
-> MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
-> MUST NOT file an upstream bug from this page.
-> MUST NOT publish real addresses, hostnames, or custom ports.
+> MUST distinguish squashfs 100% from a missing persistent overlay after Bind is filled.
+> MUST NOT “free root” on squashfs.
+> MUST NOT apply netfilter from this page.
 
 ## Procedure
 
-Placeholders only until Bind is filled: `<cloud-vps>`, `<lan-pi>`, `<overlay-peer>`, `<exit-node>`, `<wg-iface>`, `<gcp-nic>`, plus the Bind extras on this page.
 
 ### Copy-paste commands (after Bind)
 
@@ -137,16 +113,16 @@ df -h
 
 - Ops backup includes persistent overlay.
 - squashfs 100% not treated as an incident.
-- ICMP / small ping success was **not** used as the pass criterion when this spec names TCP, SSH, or HTTPS.
-- Bind table was filled by a human before any live `ip` / nft / iptables change.
 
 ## MUST NOT
 
 - MUST NOT publish real jffs paths as universal.
 - MUST NOT wipe squashfs to “free space.”
-- MUST NOT apply live network or firewall changes until Bind is filled by a human.
-- MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
 - MUST NOT publish hostnames, addresses, ULAs, or custom ports.
+
+## Page changelog
+
+- Edition 2 (8 Sep 2026, Mountain Time): Trap-specific Bind and agent stop rule (review cleanup).
 
 ## Related specs
 

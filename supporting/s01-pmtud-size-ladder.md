@@ -1,13 +1,13 @@
 ---
-id: OEN-S01
-title: Don't-fragment ping size ladder (path MTU discovery)
-kind: supporting
-status: active
-edition: 2
-date_published: 2026-09-07
-author: Eugene Armstead
-author_url: https://www.armsteadent.com/
-canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s01-pmtud-size-ladder.html
+id: "OEN-S01"
+title: "Don't-fragment ping size ladder (path MTU discovery)"
+kind: "supporting"
+status: "active"
+edition: 3
+date_published: "2026-09-07"
+author: "Eugene Armstead"
+author_url: "https://www.armsteadent.com/"
+canonical: "https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s01-pmtud-size-ladder.html"
 keywords:
   - "don't-fragment ping size ladder"
   - "ping -M do path MTU"
@@ -25,71 +25,66 @@ backs:
   - OEN-01
   - OEN-02
   - OEN-04
-backed_by: []
-description: Measure path MTU with don't-fragment ping size ladders on IPv4 and IPv6. Small ICMP can succeed while large TCP still dies.
+backed_by:
+  []
+description: "Measure path MTU with don't-fragment ping size ladders on IPv4 and IPv6. Small ICMP can succeed while large TCP still dies."
 terms:
-  - abbr: OEN
-    expansion: Overlay and Edge Notes
+  - abbr: AAAA
+    expansion: DNS IPv6 address record
+  - abbr: Chromium
+    expansion: open-source browser engine
+  - abbr: CLI
+    expansion: command-line interface
+  - abbr: ClientHello
+    expansion: TLS handshake message sent by the client
+  - abbr: ControlPath
+    expansion: OpenSSH multiplexing socket path option
   - abbr: DF
     expansion: don't-fragment (IP flag)
-  - abbr: PMTUD
-    expansion: path MTU discovery
-  - abbr: MTU
-    expansion: Maximum Transmission Unit
+  - abbr: DNS
+    expansion: Domain Name System
+  - abbr: HTTPS
+    expansion: Hypertext Transfer Protocol Secure
   - abbr: ICMP
     expansion: Internet Control Message Protocol
-  - abbr: TCP
-    expansion: Transmission Control Protocol
-  - abbr: MSS
-    expansion: Maximum Segment Size
-  - abbr: TCPMSS
-    expansion: iptables/nft target that sets TCP Maximum Segment Size
-  - abbr: TLS
-    expansion: Transport Layer Security
-  - abbr: SSH
-    expansion: Secure Shell
+  - abbr: ICMPv6
+    expansion: Internet Control Message Protocol version 6
   - abbr: IP
     expansion: Internet Protocol
   - abbr: IPv4
     expansion: Internet Protocol version 4
   - abbr: IPv6
     expansion: Internet Protocol version 6
-  - abbr: LAN
-    expansion: Local Area Network
-  - abbr: WAN
-    expansion: Wide Area Network
-  - abbr: VPN
-    expansion: Virtual Private Network
-  - abbr: WG
-    expansion: WireGuard
-  - abbr: WireGuard
-    expansion: UDP-based VPN protocol
-  - abbr: VPS
-    expansion: Virtual Private Server
-  - abbr: DNS
-    expansion: Domain Name System
-  - abbr: HTTPS
-    expansion: Hypertext Transfer Protocol Secure
-  - abbr: ClientHello
-    expansion: TLS handshake message sent by the client
   - abbr: KB
     expansion: kilobyte
-  - abbr: UDP
-    expansion: User Datagram Protocol
-  - abbr: ICMPv6
-    expansion: Internet Control Message Protocol version 6
-  - abbr: TEST-NET-3
-    expansion: RFC 5737 documentation IPv4 prefix 203.0.113.0/24
-  - abbr: RFC
-    expansion: Request for Comments
-  - abbr: AAAA
-    expansion: DNS IPv6 address record
-  - abbr: Chromium
-    expansion: open-source browser engine
-  - abbr: ControlPath
-    expansion: OpenSSH multiplexing socket path option
+  - abbr: LAN
+    expansion: Local Area Network
+  - abbr: MSS
+    expansion: Maximum Segment Size
+  - abbr: MTU
+    expansion: Maximum Transmission Unit
   - abbr: nft
     expansion: nftables (Linux packet filter)
+  - abbr: OEN
+    expansion: Overlay and Edge Notes
+  - abbr: PMTUD
+    expansion: path MTU discovery
+  - abbr: RFC
+    expansion: Request for Comments
+  - abbr: SSH
+    expansion: Secure Shell
+  - abbr: TCP
+    expansion: Transmission Control Protocol
+  - abbr: TCPMSS
+    expansion: iptables/nft target that sets TCP Maximum Segment Size
+  - abbr: TEST-NET-3
+    expansion: RFC 5737 documentation IPv4 prefix 203.0.113.0/24
+  - abbr: TLS
+    expansion: Transport Layer Security
+  - abbr: VPS
+    expansion: Virtual Private Server
+  - abbr: WAN
+    expansion: Wide Area Network
 ---
 
 # Don't-fragment ping size ladder (path MTU discovery)
@@ -119,8 +114,10 @@ Measure **three classes of target** from the same client. Do not mix the numbers
 
 ## Bind
 
+
 | Placeholder | Operator fills | Class |
 |-------------|----------------|-------|
+| `<overlay-impl>` | Overlay implementation class | `tailscale-compatible` or other — stop and translate CLI |
 | `<wg-iface>` | Commercial WireGuard iface | Router or client |
 | `<wg-mtu>` | MTU from `ip link show <wg-iface>` | Integer |
 | `<lan-bridge>` | LAN bridge | Router |
@@ -163,6 +160,8 @@ Do this **before** blaming the overlay SSH binary, Chromium, or an exit node. Th
 > MUST NOT publish the real addresses pinged.
 
 ## Procedure
+
+This spec does not apply if `<overlay-impl>` is not tailscale-compatible.
 
 1. **P1 — Note interface MTUs.**
    - **Action:**
@@ -250,6 +249,10 @@ Documentation samples use `TEST-NET-3` `203.0.113.10` (RFC 5737). Operators MUST
 - MUST NOT publish the real addresses you pinged; write `<cloud-vps>` / “VPS public address.”
 - MUST NOT skip the TCP retest after ICMP succeeds.
 - MUST NOT skip IPv6 when the path under test is dual-stack.
+
+## Page changelog
+
+- Edition 3 (8 Sep 2026, Mountain Time): Added overlay-impl Bind and trap-specific terms (review cleanup).
 
 ## Related specs
 

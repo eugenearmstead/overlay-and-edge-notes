@@ -1,13 +1,13 @@
 ---
-id: OEN-07
+id: "OEN-07"
 title: "CrowdSec Central API HTTP 403 from native health probes"
-kind: original
-status: active
-edition: 1
-date_published: 2026-09-08
-author: Eugene Armstead
-author_url: https://www.armsteadent.com/
-canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/networking/07-crowdsec-capi-403.html
+kind: "original"
+status: "active"
+edition: 2
+date_published: "2026-09-08"
+author: "Eugene Armstead"
+author_url: "https://www.armsteadent.com/"
+canonical: "https://eugenearmstead.github.io/overlay-and-edge-notes/networking/07-crowdsec-capi-403.html"
 keywords:
   - "cscli capi 403"
   - "CrowdSec CAPI 403"
@@ -22,59 +22,54 @@ keywords:
   - "CAPI login budget"
   - "native CrowdSec not Docker"
   - "hosts pin CrowdSec IPv4"
-backs: []
+backs:
+  []
 backed_by:
   - OEN-S34
 description: "Native systemd health and fleet collectors that loop cscli capi status can 403 a Virtual Private Server IPv4 the same way Docker healthchecks do. Dummy enroll POST distinguishes banned IPv4 from a dead install."
 terms:
-  - abbr: OEN
-    expansion: Overlay and Edge Notes
-  - abbr: SSH
-    expansion: Secure Shell
-  - abbr: VPS
-    expansion: Virtual Private Server
-  - abbr: VPN
-    expansion: Virtual Private Network
-  - abbr: TCP
-    expansion: Transmission Control Protocol
-  - abbr: ICMP
-    expansion: Internet Control Message Protocol
+  - abbr: AAAA
+    expansion: DNS IPv6 address record
+  - abbr: API
+    expansion: application programming interface
+  - abbr: CAPI
+    expansion: CrowdSec Central API
+  - abbr: CLI
+    expansion: command-line interface
+  - abbr: ControlPath
+    expansion: OpenSSH multiplexing socket path option
+  - abbr: CrowdSec
+    expansion: open-source IDS/IPS with a Central API
   - abbr: HTTP
     expansion: Hypertext Transfer Protocol
-  - abbr: HTTPS
-    expansion: Hypertext Transfer Protocol Secure
   - abbr: IP
     expansion: Internet Protocol
   - abbr: IPv4
     expansion: Internet Protocol version 4
   - abbr: IPv6
     expansion: Internet Protocol version 6
-  - abbr: NAT
-    expansion: network address translation
-  - abbr: NIC
-    expansion: network interface card
-  - abbr: API
-    expansion: application programming interface
-  - abbr: CLI
-    expansion: command-line interface
-  - abbr: CAPI
-    expansion: CrowdSec Central API
-  - abbr: nft
-    expansion: nftables (Linux packet filter)
-  - abbr: ControlPath
-    expansion: OpenSSH multiplexing socket path option
   - abbr: JSON
     expansion: JavaScript Object Notation
-  - abbr: UI
-    expansion: user interface
-  - abbr: systemd
-    expansion: Linux service manager
-  - abbr: CrowdSec
-    expansion: open-source IDS/IPS with a Central API
+  - abbr: NAT
+    expansion: network address translation
+  - abbr: nft
+    expansion: nftables (Linux packet filter)
+  - abbr: NIC
+    expansion: network interface card
+  - abbr: OEN
+    expansion: Overlay and Edge Notes
   - abbr: POST
     expansion: HTTP method
-  - abbr: AAAA
-    expansion: DNS IPv6 address record
+  - abbr: SSH
+    expansion: Secure Shell
+  - abbr: systemd
+    expansion: Linux service manager
+  - abbr: UI
+    expansion: user interface
+  - abbr: VPN
+    expansion: Virtual Private Network
+  - abbr: VPS
+    expansion: Virtual Private Server
 ---
 
 # CrowdSec Central API HTTP 403 from native health probes
@@ -89,11 +84,7 @@ CAPI egress on this class of host is the **public NIC**, not the commercial tunn
 
 ## Topology
 
-```text
-[native systemd host] --HTTPS--> CrowdSec Central API
-    stacked health + collector calling `cscli capi status`  -->  login budget  --> HTTP 403
-    leftover /etc/hosts A-record pin  -->  Go uses banned IPv4 while IPv6 still 401
-```
+N/A — API
 
 ## Bind
 
@@ -101,9 +92,8 @@ Fill this table **before** any live change. Do **not** paste real values back in
 
 | Placeholder | Operator fills | Class |
 |-------------|----------------|-------|
-| `<cloud-vps>` | Native CrowdSec host | Cloud VPS |
-| `<user>` | SSH user | Guest |
-
+| `<user>` | SSH user | Guest account |
+| `<cloud-vps>` | Cloud VPS under test | Cloud VPS |
 
 ## Formulas
 
@@ -123,15 +113,13 @@ Diagnose with one dummy enroll POST per address family. Remove A-record hosts pi
 
 ## Agent stop rule
 
-> A coding agent MUST emit a **bound runbook** (placeholders replaced from Bind).
-> MUST NOT apply live `ip rule`, nft, iptables, ip6tables, sysctl, `wg set`, daemon restart, or deploy until a **human** filled Bind.
-> MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
-> MUST NOT file an upstream bug from this page.
-> MUST NOT publish real addresses, hostnames, or custom ports.
+> MUST emit the dummy unauthenticated enroll POST per address family after `<cloud-vps>` is filled.
+> MUST NOT loop `cscli capi status`.
+> MUST NOT apply nft or iptables from this page.
+> MUST NOT file a CrowdSec upstream bug from this page.
 
 ## Procedure
 
-Placeholders only until Bind is filled: `<cloud-vps>`, `<lan-pi>`, `<overlay-peer>`, `<exit-node>`, `<wg-iface>`, `<gcp-nic>`, plus the Bind extras on this page.
 
 ### Copy-paste commands (after Bind)
 
@@ -176,8 +164,6 @@ MUST NOT loop `cscli capi status`. Nested probes MUST read a cache ([OEN-S34](..
 - No api.crowdsec.net A pin in hosts.
 - At most rare cscli capi status (cached).
 - Console shows enrolled after one successful status.
-- ICMP / small ping success was **not** used as the pass criterion when this spec names TCP, SSH, or HTTPS.
-- Bind table was filled by a human before any live `ip` / nft / iptables change.
 
 ## MUST NOT
 
@@ -186,9 +172,11 @@ MUST NOT loop `cscli capi status`. Nested probes MUST read a cache ([OEN-S34](..
 - MUST NOT publish VPS public IPs or control-host names.
 - MUST NOT treat a fleet dashboard “CAPI push FAIL” as proof of not enrolled without parsing console status.
 - MUST NOT route CAPI “through the tunnel” as the first fix — default egress is often already the public NIC.
-- MUST NOT apply live network or firewall changes until Bind is filled by a human.
-- MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
 - MUST NOT publish hostnames, addresses, ULAs, or custom ports.
+
+## Page changelog
+
+- Edition 2 (8 Sep 2026, Mountain Time): Trap-specific Bind and agent stop rule (review cleanup).
 
 ## Related specs
 

@@ -1,13 +1,13 @@
 ---
-id: OEN-S07
+id: "OEN-S07"
 title: "Git merge 405 while mergeability is pending"
-kind: supporting
-status: active
-edition: 1
-date_published: 2026-09-08
-author: Eugene Armstead
-author_url: https://www.armsteadent.com/
-canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s07-git-merge-405-pending.html
+kind: "supporting"
+status: "active"
+edition: 2
+date_published: "2026-09-08"
+author: "Eugene Armstead"
+author_url: "https://www.armsteadent.com/"
+canonical: "https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s07-git-merge-405-pending.html"
 keywords:
   - "git merge 405 pending"
   - "GitLab mergeability 405"
@@ -23,33 +23,24 @@ keywords:
   - "mergeability still checking"
 backs:
   - OEN-09
-backed_by: []
+backed_by:
+  []
 description: "HTTP 405 on merge right after opening a merge request is usually mergeability still pending, not a dead token. Contrast with real 401."
 terms:
-  - abbr: OEN
-    expansion: Overlay and Edge Notes
-  - abbr: SSH
-    expansion: Secure Shell
-  - abbr: TCP
-    expansion: Transmission Control Protocol
-  - abbr: ICMP
-    expansion: Internet Control Message Protocol
-  - abbr: HTTP
-    expansion: Hypertext Transfer Protocol
-  - abbr: HTTPS
-    expansion: Hypertext Transfer Protocol Secure
-  - abbr: nft
-    expansion: nftables (Linux packet filter)
-  - abbr: URL
-    expansion: Uniform Resource Locator
-  - abbr: UI
-    expansion: user interface
+  - abbr: API
+    expansion: application programming interface
   - abbr: GitLab
     expansion: git hosting and merge-request service
+  - abbr: HTTP
+    expansion: Hypertext Transfer Protocol
+  - abbr: ICMP
+    expansion: Internet Control Message Protocol
+  - abbr: OEN
+    expansion: Overlay and Edge Notes
   - abbr: PUT
     expansion: HTTP method
-  - abbr: MR
-    expansion: merge request
+  - abbr: URL
+    expansion: Uniform Resource Locator
 ---
 
 # Git merge 405 while mergeability is pending
@@ -60,11 +51,7 @@ Git hosting checks mergeability asynchronously. `PUT …/merge` often 405 until 
 
 ## Topology
 
-```text
-[create MR] --> Git host mergeability async
-PUT merge  -->  405 until can_be_merged
-401 is a dead token (tell the operator immediately)
-```
+N/A — deploy
 
 ## Bind
 
@@ -72,11 +59,7 @@ Fill this table **before** any live change. Do **not** paste real values back in
 
 | Placeholder | Operator fills | Class |
 |-------------|----------------|-------|
-| `<worker-root>` | Worker / UI source tree | Directory on the workstation |
-| `<live-url>` | Public HTTPS origin | URL the browser loads |
-| `<preview-url>` | Preview origin if used | URL |
-| `<html-path>` | Path that becomes a Response body | File glob |
-
+| *(none)* | No packet-path Bind for this trap | Use the git host, origin, or API the operator already has |
 
 ## Formulas
 
@@ -92,15 +75,13 @@ Fewer false “token dead” pages. Real 401 still surfaces fast.
 
 ## Agent stop rule
 
-> A coding agent MUST emit a **bound runbook** (placeholders replaced from Bind).
-> MUST NOT apply live `ip rule`, nft, iptables, ip6tables, sysctl, `wg set`, daemon restart, or deploy until a **human** filled Bind.
-> MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
-> MUST NOT file an upstream bug from this page.
-> MUST NOT publish real addresses, hostnames, or custom ports.
+> MUST classify HTTP 401 vs 405 before retrying merge.
+> MUST NOT treat a lone 405 as a dead token; poll mergeability.
+> MUST report 401 immediately.
+> MUST NOT apply netfilter or claim an ICMP ping as a git-host fix.
 
 ## Procedure
 
-Placeholders only until Bind is filled: `<cloud-vps>`, `<lan-pi>`, `<overlay-peer>`, `<exit-node>`, `<wg-iface>`, `<gcp-nic>`, plus the Bind extras on this page.
 
 ### Copy-paste commands (after Bind)
 
@@ -132,16 +113,16 @@ Placeholders only until Bind is filled: `<cloud-vps>`, `<lan-pi>`, `<overlay-pee
 
 - 401 reported immediately if it happened.
 - 405 retried until mergeability or timeout.
-- ICMP / small ping success was **not** used as the pass criterion when this spec names TCP, SSH, or HTTPS.
-- Bind table was filled by a human before any live `ip` / nft / iptables change.
 
 ## MUST NOT
 
 - MUST NOT hide 401 as timing.
 - MUST NOT declare cannot-merge on the first 405.
-- MUST NOT apply live network or firewall changes until Bind is filled by a human.
-- MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
 - MUST NOT publish hostnames, addresses, ULAs, or custom ports.
+
+## Page changelog
+
+- Edition 2 (8 Sep 2026, Mountain Time): Trap-specific Bind and agent stop rule (review cleanup).
 
 ## Related specs
 

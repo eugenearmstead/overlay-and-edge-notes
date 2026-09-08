@@ -65,20 +65,14 @@ terms:
     expansion: Transport Layer Security
   - abbr: HTTPS
     expansion: Hypertext Transfer Protocol Secure
-  - abbr: HTTP
-    expansion: Hypertext Transfer Protocol
   - abbr: IP
     expansion: Internet Protocol
   - abbr: IPv4
     expansion: Internet Protocol version 4
   - abbr: IPv6
     expansion: Internet Protocol version 6
-  - abbr: WG
-    expansion: WireGuard
   - abbr: WireGuard
     expansion: UDP-based VPN protocol
-  - abbr: DNS
-    expansion: Domain Name System
   - abbr: ControlPath
     expansion: OpenSSH multiplexing socket path option
   - abbr: FORWARD

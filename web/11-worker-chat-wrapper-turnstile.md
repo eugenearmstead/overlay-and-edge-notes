@@ -1,13 +1,13 @@
 ---
-id: OEN-11
+id: "OEN-11"
 title: "Worker chat wrapper, Turnstile, sanitize large-language-model drift"
-kind: original
-status: active
-edition: 1
-date_published: 2026-09-08
-author: Eugene Armstead
-author_url: https://www.armsteadent.com/
-canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/web/11-worker-chat-wrapper-turnstile.html
+kind: "original"
+status: "active"
+edition: 2
+date_published: "2026-09-08"
+author: "Eugene Armstead"
+author_url: "https://www.armsteadent.com/"
+canonical: "https://eugenearmstead.github.io/overlay-and-edge-notes/web/11-worker-chat-wrapper-turnstile.html"
 keywords:
   - "Worker chat iframe vs wrapper"
   - "Cloudflare Turnstile chat"
@@ -21,48 +21,41 @@ keywords:
   - "bilingual privacy chat"
   - "iframe only when copy stable"
   - "LLM output sanitize"
-backs: []
+backs:
+  []
 backed_by:
   - OEN-S06
   - OEN-S09
 description: "Iframe a Worker chat only when copy is stable. Otherwise use a same-origin wrapper, optional reverse-proxy API, send official FAQ every request, strip forbidden phrases client-side, gate with Turnstile."
 terms:
-  - abbr: OEN
-    expansion: Overlay and Edge Notes
-  - abbr: SSH
-    expansion: Secure Shell
-  - abbr: TCP
-    expansion: Transmission Control Protocol
-  - abbr: ICMP
-    expansion: Internet Control Message Protocol
-  - abbr: HTTPS
-    expansion: Hypertext Transfer Protocol Secure
-  - abbr: HTML
-    expansion: HyperText Markup Language
-  - abbr: CSS
-    expansion: Cascading Style Sheets
-  - abbr: JS
-    expansion: JavaScript
   - abbr: API
     expansion: application programming interface
-  - abbr: nft
-    expansion: nftables (Linux packet filter)
+  - abbr: AUD
+    expansion: OAuth audience identifier
+  - abbr: CSS
+    expansion: Cascading Style Sheets
+  - abbr: DOM
+    expansion: Document Object Model
   - abbr: FAQ
     expansion: frequently asked questions
-  - abbr: URL
-    expansion: Uniform Resource Locator
-  - abbr: UI
-    expansion: user interface
+  - abbr: HTML
+    expansion: HyperText Markup Language
+  - abbr: HTTPS
+    expansion: Hypertext Transfer Protocol Secure
+  - abbr: JS
+    expansion: JavaScript
+  - abbr: NAP
+    expansion: name, address, and phone (local-business citation data)
+  - abbr: OEN
+    expansion: Overlay and Edge Notes
   - abbr: Playwright
     expansion: browser automation and test runner
   - abbr: Turnstile
     expansion: Cloudflare bot challenge widget
-  - abbr: AUD
-    expansion: OAuth audience identifier
-  - abbr: DOM
-    expansion: Document Object Model
-  - abbr: NAP
-    expansion: name, address, and phone (local-business citation data)
+  - abbr: UI
+    expansion: user interface
+  - abbr: URL
+    expansion: Uniform Resource Locator
 ---
 
 # Worker chat wrapper, Turnstile, sanitize large-language-model drift
@@ -75,12 +68,7 @@ MUST NOT publish lead-feed URLs, Access audience (AUD) values, Signal, or device
 
 ## Topology
 
-```text
-[static origin]
-    iframe Worker chat     -- only if copy is stable
-    else chatbot.html wrapper + optional same-origin /chatbot-api/ proxy
-    FAQ every request; strip forbidden phrases before paint; Turnstile gate
-```
+N/A — deploy
 
 ## Bind
 
@@ -88,11 +76,8 @@ Fill this table **before** any live change. Do **not** paste real values back in
 
 | Placeholder | Operator fills | Class |
 |-------------|----------------|-------|
-| `<worker-root>` | Worker / UI source tree | Directory on the workstation |
-| `<live-url>` | Public HTTPS origin | URL the browser loads |
-| `<preview-url>` | Preview origin if used | URL |
-| `<html-path>` | Path that becomes a Response body | File glob |
-
+| `<worker-root>` | Worker / UI source tree | Directory |
+| `<live-url>` | Public HTTPS origin | URL |
 
 ## Formulas
 
@@ -110,15 +95,13 @@ Prefer same-origin wrapper when the model drifts. MUST sanitize on the client be
 
 ## Agent stop rule
 
-> A coding agent MUST emit a **bound runbook** (placeholders replaced from Bind).
-> MUST NOT apply live `ip rule`, nft, iptables, ip6tables, sysctl, `wg set`, daemon restart, or deploy until a **human** filled Bind.
-> MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
-> MUST NOT file an upstream bug from this page.
-> MUST NOT publish real addresses, hostnames, or custom ports.
+> MUST emit wrapper vs iframe and Turnstile checks with `<live-url>` filled.
+> MUST NOT deploy until Bind is filled.
+> MUST NOT publish site secrets, Access ids, or prompt text that identifies a lab.
+> MUST NOT apply netfilter from this page.
 
 ## Procedure
 
-Placeholders only until Bind is filled: `<cloud-vps>`, `<lan-pi>`, `<overlay-peer>`, `<exit-node>`, `<wg-iface>`, `<gcp-nic>`, plus the Bind extras on this page.
 
 ### Copy-paste commands (after Bind)
 
@@ -156,8 +139,6 @@ curl -sS -o /dev/null -w '%{http_code}\n' --max-time 15 <live-url>/chatbot.html
 - Forbidden phrases cannot render.
 - Turnstile gates the chat.
 - No localhost ingest; no lead-feed or Access AUDs in the public spec or page.
-- ICMP / small ping success was **not** used as the pass criterion when this spec names TCP, SSH, or HTTPS.
-- Bind table was filled by a human before any live `ip` / nft / iptables change.
 
 ## MUST NOT
 
@@ -165,9 +146,11 @@ curl -sS -o /dev/null -w '%{http_code}\n' --max-time 15 <live-url>/chatbot.html
 - MUST NOT ship localhost debug beacons in the wrapper.
 - MUST NOT iframe an unstable Worker without a sanitizer.
 - MUST NOT skip bilingual privacy links the site already uses elsewhere.
-- MUST NOT apply live network or firewall changes until Bind is filled by a human.
-- MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
 - MUST NOT publish hostnames, addresses, ULAs, or custom ports.
+
+## Page changelog
+
+- Edition 2 (8 Sep 2026, Mountain Time): Trap-specific Bind and agent stop rule (review cleanup).
 
 ## Related specs
 

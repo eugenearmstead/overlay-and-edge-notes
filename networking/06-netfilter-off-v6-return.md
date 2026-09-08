@@ -1,13 +1,13 @@
 ---
-id: OEN-06
+id: "OEN-06"
 title: "Netfilter-off IPv6 return-path blackhole"
-kind: original
-status: active
-edition: 1
-date_published: 2026-09-08
-author: Eugene Armstead
-author_url: https://www.armsteadent.com/
-canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/networking/06-netfilter-off-v6-return.html
+kind: "original"
+status: "active"
+edition: 2
+date_published: "2026-09-08"
+author: "Eugene Armstead"
+author_url: "https://www.armsteadent.com/"
+canonical: "https://eugenearmstead.github.io/overlay-and-edge-notes/networking/06-netfilter-off-v6-return.html"
 keywords:
   - "NetfilterMode=off IPv6 blackhole"
   - "nft prerouting mark FIB"
@@ -21,67 +21,66 @@ keywords:
   - "conntrack split nft ip6tables"
   - "ip -6 route get iif tunnel"
   - "Headscale ULA return"
-backs: []
+backs:
+  []
 backed_by:
   - OEN-S27
 description: "With overlay netfilter off, an nft prerouting mark does not win the first IPv6 route lookup. Use one ip6tables path and install the overlay unique-local /48 on table 52 and main."
 terms:
-  - abbr: OEN
-    expansion: Overlay and Edge Notes
-  - abbr: SSH
-    expansion: Secure Shell
-  - abbr: VPS
-    expansion: Virtual Private Server
-  - abbr: LAN
-    expansion: Local Area Network
-  - abbr: WAN
-    expansion: Wide Area Network
-  - abbr: TCP
-    expansion: Transmission Control Protocol
-  - abbr: MTU
-    expansion: Maximum Transmission Unit
-  - abbr: ICMP
-    expansion: Internet Control Message Protocol
+  - abbr: ControlPath
+    expansion: OpenSSH multiplexing socket path option
+  - abbr: DNS
+    expansion: Domain Name System
+  - abbr: FIB
+    expansion: forwarding information base
+  - abbr: FORWARD
+    expansion: netfilter/iptables forward chain
+  - abbr: GCP
+    expansion: Google Cloud Platform
   - abbr: HTTP
     expansion: Hypertext Transfer Protocol
   - abbr: HTTPS
     expansion: Hypertext Transfer Protocol Secure
+  - abbr: ICMP
+    expansion: Internet Control Message Protocol
   - abbr: IPv4
     expansion: Internet Protocol version 4
   - abbr: IPv6
     expansion: Internet Protocol version 6
-  - abbr: DNS
-    expansion: Domain Name System
-  - abbr: NAT
-    expansion: network address translation
-  - abbr: SNAT
-    expansion: source network address translation
-  - abbr: ULA
-    expansion: unique-local address (IPv6)
-  - abbr: GCP
-    expansion: Google Cloud Platform
-  - abbr: VM
-    expansion: virtual machine
-  - abbr: NIC
-    expansion: network interface card
-  - abbr: FIB
-    expansion: forwarding information base
-  - abbr: nft
-    expansion: nftables (Linux packet filter)
-  - abbr: FORWARD
-    expansion: netfilter/iptables forward chain
-  - abbr: MASQUERADE
-    expansion: iptables masquerade (source NAT)
-  - abbr: PREROUTING
-    expansion: netfilter prerouting chain
+  - abbr: LAN
+    expansion: Local Area Network
   - abbr: MARK
     expansion: netfilter packet mark
-  - abbr: ControlPath
-    expansion: OpenSSH multiplexing socket path option
+  - abbr: MASQUERADE
+    expansion: iptables masquerade (source NAT)
+  - abbr: NAT
+    expansion: network address translation
+  - abbr: nft
+    expansion: nftables (Linux packet filter)
+  - abbr: NIC
+    expansion: network interface card
+  - abbr: OEN
+    expansion: Overlay and Edge Notes
   - abbr: Pi
     expansion: single-board computer (Raspberry Pi class)
   - abbr: POSTROUTING
     expansion: netfilter postrouting chain
+  - abbr: PREROUTING
+    expansion: netfilter prerouting chain
+  - abbr: SNAT
+    expansion: source network address translation
+  - abbr: SSH
+    expansion: Secure Shell
+  - abbr: TCP
+    expansion: Transmission Control Protocol
+  - abbr: ULA
+    expansion: unique-local address (IPv6)
+  - abbr: VM
+    expansion: virtual machine
+  - abbr: VPS
+    expansion: Virtual Private Server
+  - abbr: WAN
+    expansion: Wide Area Network
 ---
 
 # Netfilter-off IPv6 return-path blackhole
@@ -109,14 +108,14 @@ Fill this table **before** any live change. Do **not** paste real values back in
 
 | Placeholder | Operator fills | Class |
 |-------------|----------------|-------|
-| `<exit-node>` | Overlay exit node | Cloud VM or LAN Pi used as exit |
-| `<overlay-peer>` | Soak client (**not** the agent workstation) | LAN Pi |
-| `<user>` | SSH user | Guest |
-| `<overlay-tun>` | Overlay tun on the exit | Iface |
+| `<user>` | SSH user | Guest account |
+| `<exit-node>` | Overlay exit node | Cloud VM or LAN Pi |
+| `<overlay-ula>` | Overlay unique-local prefix class | ULA /48; never publish |
+| `<wg-iface>` | Commercial WireGuard iface | Router or VPS client |
+| `<wan-iface>` | WAN / public NIC | Router or VPS |
 | `<gcp-nic>` | Public NIC on a Google Cloud guest | Iface; omit on non-GCP exits |
-| `<wan-iface>` | WAN / public NIC | Iface |
-| `<mss4>` / `<mss6>` | Computed from underlay or overlay tun MTU | Formulas |
-
+| `<tunnel>` | Commercial tunnel iface on the exit | Iface |
+| `<overlay-peer>` | Soak client (not the agent workstation) | LAN Pi or phone |
 
 ## Formulas
 
@@ -136,15 +135,13 @@ MUST NOT split nft + ip6tables MASQUERADE. MUST NOT paste a real node ULA in pub
 
 ## Agent stop rule
 
-> A coding agent MUST emit a **bound runbook** (placeholders replaced from Bind).
-> MUST NOT apply live `ip rule`, nft, iptables, ip6tables, sysctl, `wg set`, daemon restart, or deploy until a **human** filled Bind.
-> MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
-> MUST NOT file an upstream bug from this page.
-> MUST NOT publish real addresses, hostnames, or custom ports.
+> MUST emit a bound runbook (`ip -6 rule`, nft/iptables variants, v4 and v6) after Bind is filled.
+> MUST NOT apply `ip rule`, nft, iptables, or sysctl until a human filled Bind.
+> MUST NOT claim the trap is fixed because ICMP ping succeeded — Verify is exit-client HTTPS both families.
+> MUST NOT file an overlay-product bug from this page.
 
 ## Procedure
 
-Placeholders only until Bind is filled: `<cloud-vps>`, `<lan-pi>`, `<overlay-peer>`, `<exit-node>`, `<wg-iface>`, `<gcp-nic>`, plus the Bind extras on this page.
 
 ### Copy-paste commands (after Bind)
 
@@ -205,6 +202,10 @@ MUST NOT split nft MASQUERADE and ip6tables MASQUERADE. MUST NOT add a second `-
 - MUST NOT apply live network or firewall changes until Bind is filled by a human.
 - MUST NOT claim a fix on ICMP ping alone when Verify names TCP, SSH, or HTTPS.
 - MUST NOT publish hostnames, addresses, ULAs, or custom ports.
+
+## Page changelog
+
+- Edition 2 (8 Sep 2026, Mountain Time): Trap-specific Bind and agent stop rule (review cleanup).
 
 ## Related specs
 

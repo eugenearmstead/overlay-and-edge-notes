@@ -28,36 +28,18 @@ terms:
     expansion: Local Area Network
   - abbr: VPN
     expansion: Virtual Private Network
-  - abbr: WG
-    expansion: WireGuard
   - abbr: WireGuard
     expansion: UDP-based VPN protocol
-  - abbr: SSH
-    expansion: Secure Shell
-  - abbr: IP
-    expansion: Internet Protocol
-  - abbr: IPv4
-    expansion: Internet Protocol version 4
-  - abbr: IPv6
-    expansion: Internet Protocol version 6
   - abbr: MTU
     expansion: Maximum Transmission Unit
   - abbr: MSS
     expansion: Maximum Segment Size
-  - abbr: GCP
-    expansion: Google Cloud Platform
   - abbr: HTML
     expansion: HyperText Markup Language
-  - abbr: URL
-    expansion: Uniform Resource Locator
   - abbr: KB
     expansion: kilobyte
-  - abbr: UDP
-    expansion: User Datagram Protocol
   - abbr: Pi
     expansion: single-board computer (Raspberry Pi class)
-  - abbr: README
-    expansion: repository citation index in Markdown
 ---
 
 # Disclosure and license
@@ -66,7 +48,7 @@ terms:
 **Website:** <https://www.armsteadent.com/>  
 **License:** [Creative Commons Attribution 4.0 International](https://creativecommons.org/licenses/by/4.0/) ([LICENSE](LICENSE) in this repository)
 
-These pages are **field notes**: named failure modes with procedures another operator or coding agent can run. They are not a product manual, not legal advice, and not a map of any private network.
+These pages are **field notes**: named failure modes with procedures another operator or coding agent can run. Overlay and Edge Notes (OEN) is not a product manual, not legal advice, and not a map of any private network.
 
 ## What you may copy
 
