@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Overlay and Edge Notes — Eugene Armstead</title>
+    <meta name="description" content="Living field notes on overlay SSH path MTU, commercial WireGuard, cloud exit nodes, and edge HTML. Written by Eugene Armstead.">
+    <link rel="canonical" href="https://eugenearmstead.github.io/overlay-and-edge-notes/">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Source+Sans+3:wght@400;500;600&amp;display=swap">
+    <link rel="stylesheet" href="assets/spec.css">
+    <link rel="describedby" href="llms.txt">
+    <meta name="author" content="Eugene Armstead">
+    <meta name="citation_author" content="Eugene Armstead">
+    <meta name="dcterms.creator" content="Eugene Armstead">
+    <link rel="author" href="https://www.armsteadent.com/">
+    <meta property="article:author" content="Eugene Armstead">
+    <meta property="og:see_also" content="https://www.armsteadent.com/">
+    <meta property="og:title" content="Overlay and Edge Notes — Eugene Armstead">
+    <meta property="og:description" content="Living field notes on overlay SSH path MTU, commercial WireGuard, cloud exit nodes, and edge HTML. Written by Eugene Armstead.">
+    <meta property="og:url" content="https://eugenearmstead.github.io/overlay-and-edge-notes/">
+    <meta property="og:type" content="website">
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Overlay and Edge Notes",
+  "url": "https://eugenearmstead.github.io/overlay-and-edge-notes/",
+  "description": "Living field notes on overlay SSH path MTU, commercial WireGuard, cloud exit nodes, and edge HTML. Written by Eugene Armstead.",
+  "author": {
+    "@type": "Person",
+    "name": "Eugene Armstead",
+    "url": "https://www.armsteadent.com/",
+    "sameAs": [
+      "https://github.com/eugenearmstead"
+    ]
+  },
+  "publisher": {
+    "@type": "Person",
+    "name": "Eugene Armstead",
+    "url": "https://www.armsteadent.com/",
+    "sameAs": [
+      "https://github.com/eugenearmstead"
+    ]
+  },
+  "license": "https://creativecommons.org/licenses/by/4.0/"
+}
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <div class="site-header-inner">
+        <p class="site-title"><a href="index.html">Overlay and Edge Notes</a></p>
+        <p class="site-tag">Public field notes by Eugene Armstead</p>
+    <nav class="site-nav" aria-label="Site">
+      <a href="index.html">Home</a>
+      <a href="DISCLOSURE.html">Disclosure</a>
+      <a href="AGENTS.md">AGENTS.md</a>
+      <a href="index.html#networking">Networking</a>
+      <a href="index.html#web">Web</a>
+      <a href="index.html#supporting">Supporting</a>
+      <a href="index.html#editions">Editions</a>
+    </nav>
+      </div>
+    </header>
+    <nav class="breadcrumb" aria-label="Breadcrumb"><ol><li>Home</li></ol></nav>
+    <main id="main">
+      <div class="page-body">
+        <h1>Overlay and Edge Notes</h1>
+        <p class="lede">Named traps with replicable procedures. Stable IDs that do not reset by year. Markdown is the source of truth; HTML is generated.</p>
+        <p>This first inspectable slice ships a handful of originals plus one supporting method. The citation index lists the full planned set. Unbuilt IDs are marked forthcoming and are not links.</p>
+        <section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>OEN</dt><dd>Overlay and Edge Notes (this series)</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>TLS</dt><dd>Transport Layer Security</dd><dt>DNS</dt><dd>Domain Name System</dd><dt>VPN</dt><dd>Virtual Private Network</dd><dt>MTU</dt><dd>Maximum Transmission Unit</dd><dt>TCP</dt><dd>Transmission Control Protocol</dd><dt>MSS</dt><dd>Maximum Segment Size</dd><dt>TCPMSS</dt><dd>iptables/nft target that sets TCP Maximum Segment Size</dd><dt>PeerAPI</dt><dd>overlay peer application-programming interface (exit DNS over HTTPS)</dd><dt>ULA</dt><dd>unique-local address (IPv6)</dd><dt>LAN</dt><dd>Local Area Network</dd><dt>VPS</dt><dd>Virtual Private Server</dd><dt>WG</dt><dd>WireGuard</dd><dt>WireGuard</dt><dd>UDP-based VPN protocol</dd><dt>GCP</dt><dd>Google Cloud Platform</dd><dt>IP</dt><dd>Internet Protocol</dd><dt>IPv4</dt><dd>Internet Protocol version 4</dd><dt>IPv6</dt><dd>Internet Protocol version 6</dd><dt>IAP</dt><dd>Identity-Aware Proxy</dd><dt>NAT</dt><dd>network address translation</dd><dt>UDP</dt><dd>User Datagram Protocol</dd><dt>HTML</dt><dd>HyperText Markup Language</dd><dt>HTTP</dt><dd>Hypertext Transfer Protocol</dd><dt>HTTPS</dt><dd>Hypertext Transfer Protocol Secure</dd><dt>CDN</dt><dd>content delivery network</dd><dt>CSS</dt><dd>Cascading Style Sheets</dd><dt>LLM</dt><dd>large language model</dd><dt>ICMP</dt><dd>Internet Control Message Protocol</dd><dt>DF</dt><dd>don&#x27;t-fragment (IP flag)</dd><dt>PMTUD</dt><dd>path MTU discovery</dd><dt>RDP</dt><dd>Remote Desktop Protocol</dd><dt>ACL</dt><dd>access-control list</dd><dt>NTS</dt><dd>Network Time Security</dd><dt>FIB</dt><dd>forwarding information base</dd><dt>CAPI</dt><dd>CrowdSec Central API</dd><dt>API</dt><dd>application programming interface</dd><dt>KEX</dt><dd>key exchange</dd><dt>VPC</dt><dd>Virtual Private Cloud</dd><dt>DoH</dt><dd>DNS over HTTPS</dd><dt>RD</dt><dd>Recursion Desired (DNS flag)</dd><dt>nft</dt><dd>nftables (Linux packet filter)</dd><dt>WAL</dt><dd>write-ahead log</dd><dt>JSON</dt><dd>JavaScript Object Notation</dd><dt>SCP</dt><dd>secure copy</dd><dt>CLI</dt><dd>command-line interface</dd><dt>VM</dt><dd>virtual machine</dd><dt>KB</dt><dd>kilobyte</dd><dt>MB</dt><dd>megabyte</dd><dt>RAM</dt><dd>random-access memory</dd><dt>HIT</dt><dd>cache HIT (content still served from cache)</dd><dt>PORT</dt><dd>overlay UDP listen port setting</dd><dt>FORWARD</dt><dd>netfilter/iptables forward chain</dd><dt>MARK</dt><dd>netfilter packet mark</dd><dt>PREROUTING</dt><dd>netfilter prerouting chain</dd><dt>TS_DEBUG_MTU</dt><dd>overlay debug environment variable that sets tunnel MTU</dd><dt>ControlPath</dt><dd>OpenSSH multiplexing socket path option</dd><dt>canIpForward</dt><dd>Google Cloud instance flag that allows IP forwarding</dd><dt>SUnreclaim</dt><dd>kernel slab unreclaimable memory</dd><dt>FC</dt><dd>flow-cache (Broadcom hardware forwarding cache)</dd><dt>PATH</dt><dd>Unix executable search path</dd><dt>Pi</dt><dd>single-board computer (Raspberry Pi class)</dd><dt>REFUSES</dt><dd>DNS response code meaning the server will not answer</dd><dt>UDP</dt><dd>User Datagram Protocol</dd></dl></section>
+        <h2 id="about">About</h2>
+        <ul>
+          <li><a href="DISCLOSURE.html">Disclosure and license</a></li>
+          <li><a href="AGENTS.md">How agents should apply it (AGENTS.md)</a></li>
+          <li><a href="llms.txt">llms.txt</a> for crawlers and coding agents</li>
+        </ul>
+        <h2 id="networking">Original specs — Networking</h2>
+        <ol class="catalog"><li><span class="id">OEN-01</span><span><a href="networking/01-overlay-ssh-byte-cliff.html">Overlay SSH stalls at a byte cliff</a></span></li><li><span class="id">OEN-02</span><span>Chromium TLS fails while curl returns 200 <span class="forthcoming">(forthcoming)</span></span></li><li><span class="id">OEN-03</span><span>Router VPN DNS hijack looks like a path-MTU problem <span class="forthcoming">(forthcoming)</span></span></li><li><span class="id">OEN-04</span><span>Exit-node TCP maximum-segment-size clamp after ts-forward never runs <span class="forthcoming">(forthcoming)</span></span></li><li><span class="id">OEN-05</span><span>Exit-node overlay peer-API DNS stub (loopback only) <span class="forthcoming">(forthcoming)</span></span></li><li><span class="id">OEN-06</span><span>Netfilter-off IPv6 return-path blackhole <span class="forthcoming">(forthcoming)</span></span></li><li><span class="id">OEN-07</span><span>CrowdSec Central API HTTP 403 from native health probes <span class="forthcoming">(forthcoming)</span></span></li><li><span class="id">OEN-12</span><span>Consumer-router WireGuard FORWARD only on a phantom bridge <span class="forthcoming">(forthcoming)</span></span></li><li><span class="id">OEN-13</span><span>Overlay ≠ underlay ≠ tunnel unique-local ≠ LAN unique-local <span class="forthcoming">(forthcoming)</span></span></li><li><span class="id">OEN-14</span><span>Exit app DNS is overlay peer-API, not coordinator Unbound <span class="forthcoming">(forthcoming)</span></span></li><li><span class="id">OEN-15</span><span>Split host vs overlay resolver views on the coordinator VPS <span class="forthcoming">(forthcoming)</span></span></li><li><span class="id">OEN-16</span><span><a href="networking/16-commercial-wg-endpoint-rotation.html">Commercial WireGuard endpoint rotation (IPv6, shuffle bag, hub watch)</a></span></li><li><span class="id">OEN-17</span><span><a href="networking/17-gcp-overlay-exit.html">Google Cloud overlay exit (IP forwarding, listen port, Identity-Aware Proxy)</a></span></li><li><span class="id">OEN-18</span><span><a href="networking/18-per-node-changelog-contract.html">Per-node changelog contract (repo + hashed on-device copy)</a></span></li><li><span class="id">OEN-19</span><span>Local Unbound REFUSES overlay peer-API queries with Recursion Desired off <span class="forthcoming">(forthcoming)</span></span></li><li><span class="id">OEN-20</span><span>LAN unique-local + remote exit: IPv4 takes the exit, IPv6 leaks <span class="forthcoming">(forthcoming)</span></span></li><li><span class="id">OEN-21</span><span>Shared commercial-VPN network address translation: CrowdSec bans the whole house <span class="forthcoming">(forthcoming)</span></span></li><li><span class="id">OEN-22</span><span>Delayed WireGuard start wipes FORWARD with no restart event <span class="forthcoming">(forthcoming)</span></span></li><li><span class="id">OEN-23</span><span>Cloud-exit accept-dns=true pretty-prints, breaks overlay peer-API DNS <span class="forthcoming">(forthcoming)</span></span></li></ol>
+        <h2 id="web">Original specs — Web and Cloudflare</h2>
+        <ol class="catalog"><li><span class="id">OEN-08</span><span><a href="web/08-worker-html-localhost-debug.html">Do not ship localhost debug beacons in Worker HTML</a></span></li><li><span class="id">OEN-09</span><span>Git merge is not a live Worker (timed Wrangler fallback) <span class="forthcoming">(forthcoming)</span></span></li><li><span class="id">OEN-10</span><span>One generated blocking stylesheet and variable fonts <span class="forthcoming">(forthcoming)</span></span></li><li><span class="id">OEN-11</span><span>Worker chat wrapper, Turnstile, sanitize large-language-model drift <span class="forthcoming">(forthcoming)</span></span></li></ol>
+        <h2 id="supporting">Supporting specs</h2>
+        <ol class="catalog"><li><span class="id">OEN-S01</span><span><a href="supporting/s01-pmtud-size-ladder.html">Don&#x27;t-fragment ping size ladder (path MTU discovery)</a></span></li><li><span class="id">OEN-S02</span><span>clamp-mss-to-pmtu is a no-op when ICMP is dropped <span class="forthcoming">(forthcoming)</span></span></li><li><span class="id">OEN-S03</span><span>1 KB vs 1 MB transfer matrix + ControlPath=none <span class="forthcoming">(forthcoming)</span></span></li><li><span class="id">OEN-S04</span><span>Purge the content delivery network after deploy <span class="forthcoming">(forthcoming)</span></span></li><li><span class="id">OEN-S05</span><span>Tunnel preview HIT with a stale body <span class="forthcoming">(forthcoming)</span></span></li><li><span class="id">OEN-S06</span><span>Do not ship HTML-only <span class="forthcoming">(forthcoming)</span></span></li><li><span class="id">OEN-S07</span><span>Git merge 405 while mergeability is pending <span class="forthcoming">(forthcoming)</span></span></li><li><span class="id">OEN-S08</span><span>Canonical disk + tmpfs RAM origin on a Pi <span class="forthcoming">(forthcoming)</span></span></li><li><span class="id">OEN-S09</span><span>Playwright Desktop + iPhone + Pixel <span class="forthcoming">(forthcoming)</span></span></li><li><span class="id">OEN-S10</span><span>file(1) before image deploy <span class="forthcoming">(forthcoming)</span></span></li><li><span class="id">OEN-S11</span><span>Overlay session-mirror remote desktop and access-control list without deny <span class="forthcoming">(forthcoming)</span></span></li><li><span class="id">OEN-S12</span><span>Rocket Loader Off <span class="forthcoming">(forthcoming)</span></span></li><li><span class="id">OEN-S13</span><span>Restart=always on a missing unit hung the workstation <span class="forthcoming">(forthcoming)</span></span></li><li><span class="id">OEN-S14</span><span>Broadcom in-kernel WireGuard SUnreclaim (flow-cache/runner A/B fail) <span class="forthcoming">(forthcoming)</span></span></li><li><span class="id">OEN-S15</span><span>Router squashfs is always 100%; Save settings misses persistent overlay <span class="forthcoming">(forthcoming)</span></span></li><li><span class="id">OEN-S16</span><span>Never nft flush / never start stock nftables.service <span class="forthcoming">(forthcoming)</span></span></li><li><span class="id">OEN-S17</span><span>Coordination CLI blocks on SQLite write-ahead log while serve is up <span class="forthcoming">(forthcoming)</span></span></li><li><span class="id">OEN-S18</span><span>Do not set exit-node on the agent workstation <span class="forthcoming">(forthcoming)</span></span></li><li><span class="id">OEN-S19</span><span>Push small overlay snapshots; do not copy-pull large JSON <span class="forthcoming">(forthcoming)</span></span></li><li><span class="id">OEN-S20</span><span>SSH TCP-open with no banner is userspace-sick <span class="forthcoming">(forthcoming)</span></span></li><li><span class="id">OEN-S21</span><span>Cloud exit hairpins home LAN HTTP while overlay SSH still works <span class="forthcoming">(forthcoming)</span></span></li><li><span class="id">OEN-S22</span><span>Identity-Aware Proxy is break-glass; overlay SSH key-exchange can fail on some cloud VMs <span class="forthcoming">(forthcoming)</span></span></li><li><span class="id">OEN-S23</span><span>Cloud firewall UDP 41641 is useless while overlay PORT=0 <span class="forthcoming">(forthcoming)</span></span></li><li><span class="id">OEN-S24</span><span>LAN DNS returning 0.0.0.0 is a sinkhole, not a site bug <span class="forthcoming">(forthcoming)</span></span></li><li><span class="id">OEN-S25</span><span>Network Time Security chrony address-family flags need a newer chrony than the distro <span class="forthcoming">(forthcoming)</span></span></li><li><span class="id">OEN-S26</span><span>Wi-Fi underlay vs cellular underlay to the same cloud exit <span class="forthcoming">(forthcoming)</span></span></li><li><span class="id">OEN-S27</span><span>iptables-nft PREROUTING MARK does not win before the forwarding information base <span class="forthcoming">(forthcoming)</span></span></li><li><span class="id">OEN-S28</span><span>Reconnect during overlay peer-API outage sticks after heal <span class="forthcoming">(forthcoming)</span></span></li><li><span class="id">OEN-S29</span><span>Overlay peer-API stub event-loop blocks; UDP receive queue grows <span class="forthcoming">(forthcoming)</span></span></li><li><span class="id">OEN-S30</span><span>TS_DEBUG_MTU below 1280 disables overlay IPv6 <span class="forthcoming">(forthcoming)</span></span></li><li><span class="id">OEN-S31</span><span>prefixes.v6 needs nodes backfillips, not restart alone <span class="forthcoming">(forthcoming)</span></span></li><li><span class="id">OEN-S32</span><span>DNS leak-test green is not IPv6 data-plane green <span class="forthcoming">(forthcoming)</span></span></li><li><span class="id">OEN-S33</span><span>Consumer-router cron PATH omits curl; watchdog log() + set -e exits <span class="forthcoming">(forthcoming)</span></span></li><li><span class="id">OEN-S34</span><span>CrowdSec free-tier Central API login budget <span class="forthcoming">(forthcoming)</span></span></li></ol>
+        <h2 id="editions">Editions</h2>
+        <p><span class="forthcoming">2026 year index forthcoming</span> after this slice is reviewed. Year pages are indexes, not copies of specs.</p>
+      </div>
+    </main>
+    <footer class="site-footer">
+      <div class="site-footer-inner">
+    <p class="byline">Written by <a href="https://www.armsteadent.com/">Eugene Armstead</a> · <a href="https://www.armsteadent.com/">https://www.armsteadent.com/</a> · <a rel="license" href="https://creativecommons.org/licenses/by/4.0/">CC-BY-4.0</a></p>
+    <p class="license-line">Living field notes. Stable IDs. Do not copy private inventory into public text.</p>
+      </div>
+    </footer>
+  </body>
+</html>

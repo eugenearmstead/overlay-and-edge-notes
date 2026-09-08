@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>OEN-08: Do not ship localhost debug beacons in Worker HTML — Overlay and Edge Notes</title>
+    <meta name="description" content="Agent debug templates that fetch 127.0.0.1 ingest URLs must never ship in Cloudflare Worker HTML; browsers prompt for local-network access on public HTTPS pages.">
+    <link rel="canonical" href="https://eugenearmstead.github.io/overlay-and-edge-notes/web/08-worker-html-localhost-debug.html">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Source+Sans+3:wght@400;500;600&amp;display=swap">
+    <link rel="stylesheet" href="../assets/spec.css">
+    <link rel="describedby" href="../llms.txt">
+    <meta name="author" content="Eugene Armstead">
+    <meta name="citation_author" content="Eugene Armstead">
+    <meta name="dcterms.creator" content="Eugene Armstead">
+    <link rel="author" href="https://www.armsteadent.com/">
+    <meta property="article:author" content="Eugene Armstead">
+    <meta property="og:see_also" content="https://www.armsteadent.com/">
+    <meta property="og:title" content="OEN-08: Do not ship localhost debug beacons in Worker HTML — Overlay and Edge Notes">
+    <meta property="og:description" content="Agent debug templates that fetch 127.0.0.1 ingest URLs must never ship in Cloudflare Worker HTML; browsers prompt for local-network access on public HTTPS pages.">
+    <meta property="og:url" content="https://eugenearmstead.github.io/overlay-and-edge-notes/web/08-worker-html-localhost-debug.html">
+    <meta property="og:type" content="article">
+    <meta property="article:published_time" content="2026-09-07">
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "TechArticle",
+      "@id": "https://eugenearmstead.github.io/overlay-and-edge-notes/web/08-worker-html-localhost-debug.html#article",
+      "headline": "Do not ship localhost debug beacons in Worker HTML",
+      "description": "Agent debug templates that fetch 127.0.0.1 ingest URLs must never ship in Cloudflare Worker HTML; browsers prompt for local-network access on public HTTPS pages.",
+      "datePublished": "2026-09-07",
+      "author": {
+        "@type": "Person",
+        "name": "Eugene Armstead",
+        "url": "https://www.armsteadent.com/",
+        "sameAs": [
+          "https://github.com/eugenearmstead"
+        ]
+      },
+      "url": "https://eugenearmstead.github.io/overlay-and-edge-notes/web/08-worker-html-localhost-debug.html",
+      "identifier": "OEN-08",
+      "license": "https://creativecommons.org/licenses/by/4.0/",
+      "inLanguage": "en"
+    },
+    {
+      "@type": "HowTo",
+      "name": "Do not ship localhost debug beacons in Worker HTML",
+      "description": "Agent debug templates that fetch 127.0.0.1 ingest URLs must never ship in Cloudflare Worker HTML; browsers prompt for local-network access on public HTTPS pages.",
+      "author": {
+        "@type": "Person",
+        "name": "Eugene Armstead",
+        "url": "https://www.armsteadent.com/",
+        "sameAs": [
+          "https://github.com/eugenearmstead"
+        ]
+      },
+      "step": [
+        {
+          "@type": "HowToStep",
+          "position": 1,
+          "name": "P1 \u2014 Search the ship tree before deploy.",
+          "text": "Action: From the Worker/UI root:"
+        },
+        {
+          "@type": "HowToStep",
+          "position": 2,
+          "name": "P2 \u2014 Classify leftover hits.",
+          "text": "Action: If `rg` matches an agent-only Node script that never ships, keep it off the bundle. Prefer file logging. Expected: Client-executed strings are clean. Agent-only scripts MAY log locally. On failure: Move instrumentation out of templates."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 3,
+          "name": "P3 \u2014 Do not add edge fetch to loopback.",
+          "text": "Action: Review Worker `fetch` handlers for `127.0.0.1` / `localhost`. Expected: None. The edge cannot reach the author\u2019s machine. On failure: Remove it. Use `console.log` on the isolate or an origin you actually control."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 4,
+          "name": "P4 \u2014 After a bad ship, clean cache.",
+          "text": "Action: Remove beacons, redeploy, purge the HTML URL if a content delivery network (CDN) caches it (forthcoming OEN-S04). Ask the operator to Block the prompt if it still appears, then hard-refresh. Expected: View-source on the live HTML has zero `7450` / `X-Debug-Session-Id`. On failure: Search generated strings, not only source files (templates may interpolate)."
+        }
+      ]
+    }
+  ]
+}
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <div class="site-header-inner">
+        <p class="site-title"><a href="../index.html">Overlay and Edge Notes</a></p>
+        <p class="site-tag">Public field notes by Eugene Armstead</p>
+    <nav class="site-nav" aria-label="Site">
+      <a href="../index.html">Home</a>
+      <a href="../DISCLOSURE.html">Disclosure</a>
+      <a href="../AGENTS.md">AGENTS.md</a>
+      <a href="../index.html#networking">Networking</a>
+      <a href="../index.html#web">Web</a>
+      <a href="../index.html#supporting">Supporting</a>
+      <a href="../index.html#editions">Editions</a>
+    </nav>
+      </div>
+    </header>
+    <nav class="breadcrumb" aria-label="Breadcrumb"><ol><li><a href="../index.html">Home</a></li><li><a href="../index.html#web">Web</a></li><li>OEN-08</li></ol></nav>
+    <main id="main">
+      <article>
+        <h1>Do not ship localhost debug beacons in Worker HTML</h1>
+        <p class="meta-line"><span>OEN-08</span> · original · edition 1 · 2026-09-07</p>
+        <h2 id="context">Context</h2>
+<p>Coding-agent debug templates often inject a browser beacon:</p>
+<pre><code class="language-js">fetch(&#x27;http://127.0.0.1:7450/ingest/…&#x27;, { /* headers include X-Debug-Session-Id */ })</code></pre>
+<p>That is fine inside a <strong>local</strong> app on the author’s machine. It is not fine inside HyperText Markup Language (HTML) or JavaScript (JS) that a <strong>Cloudflare Worker</strong> (or any public <code>https://</code> origin) sends to a real browser.</p>
+<p>Chromium and Brave then prompt: <strong>“Access other apps and services on this device”</strong> (Local Network Access). The site owner should not be the first person to see that prompt on a live page.</p>
+<p>A Worker <code>fetch(&#x27;http://127.0.0.1:…&#x27;)</code> on the <strong>edge</strong> is also useless: the isolate cannot reach the author’s personal computer (PC). It is dead code plus noise.</p>
+<p>Local Network Access (LNA) itself is documented. The unique warning is <strong>shipping agent ingest into Worker-rendered HTML</strong>.</p>
+
+<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>HTML</dt><dd>HyperText Markup Language</dd><dt>JS</dt><dd>JavaScript</dd><dt>HTTP</dt><dd>Hypertext Transfer Protocol</dd><dt>HTTPS</dt><dd>Hypertext Transfer Protocol Secure</dd><dt>URL</dt><dd>Uniform Resource Locator</dd><dt>CDN</dt><dd>content delivery network</dd><dt>NDJSON</dt><dd>newline-delimited JavaScript Object Notation</dd><dt>LNA</dt><dd>Local Network Access (browser permission)</dd><dt>UI</dt><dd>user interface</dd><dt>PC</dt><dd>personal computer</dd><dt>JS</dt><dd>JavaScript</dd><dt>JSON</dt><dd>JavaScript Object Notation</dd><dt>HIT</dt><dd>cache HIT (content still served from cache)</dd><dt>CSS</dt><dd>Cascading Style Sheets</dd></dl></section>
+<h2 id="decision">Decision</h2>
+<p>Anything that becomes a Hypertext Transfer Protocol (HTTP) <strong>Response body</strong> (HTML templates, inline <code>&lt;script&gt;</code>, bundled browser JS) MUST NOT contain:</p>
+<ul><li><code>127.0.0.1:7450</code> or <code>localhost:7450</code></li><li><code>/ingest/</code> debug paths of that family</li><li><code>X-Debug-Session-Id</code></li></ul>
+<p>Predeploy MUST grep the Worker/UI tree and <strong>fail the ship</strong> on client-executed hits.</p>
+<p>Log from office scripts that write newline-delimited JSON (NDJSON) to a local file, or from temporary <strong>server</strong> <code>console.log</code> / audit rows — not from page JS.</p>
+<h2 id="consequences">Consequences</h2>
+<ul><li>Public pages stop triggering local-network permission prompts.</li><li>Debug still exists, just not in the browser.</li><li>If a prompt already fired, remove beacons, redeploy, and tell the operator to <strong>Block</strong> once if the old page is cached, then hard-refresh.</li></ul>
+<h2 id="procedure">Procedure</h2>
+<p>Placeholders: a Worker or static origin that emits HTML. No private site internals.</p>
+<ol><li><strong>P1 — Search the ship tree before deploy.</strong><br>
+- <strong>Action:</strong> From the Worker/UI root:</li></ol>
+<pre><code class="language-bash">     rg -n &quot;127\\.0\\.0\\.1:7450|localhost:7450|/ingest/[0-9a-f-]{8}|X-Debug-Session-Id&quot; src/ public/ || true
+     </code></pre>
+<p>- <strong>Expected:</strong> No matches in files that land in a Response body (<code>*.html</code>, <code>ui.js</code> templates, browser bundles). - <strong>On failure:</strong> Treat hits as blockers. Delete or gate them behind a build that never ships.</p>
+<ol><li><strong>P2 — Classify leftover hits.</strong><br>
+- <strong>Action:</strong> If <code>rg</code> matches an agent-only Node script that never ships, keep it off the bundle. Prefer file logging.<br>
+- <strong>Expected:</strong> Client-executed strings are clean. Agent-only scripts MAY log locally.<br>
+- <strong>On failure:</strong> Move instrumentation out of templates.</li><li><strong>P3 — Do not add edge fetch to loopback.</strong><br>
+- <strong>Action:</strong> Review Worker <code>fetch</code> handlers for <code>127.0.0.1</code> / <code>localhost</code>.<br>
+- <strong>Expected:</strong> None. The edge cannot reach the author’s machine.<br>
+- <strong>On failure:</strong> Remove it. Use <code>console.log</code> on the isolate or an origin you actually control.</li><li><strong>P4 — After a bad ship, clean cache.</strong><br>
+- <strong>Action:</strong> Remove beacons, redeploy, purge the HTML URL if a content delivery network (CDN) caches it (forthcoming OEN-S04). Ask the operator to Block the prompt if it still appears, then hard-refresh.<br>
+- <strong>Expected:</strong> View-source on the live HTML has zero <code>7450</code> / <code>X-Debug-Session-Id</code>.<br>
+- <strong>On failure:</strong> Search generated strings, not only source files (templates may interpolate).</li></ol>
+<h2 id="verify">Verify</h2>
+<ul><li>Predeploy <code>rg</code> is clean for client-executed paths.</li><li>Live view-source has no loopback ingest URL.</li><li>No Worker code fetches loopback.</li><li>A browser on a fresh profile does not show a local-network permission prompt on that page.</li></ul>
+<h2 id="must-not" class="must-not">MUST NOT</h2>
+<ul><li>MUST NOT leave Cursor/agent ingest beacons in Worker HTML, even “just for this debug session.”</li><li>MUST NOT fetch <code>127.0.0.1</code> from page JS on a public <code>https://</code> origin.</li><li>MUST NOT fetch <code>127.0.0.1</code> from the Worker isolate expecting to reach the author’s PC.</li><li>MUST NOT ship HTML comments that still contain ingest URLs (view-source is public).</li><li>MUST NOT tell the operator the prompt is a “browser bug” before grepping the response body.</li></ul>
+<h2 id="related-specs">Related specs</h2>
+<ul><li>OEN-09 Git merge is not a live Worker (forthcoming)</li><li>OEN-S04 purge the CDN after deploy (forthcoming)</li><li>OEN-S05 tunnel preview HIT with a stale body (forthcoming)</li><li>OEN-S06 do not ship HTML-only (forthcoming)</li></ul>
+<h2 id="prior-art-not-novel">Prior art (Not novel)</h2>
+<p>Local Network Access prompts and “don’t call localhost from production” are known. This spec’s claim is the <strong>agent-ingest + Worker HTML</strong> failure mode: templates designed for a desktop debug port leaking onto a public HTTPS response.</p>
+      </article>
+    </main>
+    <footer class="site-footer">
+      <div class="site-footer-inner">
+    <p class="byline">Written by <a href="https://www.armsteadent.com/">Eugene Armstead</a> · <a href="https://www.armsteadent.com/">https://www.armsteadent.com/</a> · <a rel="license" href="https://creativecommons.org/licenses/by/4.0/">CC-BY-4.0</a></p>
+    <p class="license-line">Living field notes. Stable IDs. Do not copy private inventory into public text.</p>
+      </div>
+    </footer>
+  </body>
+</html>

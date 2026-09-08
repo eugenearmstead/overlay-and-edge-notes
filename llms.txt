@@ -1,0 +1,21 @@
+# Overlay and Edge Notes
+
+> Field notes by Eugene Armstead (https://www.armsteadent.com/). Living specs with stable IDs. CC-BY-4.0. Placeholders only: <cloud-vps>, <lan-pi>, <overlay-peer>, <exit-node>, <wg-iface>, <gcp-nic>.
+
+## Original specs (built)
+
+- [OEN-01 Overlay SSH stalls at a byte cliff](https://eugenearmstead.github.io/overlay-and-edge-notes/networking/01-overlay-ssh-byte-cliff.html): living spec
+- [OEN-16 Commercial WireGuard endpoint rotation (IPv6, shuffle bag, hub watch)](https://eugenearmstead.github.io/overlay-and-edge-notes/networking/16-commercial-wg-endpoint-rotation.html): living spec
+- [OEN-17 Google Cloud overlay exit (IP forwarding, listen port, Identity-Aware Proxy)](https://eugenearmstead.github.io/overlay-and-edge-notes/networking/17-gcp-overlay-exit.html): living spec
+- [OEN-18 Per-node changelog contract (repo + hashed on-device copy)](https://eugenearmstead.github.io/overlay-and-edge-notes/networking/18-per-node-changelog-contract.html): living spec
+- [OEN-08 Do not ship localhost debug beacons in Worker HTML](https://eugenearmstead.github.io/overlay-and-edge-notes/web/08-worker-html-localhost-debug.html): living spec
+
+## Supporting specs (built)
+
+- [OEN-S01 Don't-fragment ping size ladder (path MTU discovery)](https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s01-pmtud-size-ladder.html): supporting method
+
+## About
+
+- [Disclosure and license](https://eugenearmstead.github.io/overlay-and-edge-notes/DISCLOSURE.html): author, site, CC-BY-4.0
+- [AGENTS.md](https://eugenearmstead.github.io/overlay-and-edge-notes/AGENTS.md): how coding agents MUST apply these specs
+- [Home](https://eugenearmstead.github.io/overlay-and-edge-notes/): citation index of all planned IDs (unbuilt rows are forthcoming)
