@@ -90,7 +90,7 @@
           "@type": "HowToStep",
           "position": 3,
           "name": "P3 \u2014 Trust rotating VPN egress; unban; restart bouncer.",
-          "text": "Action: Add the current tunnel egress (v4 and v6) to the trusted set used by CrowdSec. Delete the ban. Restart the bouncer. After [OEN-16](16-commercial-wg-endpoint-rotation.md) hops, refresh the set. Expected: Login HTTPS and SSH recover for the house. On failure: If it fails after hop, the allowlist is stale \u2014 refresh, do not add more bans."
+          "text": "Action: Add the current tunnel egress (v4 and v6) to the trusted set used by CrowdSec. Delete the ban. Restart the bouncer. After a **verified** [OEN-16](16-commercial-wg-endpoint-rotation.md) hop, refresh the set. Expected: Login HTTPS and SSH recover for the house. On failure: If it fails after hop, the allowlist is stale \u2014 refresh, do not add more bans."
         },
         {
           "@type": "HowToStep",
@@ -126,7 +126,7 @@
     <main id="main">
       <article>
         <h1>Shared commercial-VPN network address translation: CrowdSec bans the whole house</h1>
-        <p class="meta-line"><span>OEN-21</span> · original · edition 2 · 2026-09-08</p>
+        <p class="meta-line"><span>OEN-21</span> · original · edition 3 · 2026-09-08</p>
         <h2 id="context">Context</h2>
 <p>Many Local Area Network (LAN) and overlay clients share one commercial Virtual Private Network (VPN) egress. CrowdSec (sshd / Caddy) bans that <strong>single public IP</strong>. Coordination, login Hypertext Transfer Protocol Secure (HTTPS), and Secure Shell (SSH) to the Virtual Private Server (VPS) look dead for everyone. Overlay <strong>direct User Datagram Protocol (UDP)</strong> often still works.</p>
 <p>Distinct from <a href="07-crowdsec-capi-403.html">OEN-07</a> (Central API 403 from health probes). MUST NOT document trusted-egress push architecture, root forced-command, or token payload.</p>
@@ -141,9 +141,9 @@ Distinct from CAPI 403 ([OEN-07](07-crowdsec-capi-403.html))</code></pre>
 <p>Fill this table <strong>before</strong> any live change. Do <strong>not</strong> paste real values back into public notes.</p>
 <table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><code>&lt;user&gt;</code></td><td>SSH user</td><td>Guest account</td></tr><tr><td><code>&lt;cloud-vps&gt;</code></td><td>Cloud VPS under test</td><td>Cloud VPS</td></tr></tbody></table>
 <h2 id="formulas">Formulas</h2>
-<p>Treat rotating VPN egress (v4+v6) as trusted; refresh after hop (<a href="16-commercial-wg-endpoint-rotation.html">OEN-16</a>). No token payloads in public notes.</p>
+<p>Treat rotating VPN egress (v4+v6) as trusted; refresh after a <strong>verified</strong> hop (<a href="16-commercial-wg-endpoint-rotation.html">OEN-16</a>). No token payloads in public notes.</p>
 <h2 id="decision">Decision</h2>
-<p>Treat rotating VPN egress (IPv4 and IPv6) as <strong>trusted</strong> for CrowdSec on the coordination/login host. Refresh the allow after an endpoint hop (<a href="16-commercial-wg-endpoint-rotation.html">OEN-16</a>). Restart the bouncer after unban.</p>
+<p>Treat rotating VPN egress (IPv4 and IPv6) as <strong>trusted</strong> for CrowdSec on the coordination/login host. Refresh the allow after a <strong>verified</strong> endpoint hop (<a href="16-commercial-wg-endpoint-rotation.html">OEN-16</a>). Restart the bouncer after unban.</p>
 <p>Generic recipe only: allowlist the current egress, not a private push bus.</p>
 <h2 id="consequences">Consequences</h2>
 <ul><li>House traffic survives a hop without a mass ban.</li><li>Overlay UDP staying up is no longer mistaken for “the VPS is fine.”</li><li>Unban plus bouncer restart actually takes effect.</li></ul>
@@ -161,7 +161,7 @@ ssh -o ControlPath=none &lt;user&gt;@&lt;cloud-vps&gt; &#x27;echo overlay-ok&#x2
 - <strong>Action:</strong> From two LAN hosts, <code>curl -4</code> / <code>curl -6</code> “what is my IP” through the tunnel. Compare with the address CrowdSec banned (decisions list).<br>
 - <strong>Expected:</strong> Same public v4/v6 as the ban. Multiple clients share it.<br>
 - <strong>On failure:</strong> Do not paste the IP in public notes.</li><li><strong>P3 — Trust rotating VPN egress; unban; restart bouncer.</strong><br>
-- <strong>Action:</strong> Add the current tunnel egress (v4 and v6) to the trusted set used by CrowdSec. Delete the ban. Restart the bouncer. After <a href="16-commercial-wg-endpoint-rotation.html">OEN-16</a> hops, refresh the set.<br>
+- <strong>Action:</strong> Add the current tunnel egress (v4 and v6) to the trusted set used by CrowdSec. Delete the ban. Restart the bouncer. After a <strong>verified</strong> <a href="16-commercial-wg-endpoint-rotation.html">OEN-16</a> hop, refresh the set.<br>
 - <strong>Expected:</strong> Login HTTPS and SSH recover for the house.<br>
 - <strong>On failure:</strong> If it fails after hop, the allowlist is stale — refresh, do not add more bans.</li><li><strong>P4 — Do not confuse with CAPI 403.</strong><br>
 - <strong>Action:</strong> If <code>cscli capi status</code> is 403, that is <a href="07-crowdsec-capi-403.html">OEN-07</a>, not this house ban.<br>
@@ -174,7 +174,7 @@ ssh -o ControlPath=none &lt;user&gt;@&lt;cloud-vps&gt; &#x27;echo overlay-ok&#x2
 <h2 id="must-not" class="must-not">MUST NOT</h2>
 <ul><li>MUST NOT publish the banned public IP or overlay addresses.</li><li>MUST NOT document trusted-egress push, root forced-command, or token payload.</li><li>MUST NOT name the commercial VPN provider.</li><li>MUST NOT loop cscli capi status while diagnosing a ban.</li><li>MUST NOT publish hostnames, addresses, ULAs, or custom ports.</li></ul>
 <h2 id="page-changelog">Page changelog</h2>
-<ul><li>Edition 2 (8 Sep 2026, Mountain Time): Trap-specific Bind and agent stop rule (review cleanup).</li></ul>
+<ul><li>Edition 3 (10 Sep 2026, Mountain Time): Refresh trusted egress after a verified hop.</li><li>Edition 2 (8 Sep 2026, Mountain Time): Trap-specific Bind and agent stop rule (review cleanup).</li></ul>
 <h2 id="related-specs">Related specs</h2>
 <ul><li><a href="07-crowdsec-capi-403.html">OEN-07 CrowdSec CAPI 403</a></li><li><a href="16-commercial-wg-endpoint-rotation.html">OEN-16 Commercial WireGuard endpoint rotation</a></li><li><a href="01-overlay-ssh-byte-cliff.html">OEN-01 Overlay SSH byte cliff</a></li></ul>
       </article>

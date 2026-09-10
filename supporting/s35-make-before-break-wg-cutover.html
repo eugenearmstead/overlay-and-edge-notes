@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>OEN-S35: Make-before-break commercial WireGuard cutover on a cloud VPS — Overlay and Edge Notes</title>
+    <meta name="description" content="A scheduled hop on one WireGuard iface is a cold cut; spare Table=off dual-up can leave two defaults or an empty [Peer] if cutover waits a full hop interval.">
+    <meta name="keywords" content="make-before-break WireGuard, Table off spare iface, WireGuard dual default route, empty Peer section cutover, WireGuard dual-up leftover, orphan spare iface, skip warm session quota, cold wg set health hop, two consecutive tunnel probes, warm lead WireGuard, do not wg-quick every hop, cloud VPS WireGuard cutover">
+    <meta name="citation_keywords" content="make-before-break WireGuard, Table off spare iface, WireGuard dual default route, empty Peer section cutover, WireGuard dual-up leftover, orphan spare iface, skip warm session quota, cold wg set health hop, two consecutive tunnel probes, warm lead WireGuard, do not wg-quick every hop, cloud VPS WireGuard cutover">
+    <link rel="canonical" href="https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s35-make-before-break-wg-cutover.html">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Source+Sans+3:wght@400;500;600&amp;display=swap">
+    <link rel="stylesheet" href="../assets/spec.css">
+    <link rel="describedby" href="../llms.txt">
+    <meta name="author" content="Eugene Armstead">
+    <meta name="citation_author" content="Eugene Armstead">
+    <meta name="dcterms.creator" content="Eugene Armstead">
+    <link rel="author" href="https://www.armsteadent.com/">
+    <meta property="article:author" content="Eugene Armstead">
+    <meta property="og:see_also" content="https://www.armsteadent.com/">
+    <meta property="og:title" content="OEN-S35: Make-before-break commercial WireGuard cutover on a cloud VPS — Overlay and Edge Notes">
+    <meta property="og:description" content="A scheduled hop on one WireGuard iface is a cold cut; spare Table=off dual-up can leave two defaults or an empty [Peer] if cutover waits a full hop interval.">
+    <meta property="og:url" content="https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s35-make-before-break-wg-cutover.html">
+    <meta property="og:type" content="article">
+    <meta property="article:published_time" content="2026-09-10">
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "TechArticle",
+      "@id": "https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s35-make-before-break-wg-cutover.html#article",
+      "headline": "Make-before-break commercial WireGuard cutover on a cloud VPS",
+      "description": "A scheduled hop on one WireGuard iface is a cold cut; spare Table=off dual-up can leave two defaults or an empty [Peer] if cutover waits a full hop interval.",
+      "datePublished": "2026-09-10",
+      "author": {
+        "@type": "Person",
+        "name": "Eugene Armstead",
+        "url": "https://www.armsteadent.com/",
+        "sameAs": [
+          "https://github.com/eugenearmstead"
+        ]
+      },
+      "url": "https://eugenearmstead.github.io/overlay-and-edge-notes/supporting/s35-make-before-break-wg-cutover.html",
+      "identifier": "OEN-S35",
+      "license": "https://creativecommons.org/licenses/by/4.0/",
+      "inLanguage": "en",
+      "keywords": [
+        "make-before-break WireGuard",
+        "Table off spare iface",
+        "WireGuard dual default route",
+        "empty Peer section cutover",
+        "WireGuard dual-up leftover",
+        "orphan spare iface",
+        "skip warm session quota",
+        "cold wg set health hop",
+        "two consecutive tunnel probes",
+        "warm lead WireGuard",
+        "do not wg-quick every hop",
+        "cloud VPS WireGuard cutover"
+      ]
+    },
+    {
+      "@type": "HowTo",
+      "name": "Make-before-break commercial WireGuard cutover on a cloud VPS",
+      "description": "A scheduled hop on one WireGuard iface is a cold cut; spare Table=off dual-up can leave two defaults or an empty [Peer] if cutover waits a full hop interval.",
+      "author": {
+        "@type": "Person",
+        "name": "Eugene Armstead",
+        "url": "https://www.armsteadent.com/",
+        "sameAs": [
+          "https://github.com/eugenearmstead"
+        ]
+      },
+      "step": [
+        {
+          "@type": "HowToStep",
+          "position": 1,
+          "name": "P1 \u2014 Spare is `Table = off`, not a second default.",
+          "text": "Action: Read the spare config on `<cloud-vps>`. Confirm `Table = off` and that **main** has no `0.0.0.0/0` via `<wg-spare>`. Policy routing for the spare MUST stay off the main default. Expected: Production default unchanged. Spare has no default in main. On failure: Do not bring the spare up. Dual default in main is this trap."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 2,
+          "name": "P2 \u2014 Persist `[Peer]`; never a keepalive-only dump.",
+          "text": "Action: Before cutover, confirm the on-disk production config still has a `[Peer]` section with `Endpoint`, keys, and `PersistentKeepalive`. A cutover that writes `wg showconf` output with only PersistentKeepalive MUST NOT replace the file. Expected: `[Peer]` present after cutover. On failure: Restore the previous config. Do not hop again until `[Peer]` is whole."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 3,
+          "name": "P3 \u2014 Warm lead: two consecutive probes, then drain.",
+          "text": "Action: During the warm lead (tens of minutes), bring `<wg-spare>` up to the **next** leftover endpoint from OEN-16 (never current name + global unicast address (GUA)). Probe the spare twice in a row (example: Hypertext Transfer Protocol Secure (HTTPS) via `<tunnel-ula>` on the spare, or equivalent tunnel bind). After two consecutive passes, drain briefly, then take over (rename or swap so `<wg-prod>` is the live iface). Expected: Spare probes pass twice. Production takes over. Old iface down af"
+        },
+        {
+          "@type": "HowToStep",
+          "position": 4,
+          "name": "P4 \u2014 Dual-up outside the warm lead.",
+          "text": "Action: If both ifaces are up outside the lead: cut over if two probes already passed; if production is already on the spare name, drain and down the old iface then finish rename; else tear the spare. Expected: At most one production tunnel in main. Dual-up does not last until the next hop interval. On failure: An all-evening dual-up was this skip. Cut over or tear now \u2014 do not wait."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 5,
+          "name": "P5 \u2014 Orphan spare (production iface gone, rename never finished).",
+          "text": "Action: If `<wg-prod>` is gone and `<wg-spare>` is the live tunnel, finish the rename, persist `[Peer]`, and do **not** reset the verified-hop clock. Never hop to the same name + GUA. Expected: One production iface name. Verified hop clock unchanged. On failure: Do not treat the orphan as a failed hop that redraws current."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 6,
+          "name": "P6 \u2014 \u201cOld iface still up\u201d is not \u201cVPN down.\u201d",
+          "text": "Action: While the spare is probing, `<wg-prod>` SHOULD still be up. Hub watch and status JSON from OEN-16 MUST NOT treat that window as a dead tunnel. Expected: Production traffic still uses `<wg-prod>` until cutover. On failure: A hop or restart during probe is the wrong fix."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 7,
+          "name": "P7 \u2014 Skip warm near session quota; health hops stay cold.",
+          "text": "Action: If the commercial provider\u2019s session quota is **nearly full**, skip the spare. Health and handshake hops stay a **cold** `wg set` as in OEN-16 P4 (placeholders; Bind-then-stop). MUST NOT publish the numeric quota. Expected: Warm path only when quota has room. Immediate OEN-16 hops do not wait for a warm lead. On failure: A second session that the provider rejects is this skip. Stay on cold `wg set`."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 8,
+          "name": "P8 \u2014 Do not bounce production with `wg-quick` on a successful hop.",
+          "text": "Action: After a successful cold `wg set` or a finished cutover, MUST NOT `wg-quick down` / `wg-quick up` `<wg-prod>` if `wg set` (or the cutover rename) already applied the peer. A full restart can wipe FORWARD ([OEN-22](../networking/22-delayed-wg-forward-wipe.md)). Expected: Tunnel stays up. FORWARD counters still increment. On failure: Delayed Local Area Network (LAN) death after a \u201csuccessful\u201d hop is OEN-22, not a reason to hop again."
+        }
+      ]
+    }
+  ]
+}
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <div class="site-header-inner">
+        <p class="site-title"><a href="../index.html">Overlay and Edge Notes</a></p>
+        <p class="site-tag">Public field notes by Eugene Armstead</p>
+    <nav class="site-nav" aria-label="Site">
+      <a href="../index.html">Home</a>
+      <a href="../DISCLOSURE.html">Disclosure</a>
+      <a href="../changelog.html">Changelog</a>
+      <a href="../editions/2026.html">2026</a>
+      <a href="../AGENTS.md">AGENTS.md</a>
+      <a href="../index.html#networking">Networking</a>
+      <a href="../index.html#web">Web</a>
+      <a href="../index.html#supporting">Supporting</a>
+    </nav>
+      </div>
+    </header>
+    <nav class="breadcrumb" aria-label="Breadcrumb"><ol><li><a href="../index.html">Home</a></li><li><a href="../index.html#supporting">Supporting</a></li><li>OEN-S35</li></ol></nav>
+    <main id="main">
+      <article>
+        <h1>Make-before-break commercial WireGuard cutover on a cloud VPS</h1>
+        <p class="meta-line"><span>OEN-S35</span> · supporting · edition 1 · 2026-09-10</p>
+        <h2 id="context">Context</h2>
+<p>Method behind <a href="../networking/16-commercial-wg-endpoint-rotation.html">OEN-16</a> for a <strong>cloud Virtual Private Server (VPS)</strong> Internet Protocol version 6 (IPv6) WireGuard (WG) client. A scheduled hop that only runs <code>wg set</code> on the production iface is a <strong>cold cut</strong>: handshake and egress drop until the new peer is up.</p>
+<p>A <strong>spare</strong> iface with <code>Table = off</code> plus policy routing can come up during a <strong>warm lead</strong> (tens of minutes before the next scheduled hop), pass <strong>two consecutive</strong> tunnel probes, drain, then take over. Health and handshake hops from OEN-16 stay a <strong>cold</strong> <code>wg set</code> (procedure with placeholders; Bind-then-stop). Skip the warm path when the commercial provider’s <strong>session quota</strong> is nearly full. Do not publish the numeric quota. Do not treat the dual-up window as Virtual Private Network (VPN) down.</p>
+<p>This spec does not apply to the consumer-router client in OEN-16. Hub watch stays on the always-on hub host in OEN-16.</p>
+
+<section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>WG</dt><dd>WireGuard</dd><dt>VPS</dt><dd>Virtual Private Server</dd><dt>ULA</dt><dd>unique-local address (IPv6)</dd><dt>VPN</dt><dd>Virtual Private Network</dd><dt>IPv6</dt><dd>Internet Protocol version 6</dd><dt>WAN</dt><dd>Wide Area Network</dd><dt>GUA</dt><dd>global unicast address (IPv6)</dd><dt>LAN</dt><dd>Local Area Network</dd><dt>HTTPS</dt><dd>Hypertext Transfer Protocol Secure</dd><dt>JSON</dt><dd>JavaScript Object Notation</dd><dt>PersistentKeepalive</dt><dd>WireGuard peer option that sends periodic keepalive packets</dd><dt>FORWARD</dt><dd>netfilter/iptables forward chain</dd></dl></section>
+<h2 id="topology">Topology</h2>
+<pre><code class="language-text">[&lt;cloud-vps&gt; commercial WG]
+  &lt;wg-prod&gt;   production tunnel (current endpoint)
+  &lt;wg-spare&gt;  Table = off + policy routing — NOT a default in main
+  &lt;wan-iface&gt; WAN for provider health (OEN-16 P2)
+
+Warm lead: spare up, two consecutive tunnel probes, drain, then take over
+MUST NOT: spare 0.0.0.0/0 in main; empty [Peer]; dual-up for a full hop interval</code></pre>
+<h2 id="bind">Bind</h2>
+<p>Fill this table <strong>before</strong> any live change. Do <strong>not</strong> paste real values back into public notes.</p>
+<table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><code>&lt;cloud-vps&gt;</code></td><td>Cloud VPS running the commercial WG client</td><td>Cloud VPS</td></tr><tr><td><code>&lt;wg-prod&gt;</code></td><td>Production tunnel iface</td><td>VPS</td></tr><tr><td><code>&lt;wg-spare&gt;</code></td><td>Spare tunnel iface (<code>Table = off</code>)</td><td>VPS</td></tr><tr><td><code>&lt;wan-iface&gt;</code></td><td>WAN iface on that VPS</td><td>Same host</td></tr><tr><td><code>&lt;tunnel-ula&gt;</code></td><td>Tunnel unique-local used to bind a probe</td><td>ULA class; never publish</td></tr></tbody></table>
+<h2 id="formulas">Formulas</h2>
+<p>Qualitative only. No path-size family on this page.</p>
+<ul><li>Warm lead: tens of minutes before the next <strong>scheduled</strong> hop from <a href="../networking/16-commercial-wg-endpoint-rotation.html">OEN-16</a>.</li><li>Cutover: two consecutive tunnel probes, then a brief drain, then take over.</li><li>Dual-up outside that lead: cut over or tear the spare. MUST NOT wait a full hop interval.</li></ul>
+<h2 id="method">Method</h2>
+<p>Bring the spare up with <code>Table = off</code> so it does not install <code>0.0.0.0/0</code> in <strong>main</strong>. Probe the spare twice. Drain. Promote. Persist a full <code>[Peer]</code> section. Health/handshake hops stay cold <code>wg set</code> when warm is skipped.</p>
+<h2 id="consequences">Consequences</h2>
+<ul><li>Scheduled hops do not drop the production tunnel for the whole handshake.</li><li>A keepalive-only dump cannot replace <code>[Peer]</code>.</li><li>Dual-up is a short local window, not an all-evening second default.</li><li>Operators do not treat “old iface still up while the spare is probing” as “VPN down.”</li></ul>
+<h2 id="agent-stop-rule">Agent stop rule</h2>
+<blockquote><p>MUST emit a bound inspect-and-cutover runbook after Bind is filled.   MUST NOT run <code>wg-quick</code>, <code>ip rule</code>, <code>wg set</code>, or iface rename until a human filled Bind.   MUST NOT <code>wg-quick down</code> / <code>wg-quick up</code> the production iface on every successful hop if <code>wg set</code> is enough (<a href="../networking/22-delayed-wg-forward-wipe.html">OEN-22</a>).   MUST NOT wait a full hop interval while both ifaces are up.</p></blockquote>
+<h2 id="procedure">Procedure</h2>
+<p>Placeholders: <code>&lt;cloud-vps&gt;</code>, <code>&lt;wg-prod&gt;</code>, <code>&lt;wg-spare&gt;</code>, <code>&lt;wan-iface&gt;</code>, <code>&lt;tunnel-ula&gt;</code>.</p>
+<h3>Copy-paste commands (after Bind)</h3>
+<p>Inspect only until a human filled Bind and asked to apply:</p>
+<pre><code class="language-bash">wg show &lt;wg-prod&gt;
+wg show &lt;wg-spare&gt;</code></pre>
+<ol><li><strong>P1 — Spare is <code>Table = off</code>, not a second default.</strong><br>
+- <strong>Action:</strong> Read the spare config on <code>&lt;cloud-vps&gt;</code>. Confirm <code>Table = off</code> and that <strong>main</strong> has no <code>0.0.0.0/0</code> via <code>&lt;wg-spare&gt;</code>. Policy routing for the spare MUST stay off the main default.<br>
+- <strong>Expected:</strong> Production default unchanged. Spare has no default in main.<br>
+- <strong>On failure:</strong> Do not bring the spare up. Dual default in main is this trap.</li><li><strong>P2 — Persist <code>[Peer]</code>; never a keepalive-only dump.</strong><br>
+- <strong>Action:</strong> Before cutover, confirm the on-disk production config still has a <code>[Peer]</code> section with <code>Endpoint</code>, keys, and <code>PersistentKeepalive</code>. A cutover that writes <code>wg showconf</code> output with only PersistentKeepalive MUST NOT replace the file.<br>
+- <strong>Expected:</strong> <code>[Peer]</code> present after cutover.<br>
+- <strong>On failure:</strong> Restore the previous config. Do not hop again until <code>[Peer]</code> is whole.</li><li><strong>P3 — Warm lead: two consecutive probes, then drain.</strong><br>
+- <strong>Action:</strong> During the warm lead (tens of minutes), bring <code>&lt;wg-spare&gt;</code> up to the <strong>next</strong> leftover endpoint from OEN-16 (never current name + global unicast address (GUA)). Probe the spare twice in a row (example: Hypertext Transfer Protocol Secure (HTTPS) via <code>&lt;tunnel-ula&gt;</code> on the spare, or equivalent tunnel bind). After two consecutive passes, drain briefly, then take over (rename or swap so <code>&lt;wg-prod&gt;</code> is the live iface).<br>
+- <strong>Expected:</strong> Spare probes pass twice. Production takes over. Old iface down after drain.<br>
+- <strong>On failure:</strong> Tear the spare. Do not leave dual-up. Do not wait for the next hop interval.</li><li><strong>P4 — Dual-up outside the warm lead.</strong><br>
+- <strong>Action:</strong> If both ifaces are up outside the lead: cut over if two probes already passed; if production is already on the spare name, drain and down the old iface then finish rename; else tear the spare.<br>
+- <strong>Expected:</strong> At most one production tunnel in main. Dual-up does not last until the next hop interval.<br>
+- <strong>On failure:</strong> An all-evening dual-up was this skip. Cut over or tear now — do not wait.</li><li><strong>P5 — Orphan spare (production iface gone, rename never finished).</strong><br>
+- <strong>Action:</strong> If <code>&lt;wg-prod&gt;</code> is gone and <code>&lt;wg-spare&gt;</code> is the live tunnel, finish the rename, persist <code>[Peer]</code>, and do <strong>not</strong> reset the verified-hop clock. Never hop to the same name + GUA.<br>
+- <strong>Expected:</strong> One production iface name. Verified hop clock unchanged.<br>
+- <strong>On failure:</strong> Do not treat the orphan as a failed hop that redraws current.</li><li><strong>P6 — “Old iface still up” is not “VPN down.”</strong><br>
+- <strong>Action:</strong> While the spare is probing, <code>&lt;wg-prod&gt;</code> SHOULD still be up. Hub watch and status JSON from OEN-16 MUST NOT treat that window as a dead tunnel.<br>
+- <strong>Expected:</strong> Production traffic still uses <code>&lt;wg-prod&gt;</code> until cutover.<br>
+- <strong>On failure:</strong> A hop or restart during probe is the wrong fix.</li><li><strong>P7 — Skip warm near session quota; health hops stay cold.</strong><br>
+- <strong>Action:</strong> If the commercial provider’s session quota is <strong>nearly full</strong>, skip the spare. Health and handshake hops stay a <strong>cold</strong> <code>wg set</code> as in OEN-16 P4 (placeholders; Bind-then-stop). MUST NOT publish the numeric quota.<br>
+- <strong>Expected:</strong> Warm path only when quota has room. Immediate OEN-16 hops do not wait for a warm lead.<br>
+- <strong>On failure:</strong> A second session that the provider rejects is this skip. Stay on cold <code>wg set</code>.</li><li><strong>P8 — Do not bounce production with <code>wg-quick</code> on a successful hop.</strong><br>
+- <strong>Action:</strong> After a successful cold <code>wg set</code> or a finished cutover, MUST NOT <code>wg-quick down</code> / <code>wg-quick up</code> <code>&lt;wg-prod&gt;</code> if <code>wg set</code> (or the cutover rename) already applied the peer. A full restart can wipe FORWARD (<a href="../networking/22-delayed-wg-forward-wipe.html">OEN-22</a>).<br>
+- <strong>Expected:</strong> Tunnel stays up. FORWARD counters still increment.<br>
+- <strong>On failure:</strong> Delayed Local Area Network (LAN) death after a “successful” hop is OEN-22, not a reason to hop again.</li></ol>
+<h2 id="expected-samples">Expected samples</h2>
+<pre><code class="language-text"># inspect after Bind
+interface: &lt;wg-prod&gt;
+# spare config (human-read)
+Table = off
+# after cutover
+[Peer]
+Endpoint = [2001:db8::1]:&lt;port&gt;
+PersistentKeepalive = 25</code></pre>
+<h2 id="verify">Verify</h2>
+<ul><li>Spare never installed <code>0.0.0.0/0</code> in main.</li><li>On-disk config still has <code>[Peer]</code> after cutover (not PersistentKeepalive alone).</li><li>Dual-up did not last a full hop interval.</li><li>Orphan spare was renamed; verified-hop clock was not reset.</li><li>“Old iface up while spare probing” was not treated as VPN down.</li><li>Production iface was not <code>wg-quick</code> bounced on a successful hop.</li><li>HTTPS (or equivalent) tunnel probes on the spare — not a small ping — were the cutover gate.</li></ul>
+<h2 id="must-not" class="must-not">MUST NOT</h2>
+<ul><li>MUST NOT put the spare in the main table with <code>0.0.0.0/0</code>.</li><li>MUST NOT overwrite config so <code>[Peer]</code> is missing.</li><li>MUST NOT leave dual-up until the next hop interval.</li><li>MUST NOT treat “old iface still up while the spare is probing” as “VPN down.”</li><li>MUST NOT publish the provider session-quota count.</li><li>MUST NOT <code>wg-quick down</code> / <code>wg-quick up</code> the production iface on every successful hop if <code>wg set</code> is enough.</li><li>MUST NOT apply <code>ip rule</code>, <code>wg set</code>, or <code>wg-quick</code> from unbound placeholders.</li><li>MUST NOT publish commercial VPN brand names, server nicknames, addresses, ULAs, or custom ports.</li></ul>
+<h2 id="page-changelog">Page changelog</h2>
+<ul><li>Edition 1 (10 Sep 2026, Mountain Time): Make-before-break spare iface on a cloud VPS.</li></ul>
+<h2 id="related-specs">Related specs</h2>
+<ul><li><a href="../networking/16-commercial-wg-endpoint-rotation.html">OEN-16 Commercial WireGuard endpoint rotation</a></li><li><a href="../networking/22-delayed-wg-forward-wipe.html">OEN-22 Delayed WG FORWARD wipe</a></li></ul>
+<h2 id="prior-art-not-novel">Prior art (Not novel)</h2>
+<p><a href="https://www.wireguard.com/">WireGuard routing</a> documents <code>Table = off</code> and AllowedIPs. This note is the commercial-hop failure modes: double default, empty <code>[Peer]</code>, dual-up that waited a hop interval, and skipping warm when session quota is nearly full.</p>
+      </article>
+    </main>
+    <footer class="site-footer">
+      <div class="site-footer-inner">
+    <p class="byline">Written by <a href="https://www.armsteadent.com/">Eugene Armstead</a> · <a href="https://www.armsteadent.com/">https://www.armsteadent.com/</a> · <a rel="license" href="https://creativecommons.org/licenses/by/4.0/">CC-BY-4.0</a></p>
+    <p class="license-line">Living field notes. Stable IDs. Do not copy private inventory into public text.</p>
+      </div>
+    </footer>
+  </body>
+</html>

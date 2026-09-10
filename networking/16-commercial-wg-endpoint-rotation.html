@@ -3,10 +3,10 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>OEN-16: Commercial WireGuard endpoint rotation (IPv6, shuffle bag, hub watch) — Overlay and Edge Notes</title>
-    <meta name="description" content="IPv6-only WireGuard rotation fails when health checks ride the tunnel: use WAN curl -6, ULA egress verify, a shuffle bag, and a hub watch.">
-    <meta name="keywords" content="WireGuard endpoint rotation, IPv6-only WireGuard endpoint, WireGuard shuffle bag, PersistentKeepalive 25, curl -6 WAN health check, WireGuard handshake stale, commercial WireGuard rotator, tunnel ULA egress verify, hub watch LAN Pi, Endpoint IPv6 port not FQDN, WireGuard hop cooldown, ISP down vs VPN down, allowlisted IPv6 endpoints">
-    <meta name="citation_keywords" content="WireGuard endpoint rotation, IPv6-only WireGuard endpoint, WireGuard shuffle bag, PersistentKeepalive 25, curl -6 WAN health check, WireGuard handshake stale, commercial WireGuard rotator, tunnel ULA egress verify, hub watch LAN Pi, Endpoint IPv6 port not FQDN, WireGuard hop cooldown, ISP down vs VPN down, allowlisted IPv6 endpoints">
+    <title>OEN-16: Commercial WireGuard endpoint rotation (IPv6, leftover bag, hub watch) — Overlay and Edge Notes</title>
+    <meta name="description" content="IPv6-only WireGuard leftover-bag rotation fails when sick names are dropped and the bag refills healthy-only; stay-put, split wake vs hop.">
+    <meta name="keywords" content="WireGuard leftover bag, leftover bag stay-put, wake tick vs hop interval, WireGuard endpoint rotation, IPv6-only WireGuard endpoint, PersistentKeepalive NAT, curl -6 WAN health check, WireGuard handshake stale, commercial WireGuard rotator, tunnel ULA egress verify, hub watch LAN Pi, Endpoint IPv6 port not FQDN, WireGuard hop cooldown, ISP down vs VPN down, skip sick leftover names, verified hop interval, allowlisted IPv6 endpoints, status JSON is not a hop">
+    <meta name="citation_keywords" content="WireGuard leftover bag, leftover bag stay-put, wake tick vs hop interval, WireGuard endpoint rotation, IPv6-only WireGuard endpoint, PersistentKeepalive NAT, curl -6 WAN health check, WireGuard handshake stale, commercial WireGuard rotator, tunnel ULA egress verify, hub watch LAN Pi, Endpoint IPv6 port not FQDN, WireGuard hop cooldown, ISP down vs VPN down, skip sick leftover names, verified hop interval, allowlisted IPv6 endpoints, status JSON is not a hop">
     <link rel="canonical" href="https://eugenearmstead.github.io/overlay-and-edge-notes/networking/16-commercial-wg-endpoint-rotation.html">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -19,8 +19,8 @@
     <link rel="author" href="https://www.armsteadent.com/">
     <meta property="article:author" content="Eugene Armstead">
     <meta property="og:see_also" content="https://www.armsteadent.com/">
-    <meta property="og:title" content="OEN-16: Commercial WireGuard endpoint rotation (IPv6, shuffle bag, hub watch) — Overlay and Edge Notes">
-    <meta property="og:description" content="IPv6-only WireGuard rotation fails when health checks ride the tunnel: use WAN curl -6, ULA egress verify, a shuffle bag, and a hub watch.">
+    <meta property="og:title" content="OEN-16: Commercial WireGuard endpoint rotation (IPv6, leftover bag, hub watch) — Overlay and Edge Notes">
+    <meta property="og:description" content="IPv6-only WireGuard leftover-bag rotation fails when sick names are dropped and the bag refills healthy-only; stay-put, split wake vs hop.">
     <meta property="og:url" content="https://eugenearmstead.github.io/overlay-and-edge-notes/networking/16-commercial-wg-endpoint-rotation.html">
     <meta property="og:type" content="article">
     <meta property="article:published_time" content="2026-09-07">
@@ -31,8 +31,8 @@
     {
       "@type": "TechArticle",
       "@id": "https://eugenearmstead.github.io/overlay-and-edge-notes/networking/16-commercial-wg-endpoint-rotation.html#article",
-      "headline": "Commercial WireGuard endpoint rotation (IPv6, shuffle bag, hub watch)",
-      "description": "IPv6-only WireGuard rotation fails when health checks ride the tunnel: use WAN curl -6, ULA egress verify, a shuffle bag, and a hub watch.",
+      "headline": "Commercial WireGuard endpoint rotation (IPv6, leftover bag, hub watch)",
+      "description": "IPv6-only WireGuard leftover-bag rotation fails when sick names are dropped and the bag refills healthy-only; stay-put, split wake vs hop.",
       "datePublished": "2026-09-07",
       "author": {
         "@type": "Person",
@@ -47,10 +47,12 @@
       "license": "https://creativecommons.org/licenses/by/4.0/",
       "inLanguage": "en",
       "keywords": [
+        "WireGuard leftover bag",
+        "leftover bag stay-put",
+        "wake tick vs hop interval",
         "WireGuard endpoint rotation",
         "IPv6-only WireGuard endpoint",
-        "WireGuard shuffle bag",
-        "PersistentKeepalive 25",
+        "PersistentKeepalive NAT",
         "curl -6 WAN health check",
         "WireGuard handshake stale",
         "commercial WireGuard rotator",
@@ -59,13 +61,16 @@
         "Endpoint IPv6 port not FQDN",
         "WireGuard hop cooldown",
         "ISP down vs VPN down",
-        "allowlisted IPv6 endpoints"
+        "skip sick leftover names",
+        "verified hop interval",
+        "allowlisted IPv6 endpoints",
+        "status JSON is not a hop"
       ]
     },
     {
       "@type": "HowTo",
-      "name": "Commercial WireGuard endpoint rotation (IPv6, shuffle bag, hub watch)",
-      "description": "IPv6-only WireGuard rotation fails when health checks ride the tunnel: use WAN curl -6, ULA egress verify, a shuffle bag, and a hub watch.",
+      "name": "Commercial WireGuard endpoint rotation (IPv6, leftover bag, hub watch)",
+      "description": "IPv6-only WireGuard leftover-bag rotation fails when sick names are dropped and the bag refills healthy-only; stay-put, split wake vs hop.",
       "author": {
         "@type": "Person",
         "name": "Eugene Armstead",
@@ -79,25 +84,25 @@
           "@type": "HowToStep",
           "position": 1,
           "name": "P1 \u2014 Confirm Endpoint is an IPv6 literal.",
-          "text": "Action: Read the live WireGuard config on `<cloud-vps>` and on the consumer router client. Check `Endpoint`. Expected: `[IPv6]:port` only. No hostname. No IPv4 literal if the working product path is v6. On failure: Rewrite the peer to an allowlisted IPv6 global unicast address (GUA) and restart the client once. Do not leave FQDN in production."
+          "text": "Action: Read the live WireGuard config on `<cloud-vps>` and on the consumer router client. Check `Endpoint`. Expected: `[IPv6]:port` only. No hostname. No IPv4 literal if the working product path is v6. On failure: Rewrite the peer to an allowlisted IPv6 GUA and restart the client once. Do not leave FQDN in production."
         },
         {
           "@type": "HowToStep",
           "position": 2,
           "name": "P2 \u2014 Health-check the provider over WAN IPv6, not the tunnel.",
-          "text": "Action: `curl -6 --interface <wan-iface> --max-time 20 https://<isp-v6-canary>` (or any WAN-only v6 canary you control). Do **not** bind `<wg-iface>`."
+          "text": "Action: `curl -6 --interface <wan-iface> --max-time 20 https://<isp-v6-canary>` (or any WAN-only v6 canary you control). Do **not** bind `<wg-iface>`. Provider health fail is an immediate hop trigger **only if** WAN IPv6 itself is up."
         },
         {
           "@type": "HowToStep",
           "position": 3,
-          "name": "P3 \u2014 Build the eligible shuffle bag.",
-          "text": "Action: For each allowlisted endpoint, run a v6 preflight (WAN `curl -6` to that GUA or a documented health field). Drop peers that fail. Keep a boot-default region even if the bag is otherwise empty. Expected: Bag contains only endpoints that passed preflight. Boot-default is identified. On failure: If every peer fails preflight, leave the current endpoint; do not flap."
+          "name": "P3 \u2014 Leftover bag: consume, skip sick, stay put.",
+          "text": "Action: Draw from leftovers until the bag is empty, then refill **allowlist minus current name + GUA**. On each wake tick, skip leftovers that fail preflight or provider health; do **not** delete them. If a skipped name later reports healthy, it is pickable. If every leftover is still sick and current is healthy: stay put. Do **not** refill from a healthy-only subset while leftovers remain. Expected: Bag still lists skipped sick names. Boot-default is identified. Current name + GUA is never the "
         },
         {
           "@type": "HowToStep",
           "position": 4,
-          "name": "P4 \u2014 Hop with cooldown.",
-          "text": "Action: If handshake age is past stale, or hop interval elapsed, draw the next name from the shuffled bag (skip current). Set endpoint with `wg set` or the firmware equivalent. Record cooldown on the peer you left. Expected: New endpoint is live. Old peer is not redrawn until cooldown expires. On failure: Restore previous GUA. Do not loop `--force` without a bag."
+          "name": "P4 \u2014 Hop on health, stale handshake, or interval.",
+          "text": "Action: Immediate hop when (a) WAN is up and provider health is bad, (b) handshake age is stale (a few minutes), or (c) hop interval elapsed since the last **verified** hop. Draw the next leftover (skip current). Cooldown on the peer you left MUST NOT block drawing a **different** leftover. Set endpoint with `wg set` or the firmware equivalent **after Bind**. On a cloud VPS, prefer make-before-break when the hop is a scheduled interval hop ([OEN-S35](../supporting/s35-make-before-break-wg-cutove"
         },
         {
           "@type": "HowToStep",
@@ -109,13 +114,13 @@
           "@type": "HowToStep",
           "position": 6,
           "name": "P6 \u2014 Set PersistentKeepalive.",
-          "text": "Action: Ensure the client peer has `PersistentKeepalive = 25`. Expected: `wg show` reports persistent keepalive 25. On failure: Add it and sync the interface. NAT mappings otherwise idle out and look like a dead endpoint."
+          "text": "Action: Ensure the client peer has a non-zero `PersistentKeepalive`. Suggested example: `25` (WireGuard NAT documentation). Second example: `10` (aggressive NAT). Textbook window: 10\u201330 seconds. Use one value on a given client; do not document a VPS-versus-router split. Expected: `wg show` reports a non-zero persistent keepalive (example: every 25 seconds). On failure: Add a non-zero value and sync the interface. NAT mappings otherwise idle out and look like a dead endpoint."
         },
         {
           "@type": "HowToStep",
           "position": 7,
           "name": "P7 \u2014 Hub watch on the LAN Pi only.",
-          "text": "Action: On `<lan-pi>`, poll rotator status freshness (age of the last successful rotate JSON or equivalent). If stale beyond your threshold (example: ten minutes), remotely tick the rotator on `<cloud-vps>` and on the consumer router. Do **not** install this watch on the interactive workstation. Expected: Stale rotators get one remediation tick. Logs show Pi as the watcher. On failure: Check overlay SSH to those hosts (see [OEN-01](01-overlay-ssh-byte-cliff.md)) before blaming the rotator."
+          "text": "Action: On `<lan-pi>`, poll rotator status freshness (age of the last successful rotate JSON or equivalent). If stale beyond your threshold (example: ten minutes), remotely tick the rotator on `<cloud-vps>` and on the consumer router. Do **not** install this watch on the VPS. Do **not** install it on the interactive workstation. A status dashboard or JSON refresh MUST NOT hop. Expected: Stale rotators get one remediation tick. Logs show the Pi as the only watcher. On failure: Check overlay SSH t"
         }
       ]
     }
@@ -144,77 +149,81 @@
     <nav class="breadcrumb" aria-label="Breadcrumb"><ol><li><a href="../index.html">Home</a></li><li><a href="../index.html#networking">Networking</a></li><li>OEN-16</li></ol></nav>
     <main id="main">
       <article>
-        <h1>Commercial WireGuard endpoint rotation (IPv6, shuffle bag, hub watch)</h1>
-        <p class="meta-line"><span>OEN-16</span> · original · edition 2 · 2026-09-07</p>
+        <h1>Commercial WireGuard endpoint rotation (IPv6, leftover bag, hub watch)</h1>
+        <p class="meta-line"><span>OEN-16</span> · original · edition 3 · 2026-09-07</p>
         <h2 id="context">Context</h2>
-<p>Public WireGuard rotators already exist: hop when the handshake goes stale, or hop on a schedule. What still gets operators stuck is a <strong>commercial</strong> tunnel whose published endpoint is <strong>Internet Protocol version 6 (IPv6)-only</strong>, whose “Virtual Private Network (VPN) is down” signal is confused with “Internet Service Provider (ISP) is down,” and whose hop lands on a peer that does not actually egress IPv6.</p>
+<p>Public WireGuard rotators already exist: hop when the handshake goes stale, or hop on a schedule. What still gets operators stuck is a <strong>commercial</strong> tunnel whose published endpoint is <strong>Internet Protocol version 6 (IPv6)-only</strong>, whose “Virtual Private Network (VPN) is down” signal is confused with “Internet Service Provider (ISP) is down,” and whose leftover pool is emptied by deleting sick names so the next refill repeats a peer that just failed.</p>
 <p>This note is the unpublished combo:</p>
-<ul><li><code>Endpoint</code> is <code>[IPv6]:port</code> only. Never a fully qualified domain name (FQDN) (Domain Name System (DNS) during a hop is another failure domain). Never Internet Protocol version 4 (IPv4) when the product’s working path is v6.</li><li>Health of the <strong>provider control plane</strong> is probed with <code>curl -6</code> <strong>bound to the Wide Area Network (WAN) interface</strong>, not through <code>&lt;wg-iface&gt;</code>. Otherwise ISP death looks like VPN death, and you hop forever.</li><li>After a hop, <strong>egress verify</strong> binds the <strong>tunnel unique-local address (ULA)</strong> (or the tunnel address the peer assigned) and MUST match <strong>that endpoint’s site prefix</strong>. A handshake without matching egress is a false UP.</li><li>Eligible peers live in a <strong>shuffle bag</strong>. One region is the <strong>boot-default</strong>. Peers that fail an IPv6 preflight are <strong>dropped</strong> from the bag, not retried in a tight loop.</li><li>Hop when handshake age exceeds a stale threshold, or when a hop interval elapses, then apply a <strong>cooldown</strong> so a bad peer is not redrawn immediately.</li><li><code>PersistentKeepalive = 25</code> on the client so network address translation (NAT) mappings stay warm.</li><li>The <strong>same idea</strong> runs on a <strong>consumer router VPN client</strong> and on a <strong>cloud Virtual Private Server (VPS)</strong> client. An <strong>always-on Local Area Network (LAN) Pi</strong> watches freshness of both rotators and remediates if status goes stale. The watch MUST NOT run on the interactive workstation (mistaken deploy target).</li></ul>
-<p>Do not name the commercial provider. Do not name server nicknames. Public wording: allowlisted IPv6 endpoints, boot-default region, hub watch on an always-on Pi.</p>
+<ul><li><code>Endpoint</code> is <code>[IPv6]:port</code> only. Never a fully qualified domain name (FQDN) (Domain Name System (DNS) during a hop is another failure domain). Never Internet Protocol version 4 (IPv4) when the product’s working path is v6.</li><li>Health of the <strong>provider control plane</strong> is probed with <code>curl -6</code> <strong>bound to the Wide Area Network (WAN) interface</strong>, not through <code>&lt;wg-iface&gt;</code>. Otherwise ISP death looks like VPN death, and you hop forever.</li><li>After a hop, <strong>egress verify</strong> binds the <strong>tunnel unique-local address (ULA)</strong> (or the tunnel address the peer assigned) and MUST match <strong>that endpoint’s site prefix</strong>. A handshake without matching egress is a false UP. Only a prefix match is a <strong>verified</strong> hop.</li><li>Eligible peers live in a <strong>leftover bag</strong>. One region is the <strong>boot-default</strong>. Consume leftover names until the bag is empty, then refill the allowlist minus the <strong>current</strong> name and global unicast address (GUA). Never hop to the same server (name + GUA).</li><li>Peers that fail an IPv6 preflight or provider health check <strong>stay in the leftover bag and are skipped</strong>, not deleted. Recovered names become pickable on later wake ticks. If every leftover is still sick and the current endpoint is healthy: <strong>stay put</strong>. Do <strong>not</strong> refill from a healthy-only subset while leftovers remain.</li><li><strong>Wake tick</strong> (minutes) is not the <strong>hop interval</strong> (hours, measured from the last verified hop). Immediate hop when WAN or provider health fails, when the handshake is stale (a few minutes), or when the hop interval has elapsed.</li><li>Cooldown after a hop or failed hop. Leftover draw <strong>ignores cooldown on other peers</strong> so a different leftover is not blocked. Cooldown MUST NOT be used as a reason to hop to the current name + GUA or to refill healthy-only.</li><li><code>PersistentKeepalive</code> MUST be non-zero so network address translation (NAT) mappings stay warm. Suggested example (upstream WireGuard NAT documentation): <code>25</code>. Second example (aggressive NAT / short mapping): <code>10</code>. Operators MAY pick any value in a 10–30 second textbook window. MUST NOT imply two different values on the cloud Virtual Private Server (VPS) versus the consumer router client.</li><li>The <strong>same leftover-bag idea</strong> runs on a <strong>consumer router VPN client</strong> and on a <strong>cloud VPS</strong> client. An <strong>always-on Local Area Network (LAN) Pi</strong> watches freshness of both rotators and remediates if status goes stale. The watch MUST run on <strong>one</strong> <code>&lt;lan-pi&gt;</code>. It MUST NOT also run on the VPS or on the interactive workstation.</li><li>A scheduled hop on a single VPS iface is a cold cut. Make-before-break spare-iface cutover is <a href="../supporting/s35-make-before-break-wg-cutover.html">OEN-S35</a>. Consumer-router cron PATH and <code>set -e</code> silent ticks are <a href="../supporting/s33-router-cron-path-set-e.html">OEN-S33</a>. Do not bounce the production iface on every successful hop (<a href="22-delayed-wg-forward-wipe.html">OEN-22</a>).</li></ul>
+<p>Do not name the commercial provider. Do not name server nicknames. Public wording: allowlisted IPv6 endpoints, boot-default region, leftover bag, hub watch on an always-on Pi.</p>
 
 <section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>WG</dt><dd>WireGuard</dd><dt>IPv6</dt><dd>Internet Protocol version 6</dd><dt>IPv4</dt><dd>Internet Protocol version 4</dd><dt>FQDN</dt><dd>fully qualified domain name</dd><dt>DNS</dt><dd>Domain Name System</dd><dt>VPN</dt><dd>Virtual Private Network</dd><dt>ISP</dt><dd>Internet Service Provider</dd><dt>WAN</dt><dd>Wide Area Network</dd><dt>ULA</dt><dd>unique-local address (IPv6)</dd><dt>GUA</dt><dd>global unicast address (IPv6)</dd><dt>NAT</dt><dd>network address translation</dd><dt>JSON</dt><dd>JavaScript Object Notation</dd><dt>SSH</dt><dd>Secure Shell</dd><dt>HTTPS</dt><dd>Hypertext Transfer Protocol Secure</dd><dt>LAN</dt><dd>Local Area Network</dd><dt>VPS</dt><dd>Virtual Private Server</dd><dt>Pi</dt><dd>single-board computer (Raspberry Pi class)</dd><dt>PersistentKeepalive</dt><dd>WireGuard peer option that sends periodic keepalive packets</dd><dt>FORWARD</dt><dd>netfilter/iptables forward chain</dd><dt>PATH</dt><dd>Unix executable search path</dd><dt>CrowdSec</dt><dd>open-source IDS/IPS with a Central API</dd></dl></section>
 <h2 id="topology">Topology</h2>
 <pre><code class="language-text">[&lt;cloud-vps&gt; WG client]  Endpoint = [IPv6]:port only
-[&lt;consumer router WG client&gt;]  same contract
-[&lt;lan-pi&gt; hub watch]  freshness of both rotators — NOT the workstation
+[&lt;consumer router WG client&gt;]  same leftover-bag contract
+[&lt;lan-pi&gt; hub watch]  freshness of both rotators — NOT the VPS, NOT the workstation
 
 Health: curl -6 --interface &lt;wan-iface&gt;     (ISP vs VPN split)
 Egress: curl -6 --interface &lt;tunnel-ula&gt;    MUST match that endpoint&#x27;s site prefix</code></pre>
 <h2 id="bind">Bind</h2>
+<p>Fill this table <strong>before</strong> any live change. Do <strong>not</strong> paste real values back into public notes.</p>
 <table><thead><tr><th>Placeholder</th><th>Operator fills</th><th>Class</th></tr></thead><tbody><tr><td><code>&lt;cloud-vps&gt;</code></td><td>VPS running a commercial WG client</td><td>Cloud VPS</td></tr><tr><td><code>&lt;lan-pi&gt;</code></td><td>Always-on hub watch</td><td>LAN Pi</td></tr><tr><td><code>&lt;wg-iface&gt;</code></td><td>Tunnel iface</td><td>Router or VPS</td></tr><tr><td><code>&lt;wan-iface&gt;</code></td><td>WAN iface</td><td>Same host as the client</td></tr><tr><td><code>&lt;user&gt;</code></td><td>SSH user</td><td>Guest</td></tr><tr><td><code>&lt;endpoint-gua&gt;</code></td><td>Allowlisted peer IPv6</td><td>GUA; never publish</td></tr><tr><td><code>&lt;tunnel-ula&gt;</code></td><td>Tunnel address used to bind egress verify</td><td>ULA class; never publish</td></tr></tbody></table>
 <h2 id="formulas">Formulas</h2>
-<p>Handshake stale / hop interval / cooldown are operator-tuned. <code>PersistentKeepalive = 25</code> is the usual NAT keepalive. Endpoint MUST be an IPv6 <strong>literal</strong>, never FQDN.</p>
-<p>No supporting method ID is wired: <code>backs</code> / <code>backed_by</code> stay empty; the copy-paste on this page is the method.</p>
+<p>Wake tick and hop interval are different clocks. Handshake stale and cooldown are operator-tuned. This page has no path-size formula family.</p>
+<ul><li>Wake tick: minutes, so a health or handshake hop is not delayed until the next scheduled hop. MUST NOT set the wake timer to the hop interval.</li><li>Hop interval: hours, measured from the last <strong>verified</strong> hop.</li><li>Handshake stale: a few minutes.</li><li>Cooldown: tens of minutes after a hop or a failed hop. Leftover draw MUST ignore cooldown on <strong>other</strong> peers.</li><li><code>PersistentKeepalive</code> MUST be non-zero. Suggested example (upstream): <code>25</code>. Second example: <code>10</code>. Textbook window: 10–30 seconds.</li></ul>
+<p>Endpoint MUST be an IPv6 <strong>literal</strong>, never FQDN.</p>
 <h2 id="decision">Decision</h2>
 <p>A commercial WireGuard client that must stay up across endpoint failure MUST implement all of:</p>
-<ol><li>IPv6 literal endpoints from an allowlist.</li><li>WAN-bound v6 health, tunnel-bound egress verify, site-prefix match.</li><li>Shuffle bag + boot-default + drop-on-preflight-fail + stale handshake + hop interval + cooldown.</li><li>Hub watch on <code>&lt;lan-pi&gt;</code>, not on the agent workstation.</li></ol>
-<p>Example timers operators MAY use: handshake stale after a few minutes; hop on the order of an hour; cooldown of tens of minutes. Tune to the provider. Keepalive 25 seconds is the usual WireGuard NAT value.</p>
+<ol><li>IPv6 literal endpoints from an allowlist.</li><li>WAN-bound v6 health, tunnel-bound egress verify, site-prefix match (verified hop).</li><li>Leftover bag: consume until empty, then refill allowlist minus current name + GUA; skip sick leftovers; stay put when the bag is all sick and current is healthy.</li><li>Split wake tick (minutes) from hop interval (hours from last verified hop). Immediate hop on WAN/provider health fail, stale handshake, or interval elapsed.</li><li>Leftover draw ignores cooldown on other peers. MUST NOT hop to current name + GUA.</li><li>Non-zero PersistentKeepalive (examples <code>25</code> and <code>10</code>; textbook 10–30 s). Same idea on VPS and router — do not publish two different values for those two clients.</li><li>One hub watch on <code>&lt;lan-pi&gt;</code>. MUST NOT also run on the VPS or the workstation. A status JavaScript Object Notation (JSON) refresh is not a hop.</li></ol>
+<p>Example timers operators MAY use: handshake stale after a few minutes; hop interval on the order of hours; cooldown of tens of minutes. Tune to the provider.</p>
 <h2 id="consequences">Consequences</h2>
-<ul><li>Hops continue when the ISP is healthy even if a particular endpoint dies.</li><li>ISP IPv6 loss does not burn the shuffle bag.</li><li>A peer that handshakes but egresses the wrong prefix is rejected.</li><li>The LAN Pi notices a silent rotator (no fresh status) and can tick it. The workstation is not a watchdog host.</li></ul>
+<ul><li>Hops continue when the ISP is healthy even if a particular endpoint dies.</li><li>ISP IPv6 loss does not burn the leftover bag.</li><li>A peer that handshakes but egresses the wrong prefix is rejected and is not a verified hop.</li><li>Sick names stay skippable; recovered names return without a healthy-only refill that repeats the last failure.</li><li>Stay-put avoids flapping when the leftover pool is still sick and current is fine.</li><li>The LAN Pi notices a silent rotator (no fresh status, including a silent tick exit) and can tick it. The VPS and the workstation are not watchdog hosts.</li><li>A dashboard that only rereads JSON does not change the endpoint.</li></ul>
 <h2 id="agent-stop-rule">Agent stop rule</h2>
-<blockquote><p>MUST emit bound <code>curl --interface</code> and <code>wg set</code> commands.   MUST NOT hop or restart WireGuard until Bind is filled.   MUST NOT restart the WG interface from a watchdog on every tick (<a href="22-delayed-wg-forward-wipe.html">OEN-22</a>).</p></blockquote>
+<blockquote><p>MUST emit bound <code>curl --interface</code> and <code>wg set</code> commands after Bind is filled.   MUST NOT hop, restart WireGuard, or apply <code>wg set</code> until a human filled Bind.   MUST NOT restart the WG interface from a watchdog on every tick (<a href="22-delayed-wg-forward-wipe.html">OEN-22</a>).   MUST NOT treat a status JSON refresh as a hop.</p></blockquote>
 <h2 id="procedure">Procedure</h2>
 <p>Placeholders: <code>&lt;cloud-vps&gt;</code>, <code>&lt;lan-pi&gt;</code>, <code>&lt;wg-iface&gt;</code>, WAN interface on that host.</p>
 <ol><li><strong>P1 — Confirm Endpoint is an IPv6 literal.</strong><br>
 - <strong>Action:</strong> Read the live WireGuard config on <code>&lt;cloud-vps&gt;</code> and on the consumer router client. Check <code>Endpoint</code>.<br>
 - <strong>Expected:</strong> <code>[IPv6]:port</code> only. No hostname. No IPv4 literal if the working product path is v6.<br>
-- <strong>On failure:</strong> Rewrite the peer to an allowlisted IPv6 global unicast address (GUA) and restart the client once. Do not leave FQDN in production.</li><li><strong>P2 — Health-check the provider over WAN IPv6, not the tunnel.</strong><br>
-- <strong>Action:</strong> <code>curl -6 --interface &lt;wan-iface&gt; --max-time 20 https://&lt;isp-v6-canary&gt;</code> (or any WAN-only v6 canary you control). Do <strong>not</strong> bind <code>&lt;wg-iface&gt;</code>.</li></ol>
+- <strong>On failure:</strong> Rewrite the peer to an allowlisted IPv6 GUA and restart the client once. Do not leave FQDN in production.</li><li><strong>P2 — Health-check the provider over WAN IPv6, not the tunnel.</strong><br>
+- <strong>Action:</strong> <code>curl -6 --interface &lt;wan-iface&gt; --max-time 20 https://&lt;isp-v6-canary&gt;</code> (or any WAN-only v6 canary you control). Do <strong>not</strong> bind <code>&lt;wg-iface&gt;</code>. Provider health fail is an immediate hop trigger <strong>only if</strong> WAN IPv6 itself is up.</li></ol>
 <pre><code class="language-bash">     curl -6 --interface &lt;wan-iface&gt; --max-time 20 -sS -o /dev/null -w &#x27;%{http_code}\n&#x27; https://&lt;isp-v6-canary&gt;
      curl -6 --interface &lt;wg-iface&gt; --max-time 20 -sS -o /dev/null -w &#x27;%{http_code}\n&#x27; https://&lt;isp-v6-canary&gt;
      </code></pre>
 <p>- <strong>Expected:</strong> Success means the ISP v6 path is up. Failure means do not hop; fix WAN first. - <strong>On failure:</strong> Stop rotation. Investigate WAN IPv6. Hopping cannot repair an ISP outage.</p>
-<ol><li><strong>P3 — Build the eligible shuffle bag.</strong><br>
-- <strong>Action:</strong> For each allowlisted endpoint, run a v6 preflight (WAN <code>curl -6</code> to that GUA or a documented health field). Drop peers that fail. Keep a boot-default region even if the bag is otherwise empty.<br>
-- <strong>Expected:</strong> Bag contains only endpoints that passed preflight. Boot-default is identified.<br>
-- <strong>On failure:</strong> If every peer fails preflight, leave the current endpoint; do not flap.</li><li><strong>P4 — Hop with cooldown.</strong><br>
-- <strong>Action:</strong> If handshake age is past stale, or hop interval elapsed, draw the next name from the shuffled bag (skip current). Set endpoint with <code>wg set</code> or the firmware equivalent. Record cooldown on the peer you left.<br>
-- <strong>Expected:</strong> New endpoint is live. Old peer is not redrawn until cooldown expires.<br>
-- <strong>On failure:</strong> Restore previous GUA. Do not loop <code>--force</code> without a bag.</li><li><strong>P5 — Verify egress on the tunnel address.</strong><br>
+<ol><li><strong>P3 — Leftover bag: consume, skip sick, stay put.</strong><br>
+- <strong>Action:</strong> Draw from leftovers until the bag is empty, then refill <strong>allowlist minus current name + GUA</strong>. On each wake tick, skip leftovers that fail preflight or provider health; do <strong>not</strong> delete them. If a skipped name later reports healthy, it is pickable. If every leftover is still sick and current is healthy: stay put. Do <strong>not</strong> refill from a healthy-only subset while leftovers remain.<br>
+- <strong>Expected:</strong> Bag still lists skipped sick names. Boot-default is identified. Current name + GUA is never the next draw.<br>
+- <strong>On failure:</strong> If the bag is empty of pickable leftovers and current is healthy, stay put. If current is unhealthy, pick a recovered leftover; refill only when the bag is empty.</li><li><strong>P4 — Hop on health, stale handshake, or interval.</strong><br>
+- <strong>Action:</strong> Immediate hop when (a) WAN is up and provider health is bad, (b) handshake age is stale (a few minutes), or (c) hop interval elapsed since the last <strong>verified</strong> hop. Draw the next leftover (skip current). Cooldown on the peer you left MUST NOT block drawing a <strong>different</strong> leftover. Set endpoint with <code>wg set</code> or the firmware equivalent <strong>after Bind</strong>. On a cloud VPS, prefer make-before-break when the hop is a scheduled interval hop (<a href="../supporting/s35-make-before-break-wg-cutover.html">OEN-S35</a>); health and handshake hops MAY stay a cold <code>wg set</code>.<br>
+- <strong>Expected:</strong> New endpoint is live. Old peer is not redrawn as current. A different leftover is eligible even if another peer is in cooldown.<br>
+- <strong>On failure:</strong> Restore previous GUA. Do not loop <code>--force</code> without a bag. MUST NOT hop to current name + GUA.</li><li><strong>P5 — Verify egress on the tunnel address.</strong><br>
 - <strong>Action:</strong> <code>curl -6 --interface &lt;tunnel-ula&gt; --max-time 15 https://&lt;what-is-my-ip&gt;</code> over HTTPS. Compare the returned IPv6 with the <strong>site prefix</strong> documented for that endpoint.</li></ol>
 <pre><code class="language-bash">     curl -6 --interface &lt;tunnel-ula&gt; --max-time 15 -sS https://&lt;what-is-my-ip&gt;
      wg show &lt;wg-iface&gt;
      </code></pre>
-<p>- <strong>Expected:</strong> Prefix matches the peer you just selected. - <strong>On failure:</strong> Treat as failed hop. Restore previous endpoint. Drop or cooldown the bad peer.</p>
+<p>- <strong>Expected:</strong> Prefix matches the peer you just selected. Only then record a verified hop (start the hop-interval clock). - <strong>On failure:</strong> Treat as failed hop. Restore previous endpoint. Skip that leftover on later ticks; do not delete it from the bag.</p>
 <ol><li><strong>P6 — Set PersistentKeepalive.</strong><br>
-- <strong>Action:</strong> Ensure the client peer has <code>PersistentKeepalive = 25</code>.<br>
-- <strong>Expected:</strong> <code>wg show</code> reports persistent keepalive 25.<br>
-- <strong>On failure:</strong> Add it and sync the interface. NAT mappings otherwise idle out and look like a dead endpoint.</li><li><strong>P7 — Hub watch on the LAN Pi only.</strong><br>
-- <strong>Action:</strong> On <code>&lt;lan-pi&gt;</code>, poll rotator status freshness (age of the last successful rotate JSON or equivalent). If stale beyond your threshold (example: ten minutes), remotely tick the rotator on <code>&lt;cloud-vps&gt;</code> and on the consumer router. Do <strong>not</strong> install this watch on the interactive workstation.<br>
-- <strong>Expected:</strong> Stale rotators get one remediation tick. Logs show Pi as the watcher.<br>
-- <strong>On failure:</strong> Check overlay SSH to those hosts (see <a href="01-overlay-ssh-byte-cliff.html">OEN-01</a>) before blaming the rotator.</li></ol>
+- <strong>Action:</strong> Ensure the client peer has a non-zero <code>PersistentKeepalive</code>. Suggested example: <code>25</code> (WireGuard NAT documentation). Second example: <code>10</code> (aggressive NAT). Textbook window: 10–30 seconds. Use one value on a given client; do not document a VPS-versus-router split.<br>
+- <strong>Expected:</strong> <code>wg show</code> reports a non-zero persistent keepalive (example: every 25 seconds).<br>
+- <strong>On failure:</strong> Add a non-zero value and sync the interface. NAT mappings otherwise idle out and look like a dead endpoint.</li><li><strong>P7 — Hub watch on the LAN Pi only.</strong><br>
+- <strong>Action:</strong> On <code>&lt;lan-pi&gt;</code>, poll rotator status freshness (age of the last successful rotate JSON or equivalent). If stale beyond your threshold (example: ten minutes), remotely tick the rotator on <code>&lt;cloud-vps&gt;</code> and on the consumer router. Do <strong>not</strong> install this watch on the VPS. Do <strong>not</strong> install it on the interactive workstation. A status dashboard or JSON refresh MUST NOT hop.<br>
+- <strong>Expected:</strong> Stale rotators get one remediation tick. Logs show the Pi as the only watcher.<br>
+- <strong>On failure:</strong> Check overlay SSH to those hosts (see <a href="01-overlay-ssh-byte-cliff.html">OEN-01</a>) before blaming the rotator. A silent tick exit also looks like a stale rotator (<a href="../supporting/s33-router-cron-path-set-e.html">OEN-S33</a>).</li></ol>
 <h2 id="verify">Verify</h2>
-<ul><li><code>Endpoint</code> remains <code>[IPv6]:port</code> after reboot (<code>--boot</code> path lands on the boot-default region, then reshuffles).</li><li>WAN-bound <code>curl -6</code> can fail independently of tunnel-bound <code>curl -6</code>.</li><li>A forced hop returns an egress IPv6 whose prefix matches the selected endpoint.</li><li>Failed preflight peers are absent from the next bag.</li><li>Watch runs on <code>&lt;lan-pi&gt;</code>. The workstation has no always-on rotate timer.</li></ul>
+<ul><li><code>Endpoint</code> remains <code>[IPv6]:port</code> after reboot (<code>--boot</code> path lands on the boot-default region, then leftover-bag draws).</li><li>WAN-bound <code>curl -6</code> can fail independently of tunnel-bound <code>curl -6</code>.</li><li>A hop is <strong>verified</strong> only when egress IPv6 prefix matches the selected endpoint. Small ping success is not that check.</li><li>Sick leftovers remain in the bag (skipped), not deleted. Recovered names can be drawn later.</li><li>Stay-put: all leftovers still sick and current healthy → no hop and no healthy-only refill.</li><li>Watch runs on <code>&lt;lan-pi&gt;</code> only. The VPS and the workstation have no always-on rotate watch.</li><li>Refreshing status JSON did not change <code>Endpoint</code>.</li></ul>
 <h2 id="must-not" class="must-not">MUST NOT</h2>
-<ul><li>MUST NOT publish commercial VPN <strong>brand names</strong> or <strong>server nicknames</strong>.</li><li>MUST NOT put FQDN or IPv4 in <code>Endpoint</code> when the working path is IPv6-only.</li><li>MUST NOT health-check through <code>&lt;wg-iface&gt;</code> and treat failure as “time to hop.”</li><li>MUST NOT accept a handshake without site-prefix egress verify.</li><li>MUST NOT run the hub watch on the agent workstation.</li><li>MUST NOT restart the WireGuard interface from a watchdog on every tick (use <code>wg set</code> / firmware set when possible; a full restart can wipe FORWARD — <a href="22-delayed-wg-forward-wipe.html">OEN-22</a>).</li></ul>
+<ul><li>MUST NOT publish commercial VPN <strong>brand names</strong> or <strong>server nicknames</strong>.</li><li>MUST NOT put FQDN or IPv4 in <code>Endpoint</code> when the working path is IPv6-only.</li><li>MUST NOT health-check through <code>&lt;wg-iface&gt;</code> and treat failure as “time to hop.”</li><li>MUST NOT accept a handshake without site-prefix egress verify.</li><li>MUST NOT delete sick leftover names; skip them. MUST NOT refill healthy-only while leftovers remain.</li><li>MUST NOT hop to the current name + GUA.</li><li>MUST NOT set the wake timer to the hop interval.</li><li>MUST NOT run the hub watch on the VPS or on the agent workstation.</li><li>MUST NOT treat a status dashboard or JSON refresh as a hop.</li><li>MUST NOT restart the WireGuard interface from a watchdog on every tick (use <code>wg set</code> / firmware set when possible; a full restart can wipe FORWARD — <a href="22-delayed-wg-forward-wipe.html">OEN-22</a>).</li></ul>
 <h2 id="expected-samples">Expected samples</h2>
 <pre><code class="language-text"># WAN health independent of tunnel
 200
 # Endpoint after hop
 endpoint: [2001:db8::1]:&lt;port&gt;   # documentation prefix only; operator uses allowlist
 persistent keepalive: every 25 seconds</code></pre>
+<h2 id="page-changelog">Page changelog</h2>
+<ul><li>Edition 3 (10 Sep 2026, Mountain Time): Leftover bag, stay-put, wake tick versus hop interval, hub watch on one Pi.</li></ul>
 <h2 id="related-specs">Related specs</h2>
-<ul><li><a href="01-overlay-ssh-byte-cliff.html">OEN-01 Overlay SSH byte cliff</a> — hub watch rides overlay SSH</li><li><a href="21-shared-vpn-nat-crowdsec-ban.html">OEN-21 Shared commercial-VPN NAT and CrowdSec</a></li><li><a href="22-delayed-wg-forward-wipe.html">OEN-22 Delayed WG FORWARD wipe</a></li><li><a href="../supporting/s26-wifi-vs-cellular-underlay.html">OEN-S26 Wi-Fi vs cellular underlay</a></li><li><a href="../supporting/s33-router-cron-path-set-e.html">OEN-S33 Consumer-router cron PATH</a></li></ul>
+<ul><li><a href="01-overlay-ssh-byte-cliff.html">OEN-01 Overlay SSH byte cliff</a> — hub watch rides overlay SSH</li><li><a href="21-shared-vpn-nat-crowdsec-ban.html">OEN-21 Shared commercial-VPN NAT and CrowdSec</a> — refresh trusted egress after a verified hop</li><li><a href="22-delayed-wg-forward-wipe.html">OEN-22 Delayed WG FORWARD wipe</a></li><li><a href="../supporting/s26-wifi-vs-cellular-underlay.html">OEN-S26 Wi-Fi vs cellular underlay</a></li><li><a href="../supporting/s33-router-cron-path-set-e.html">OEN-S33 Consumer-router cron PATH</a> — silent tick exit also looks like a stale rotator</li><li><a href="../supporting/s35-make-before-break-wg-cutover.html">OEN-S35 Make-before-break commercial WireGuard cutover</a></li></ul>
       </article>
     </main>
     <footer class="site-footer">

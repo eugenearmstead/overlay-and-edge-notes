@@ -1,6 +1,6 @@
 ---
 title: Overlay and Edge Notes changelog
-date_published: 2026-09-08
+date_published: 2026-09-10
 author: Eugene Armstead
 author_url: https://www.armsteadent.com/
 canonical: https://eugenearmstead.github.io/overlay-and-edge-notes/changelog.html
@@ -72,6 +72,13 @@ terms:
 # Changelog
 
 Dated in Mountain Time (MST) for this series. Spec URLs do not change when an edition bumps.
+
+## 2026-09-10 MST — Leftover-bag rotation and cloud-server warm cutover
+
+- [OEN-16](networking/16-commercial-wg-endpoint-rotation.md) edition 3: leftover bag (sick names skipped, not deleted), stay-put, wake tick versus hop interval, hub watch on one hub host.
+- New [OEN-S35](supporting/s35-make-before-break-wg-cutover.md): make-before-break commercial WireGuard cutover on a cloud Virtual Private Server (`Table = off`, two consecutive probes).
+- [OEN-S33](supporting/s33-router-cron-path-set-e.md): a silent tick exit also looks like a stale rotator.
+- [OEN-21](networking/21-shared-vpn-nat-crowdsec-ban.md): refresh trusted egress after a **verified** hop.
 
 ## 2026-09-08 MST — One trap per page (review cleanup)
 

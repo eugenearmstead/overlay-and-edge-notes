@@ -120,9 +120,9 @@
     <main id="main">
       <article>
         <h1>Consumer-router cron PATH omits curl; watchdog log() + set -e exits</h1>
-        <p class="meta-line"><span>OEN-S33</span> · supporting · edition 2 · 2026-09-08</p>
+        <p class="meta-line"><span>OEN-S33</span> · supporting · edition 3 · 2026-09-08</p>
         <h2 id="context">Context</h2>
-<p>Watchdogs for FORWARD re-apply and WG rotation silently never run.</p>
+<p>Watchdogs for FORWARD re-apply and WG rotation silently never run. A silent tick exit also looks like a stale rotator on <a href="../networking/16-commercial-wg-endpoint-rotation.html">OEN-16</a>.</p>
 
 <section class="terms" aria-labelledby="terms-heading"><h2 id="terms-heading">Terms used on this page</h2><p class="terms-kicker">Abbreviations and short forms</p><dl class="terms-list"><dt>API</dt><dd>application programming interface</dd><dt>FORWARD</dt><dd>netfilter/iptables forward chain</dd><dt>OEN</dt><dd>Overlay and Edge Notes</dd><dt>PATH</dt><dd>Unix executable search path</dd><dt>WG</dt><dd>WireGuard</dd></dl></section>
 <h2 id="topology">Topology</h2>
@@ -137,7 +137,7 @@ MUST NOT restart WG from the watchdog</code></pre>
 <h2 id="method">Method</h2>
 <p>Set PATH in the cron/script. log() MUST return 0. MUST NOT restart WG from the watchdog.</p>
 <h2 id="consequences">Consequences</h2>
-<p>Delayed FORWARD re-apply actually runs. Rotator hub watch ticks.</p>
+<p>Delayed FORWARD re-apply actually runs. Rotator hub watch ticks. A silent tick exit also looks like a stale rotator.</p>
 <h2 id="agent-stop-rule">Agent stop rule</h2>
 <blockquote><p>MUST emit bound cron PATH / <code>set -e</code> / log() checks after Bind is filled. MUST NOT restart WireGuard from the watchdog on every tick. MUST NOT apply netfilter from this page.</p></blockquote>
 <h2 id="procedure">Procedure</h2>
@@ -162,7 +162,7 @@ which iptables curl wg</code></pre>
 <h2 id="must-not" class="must-not">MUST NOT</h2>
 <ul><li>MUST NOT restart WireGuard from the watchdog.</li><li>MUST NOT publish the script path as inventory.</li><li>MUST NOT publish hostnames, addresses, ULAs, or custom ports.</li></ul>
 <h2 id="page-changelog">Page changelog</h2>
-<ul><li>Edition 2 (8 Sep 2026, Mountain Time): Trap-specific Bind and agent stop rule (review cleanup).</li></ul>
+<ul><li>Edition 3 (10 Sep 2026, Mountain Time): Silent tick exit also looks like a stale rotator (OEN-16).</li><li>Edition 2 (8 Sep 2026, Mountain Time): Trap-specific Bind and agent stop rule (review cleanup).</li></ul>
 <h2 id="related-specs">Related specs</h2>
 <ul><li><a href="../networking/22-delayed-wg-forward-wipe.html">OEN-22</a></li><li><a href="../networking/16-commercial-wg-endpoint-rotation.html">OEN-16</a></li></ul>
       </article>

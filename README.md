@@ -75,7 +75,7 @@ A remote agent MUST emit a bound runbook and MUST NOT apply live `ip` / nft / ip
 | [OEN-13](networking/13-overlay-underlay-ula-layers.md) ([html](networking/13-overlay-underlay-ula-layers.html)) | Overlay ≠ underlay ≠ tunnel unique-local ≠ LAN unique-local |
 | [OEN-14](networking/14-exit-dns-is-peerapi.md) ([html](networking/14-exit-dns-is-peerapi.html)) | Exit app DNS is overlay peer-API, not coordinator Unbound |
 | [OEN-15](networking/15-split-host-vs-overlay-resolver.md) ([html](networking/15-split-host-vs-overlay-resolver.html)) | Split host vs overlay resolver views on the coordinator VPS |
-| [OEN-16](networking/16-commercial-wg-endpoint-rotation.md) ([html](networking/16-commercial-wg-endpoint-rotation.html)) | Commercial WireGuard endpoint rotation (IPv6, shuffle bag, hub watch) |
+| [OEN-16](networking/16-commercial-wg-endpoint-rotation.md) ([html](networking/16-commercial-wg-endpoint-rotation.html)) | Commercial WireGuard endpoint rotation (IPv6, leftover bag, hub watch) |
 | [OEN-17](networking/17-gcp-overlay-exit.md) ([html](networking/17-gcp-overlay-exit.html)) | Google Cloud overlay exit (IP forwarding, listen port, Identity-Aware Proxy) |
 | [OEN-18](networking/18-per-node-changelog-contract.md) ([html](networking/18-per-node-changelog-contract.html)) | Per-node changelog contract (repo + hashed on-device copy) |
 | [OEN-19](networking/19-unbound-refuses-rd0.md) ([html](networking/19-unbound-refuses-rd0.html)) | Local Unbound REFUSES overlay peer-API queries with Recursion Desired off |
@@ -131,6 +131,7 @@ A remote agent MUST emit a bound runbook and MUST NOT apply live `ip` / nft / ip
 | [OEN-S32](supporting/s32-dns-leak-test-not-v6-dataplane.md) ([html](supporting/s32-dns-leak-test-not-v6-dataplane.html)) | DNS leak-test green is not IPv6 data-plane green |
 | [OEN-S33](supporting/s33-router-cron-path-set-e.md) ([html](supporting/s33-router-cron-path-set-e.html)) | Consumer-router cron PATH omits curl; watchdog log() + set -e exits |
 | [OEN-S34](supporting/s34-crowdsec-capi-login-budget.md) ([html](supporting/s34-crowdsec-capi-login-budget.html)) | CrowdSec free-tier Central API login budget |
+| [OEN-S35](supporting/s35-make-before-break-wg-cutover.md) ([html](supporting/s35-make-before-break-wg-cutover.html)) | Make-before-break commercial WireGuard cutover on a cloud VPS |
 
 ## Editions
 

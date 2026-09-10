@@ -44,7 +44,7 @@ CATALOG = [
     ("OEN-13", "networking", "13-overlay-underlay-ula-layers", "Overlay ≠ underlay ≠ tunnel unique-local ≠ LAN unique-local"),
     ("OEN-14", "networking", "14-exit-dns-is-peerapi", "Exit app DNS is overlay peer-API, not coordinator Unbound"),
     ("OEN-15", "networking", "15-split-host-vs-overlay-resolver", "Split host vs overlay resolver views on the coordinator VPS"),
-    ("OEN-16", "networking", "16-commercial-wg-endpoint-rotation", "Commercial WireGuard endpoint rotation (IPv6, shuffle bag, hub watch)"),
+    ("OEN-16", "networking", "16-commercial-wg-endpoint-rotation", "Commercial WireGuard endpoint rotation (IPv6, leftover bag, hub watch)"),
     ("OEN-17", "networking", "17-gcp-overlay-exit", "Google Cloud overlay exit (IP forwarding, listen port, Identity-Aware Proxy)"),
     ("OEN-18", "networking", "18-per-node-changelog-contract", "Per-node changelog contract (repo + hashed on-device copy)"),
     ("OEN-19", "networking", "19-unbound-refuses-rd0", "Local Unbound REFUSES overlay peer-API queries with Recursion Desired off"),
@@ -92,6 +92,7 @@ CATALOG = [
     ("OEN-S32", "supporting", "s32-dns-leak-test-not-v6-dataplane", "DNS leak-test green is not IPv6 data-plane green"),
     ("OEN-S33", "supporting", "s33-router-cron-path-set-e", "Consumer-router cron PATH omits curl; watchdog log() + set -e exits"),
     ("OEN-S34", "supporting", "s34-crowdsec-capi-login-budget", "CrowdSec free-tier Central API login budget"),
+    ("OEN-S35", "supporting", "s35-make-before-break-wg-cutover", "Make-before-break commercial WireGuard cutover on a cloud VPS"),
 ]
 
 # RFC 2119 keywords, date-format placeholders, and short English words.

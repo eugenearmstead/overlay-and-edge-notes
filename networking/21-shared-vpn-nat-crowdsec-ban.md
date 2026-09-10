@@ -3,7 +3,7 @@ id: "OEN-21"
 title: "Shared commercial-VPN network address translation: CrowdSec bans the whole house"
 kind: "original"
 status: "active"
-edition: 2
+edition: 3
 date_published: "2026-09-08"
 author: "Eugene Armstead"
 author_url: "https://www.armsteadent.com/"
@@ -91,11 +91,11 @@ Fill this table **before** any live change. Do **not** paste real values back in
 
 ## Formulas
 
-Treat rotating VPN egress (v4+v6) as trusted; refresh after hop ([OEN-16](16-commercial-wg-endpoint-rotation.md)). No token payloads in public notes.
+Treat rotating VPN egress (v4+v6) as trusted; refresh after a **verified** hop ([OEN-16](16-commercial-wg-endpoint-rotation.md)). No token payloads in public notes.
 
 ## Decision
 
-Treat rotating VPN egress (IPv4 and IPv6) as **trusted** for CrowdSec on the coordination/login host. Refresh the allow after an endpoint hop ([OEN-16](16-commercial-wg-endpoint-rotation.md)). Restart the bouncer after unban.
+Treat rotating VPN egress (IPv4 and IPv6) as **trusted** for CrowdSec on the coordination/login host. Refresh the allow after a **verified** endpoint hop ([OEN-16](16-commercial-wg-endpoint-rotation.md)). Restart the bouncer after unban.
 
 Generic recipe only: allowlist the current egress, not a private push bus.
 
@@ -132,7 +132,7 @@ ssh -o ControlPath=none <user>@<cloud-vps> 'echo overlay-ok'
    - **Expected:** Same public v4/v6 as the ban. Multiple clients share it.
    - **On failure:** Do not paste the IP in public notes.
 3. **P3 — Trust rotating VPN egress; unban; restart bouncer.**
-   - **Action:** Add the current tunnel egress (v4 and v6) to the trusted set used by CrowdSec. Delete the ban. Restart the bouncer. After [OEN-16](16-commercial-wg-endpoint-rotation.md) hops, refresh the set.
+   - **Action:** Add the current tunnel egress (v4 and v6) to the trusted set used by CrowdSec. Delete the ban. Restart the bouncer. After a **verified** [OEN-16](16-commercial-wg-endpoint-rotation.md) hop, refresh the set.
    - **Expected:** Login HTTPS and SSH recover for the house.
    - **On failure:** If it fails after hop, the allowlist is stale — refresh, do not add more bans.
 4. **P4 — Do not confuse with CAPI 403.**
@@ -163,6 +163,7 @@ ssh -o ControlPath=none <user>@<cloud-vps> 'echo overlay-ok'
 
 ## Page changelog
 
+- Edition 3 (10 Sep 2026, Mountain Time): Refresh trusted egress after a verified hop.
 - Edition 2 (8 Sep 2026, Mountain Time): Trap-specific Bind and agent stop rule (review cleanup).
 
 ## Related specs

@@ -3,7 +3,7 @@ id: "OEN-S33"
 title: "Consumer-router cron PATH omits curl; watchdog log() + set -e exits"
 kind: "supporting"
 status: "active"
-edition: 2
+edition: 3
 date_published: "2026-09-08"
 author: "Eugene Armstead"
 author_url: "https://www.armsteadent.com/"
@@ -45,7 +45,7 @@ terms:
 
 ## Context
 
-Watchdogs for FORWARD re-apply and WG rotation silently never run.
+Watchdogs for FORWARD re-apply and WG rotation silently never run. A silent tick exit also looks like a stale rotator on [OEN-16](../networking/16-commercial-wg-endpoint-rotation.md).
 
 ## Topology
 
@@ -73,7 +73,7 @@ Set PATH in the cron/script. log() MUST return 0. MUST NOT restart WG from the w
 
 ## Consequences
 
-Delayed FORWARD re-apply actually runs. Rotator hub watch ticks.
+Delayed FORWARD re-apply actually runs. Rotator hub watch ticks. A silent tick exit also looks like a stale rotator.
 
 ## Agent stop rule
 
@@ -125,6 +125,7 @@ which iptables curl wg
 
 ## Page changelog
 
+- Edition 3 (10 Sep 2026, Mountain Time): Silent tick exit also looks like a stale rotator (OEN-16).
 - Edition 2 (8 Sep 2026, Mountain Time): Trap-specific Bind and agent stop rule (review cleanup).
 
 ## Related specs
